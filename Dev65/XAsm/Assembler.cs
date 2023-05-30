@@ -122,19 +122,19 @@ public abstract class Assembler : Application, IAssembler
     protected readonly Token RParen = new(Operator, ")");
 
     // Token representing the LO function.
-    protected readonly Token Lo = new(Keyword, "LO");
+    protected readonly Token LO = new(Keyword, "LO");
 
     // Token representing the HI function.
-    protected readonly Token Hi = new(Keyword, "HI");
+    protected readonly Token HI = new(Keyword, "HI");
 
     // Token representing the STRLEN function.
-    protected readonly Token Strlen = new(Keyword, "STRLEN");
+    protected readonly Token STRLEN = new(Keyword, "STRLEN");
 
     // Token representing the BANK function.
-    protected readonly Token Bank = new(Keyword, "BANK");
+    protected readonly Token BANK = new(Keyword, "BANK");
 
     // Opcode that handles .INCLUDE directives.
-    protected readonly Token Include = new Opcode<Assembler>(Keyword, ".INCLUDE",
+    protected readonly Token INCLUDE = new Opcode<Assembler>(Keyword, ".INCLUDE",
         (assembler) =>
         {
             assembler.currentToken = assembler.NextRealToken();
@@ -164,7 +164,7 @@ public abstract class Assembler : Application, IAssembler
     /**
 	 * An <CODE>Opcode</CODE> that handles .APPEND directives
 	 */
-    protected readonly Token       Append	= new Opcode<Assembler>(Keyword, ".APPEND", (assembler) => 
+    protected readonly Token APPEND = new Opcode<Assembler>(Keyword, ".APPEND", (assembler) => 
     {
             if (assembler.currentToken?.Kind == String)
             {
@@ -185,7 +185,7 @@ public abstract class Assembler : Application, IAssembler
             return (false);
     });
 
-    protected readonly Token Insert = new Opcode<Assembler>(Keyword, ".INSERT", assembler =>
+    protected readonly Token INSERT = new Opcode<Assembler>(Keyword, ".INSERT", assembler =>
     {
         if (assembler.currentToken?.Kind == String)
         {
@@ -426,7 +426,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode<Assembler> Long = new(Keyword, ".LONG", assembler =>
+    protected readonly Opcode<Assembler> LONG = new(Keyword, ".LONG", assembler =>
     {
         do
         {
@@ -443,7 +443,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode<Assembler> If = new(Keyword, ".IF", assembler =>
+    protected readonly Opcode<Assembler> IF = new(Keyword, ".IF", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -471,7 +471,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IfAbs = new(Keyword, ".IFABS", assembler =>
+    protected readonly Opcode<Assembler> IFABS = new(Keyword, ".IFABS", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -493,7 +493,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IfNAbs = new(Keyword, ".IFNABS", assembler =>
+    protected readonly Opcode<Assembler> IFNABS = new(Keyword, ".IFNABS", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -515,7 +515,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IfRel = new(Keyword, ".IFREL", assembler =>
+    protected readonly Opcode<Assembler> IFREL = new(Keyword, ".IFREL", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -537,7 +537,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IfNRel = new(Keyword, ".IFNREL", assembler =>
+    protected readonly Opcode<Assembler> IFNREL = new(Keyword, ".IFNREL", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -559,7 +559,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
     
-    protected readonly Opcode<Assembler> IfDef = new (Keyword, ".IFDEF", assembler =>
+    protected readonly Opcode<Assembler> IFDEF = new (Keyword, ".IFDEF", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -580,7 +580,7 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    protected readonly Opcode<Assembler> IfNDef = new(Keyword, ".IFNDEF", assembler =>
+    protected readonly Opcode<Assembler> IFNDEF = new(Keyword, ".IFNDEF", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -601,7 +601,7 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    protected readonly Opcode<Assembler> Else = new(Keyword, ".ELSE", assembler =>
+    protected readonly Opcode<Assembler> ELSE = new(Keyword, ".ELSE", assembler =>
     {
         if (assembler.status.Count != 0)
         {
@@ -614,7 +614,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> EndIf = new(Keyword, ".ENDIF", assembler =>
+    protected readonly Opcode<Assembler> ENDIF = new(Keyword, ".ENDIF", assembler =>
     {
         if (assembler.status.Count != 0)
             assembler.status.Pop();
@@ -625,7 +625,7 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    protected readonly Opcode<Assembler> Error = new(Keyword, ".ERROR", assembler =>
+    protected readonly Opcode<Assembler> ERROR = new(Keyword, ".ERROR", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -642,7 +642,7 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    protected readonly Opcode<Assembler> Warn = new(Keyword, ".WARN", assembler =>
+    protected readonly Opcode<Assembler> WARN = new(Keyword, ".WARN", assembler =>
     {
         if (!assembler.IsActive) return (false);
 
@@ -657,7 +657,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Token Macro = new Opcode<Assembler>(Keyword, ".MACRO", assembler =>
+    protected readonly Token MACRO = new Opcode<Assembler>(Keyword, ".MACRO", assembler =>
     {
         if ((assembler.label != null) && ((assembler.macroName = assembler.label.Text) != null))
         {
@@ -692,7 +692,7 @@ public abstract class Assembler : Application, IAssembler
 
     });
 
-    protected readonly Token EndMacro = new Opcode<Assembler>(Keyword, ".ENDM", assembler =>
+    protected readonly Token ENDM = new Opcode<Assembler>(Keyword, ".ENDM", assembler =>
     {
         if (assembler.savedLines != null)
         {
@@ -705,7 +705,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Token ExitMacro = new Opcode<Assembler>(Keyword, ".EXITM", assembler =>
+    protected readonly Token EXITM = new Opcode<Assembler>(Keyword, ".EXITM", assembler =>
     {
         while (assembler.sources.Peek() is MacroSource)
             assembler.sources.Pop();
@@ -713,7 +713,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Token Repeat = new Opcode<Assembler>(Keyword, ".REPEAT", assembler =>
+    protected readonly Token REPEAT = new Opcode<Assembler>(Keyword, ".REPEAT", assembler =>
     {
         assembler.currentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
@@ -728,7 +728,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Token EndRepeat = new Opcode<Assembler>(Keyword, ".ENDR", assembler =>
+    protected readonly Token ENDR = new Opcode<Assembler>(Keyword, ".ENDR", assembler =>
     {
         if (assembler.savedLines != null)
         {
@@ -741,25 +741,25 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Code = new Opcode<Assembler>(Keyword, ".CODE", assembler =>
+    protected readonly Opcode<Assembler> CODE = new Opcode<Assembler>(Keyword, ".CODE", assembler =>
     {
         assembler.SetSection(".code");
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Data = new Opcode<Assembler>(Keyword, ".DATA", assembler =>
+    protected readonly Opcode<Assembler> DATA = new Opcode<Assembler>(Keyword, ".DATA", assembler =>
     {
         assembler.SetSection(".data");
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Bss = new Opcode<Assembler>(Keyword, ".BSS", assembler =>
+    protected readonly Opcode<Assembler> BSS = new Opcode<Assembler>(Keyword, ".BSS", assembler =>
     {
         assembler.SetSection(".bss");
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Org = new Opcode<Assembler>(Keyword, ".ORG", assembler =>
+    protected readonly Opcode<Assembler> ORG = new Opcode<Assembler>(Keyword, ".ORG", assembler =>
     {
         assembler.currentToken = assembler.NextRealToken();
         Expr? expr = assembler.ParseExpression();
@@ -773,7 +773,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode<Assembler> Extern = new Opcode<Assembler>(Keyword, ".EXTERN", assembler =>
+    protected readonly Opcode<Assembler> EXTERN = new Opcode<Assembler>(Keyword, ".EXTERN", assembler =>
     {
         if (assembler.pass == Pass.FIRST)
         {
@@ -797,7 +797,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Global = new Opcode<Assembler>(Keyword, ".GLOBAL", assembler =>
+    protected readonly Opcode<Assembler> GLOBAL = new Opcode<Assembler>(Keyword, ".GLOBAL", assembler =>
     {
         if (assembler.pass == Pass.FIRST)
         {
@@ -820,26 +820,25 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> List = new Opcode<Assembler>(Keyword, ".LIST", assembler =>
+    protected readonly Opcode<Assembler> LIST = new Opcode<Assembler>(Keyword, ".LIST", assembler =>
     {
         assembler.listing = true;
         return (false);
     });
 
-
-    protected readonly Opcode<Assembler> NoList		= new Opcode<Assembler>(Keyword, ".NOLIST", assembler => 
+    protected readonly Opcode<Assembler> NOLIST = new Opcode<Assembler>(Keyword, ".NOLIST", assembler => 
     {
             assembler.listing = false;
             return (false);
     });
 
-    protected readonly Opcode<Assembler> Page		= new Opcode<Assembler>(Keyword, ".PAGE", assembler => 
+    protected readonly Opcode<Assembler> PAGE = new Opcode<Assembler>(Keyword, ".PAGE", assembler => 
     {
             assembler.throwPage = true;
             return (false);
     });
 
-    protected Opcode<Assembler>      Title		= new Opcode<Assembler>(Keyword, ".TITLE", assembler => 
+    protected Opcode<Assembler> TITLE = new Opcode<Assembler>(Keyword, ".TITLE", assembler => 
     {
             assembler.currentToken = assembler.NextRealToken();
 
@@ -1113,17 +1112,17 @@ public abstract class Assembler : Application, IAssembler
             currentToken = NextRealToken();
             return (Expr.LogicalNot(ParseUnary()));
         }
-        if (currentToken == Lo)
+        if (currentToken == LO)
         {
             currentToken = NextRealToken();
             return (Expr.And(ParseUnary(), MASK));
         }
-        if (currentToken == Hi)
+        if (currentToken == HI)
         {
             currentToken = NextRealToken();
             return (Expr.And(Expr.Shr(ParseUnary(), EIGHT), MASK));
         }
-        if (currentToken == Bank)
+        if (currentToken == BANK)
         {
             currentToken = NextRealToken();
             return (Expr.Shr(ParseUnary(), SIXTEEN));
@@ -1429,7 +1428,7 @@ public abstract class Assembler : Application, IAssembler
                 {
                     if (savedLines is RepeatSource)
                     {
-                        if (opcode == EndRepeat)
+                        if (opcode == ENDR)
                         {
                             if (--repeatDepth == 0)
                             {
@@ -1438,13 +1437,13 @@ public abstract class Assembler : Application, IAssembler
                             }
                         }
 
-                        if (opcode == Repeat)
+                        if (opcode == REPEAT)
                             repeatDepth++;
                     }
 
                     if (savedLines is MacroSource)
                     {
-                        if (opcode == EndMacro)
+                        if (opcode == ENDM)
                         {
                             if (--macroDepth == 0)
                             {
@@ -1453,7 +1452,7 @@ public abstract class Assembler : Application, IAssembler
                             }
                         }
 
-                        if (opcode == Macro)
+                        if (opcode == MACRO)
                             macroDepth++;
                     }
 
@@ -1461,7 +1460,7 @@ public abstract class Assembler : Application, IAssembler
                     return;
                 }
 
-                if (opcode == Macro)
+                if (opcode == MACRO)
                 {
                     if (macroDepth++ == 0)
                     {
@@ -1471,7 +1470,7 @@ public abstract class Assembler : Application, IAssembler
                     }
                 }
 
-                if (opcode == Repeat)
+                if (opcode == REPEAT)
                 {
                     if (repeatDepth++ == 0)
                     {

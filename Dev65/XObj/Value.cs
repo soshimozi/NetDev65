@@ -24,7 +24,7 @@ public sealed class Value : Expr
     
 
     /// <inheritdoc />
-    public override bool IsExternal(Section section)
+    public override bool IsExternal(Section? section)
     {
         return section != _section;
     }
