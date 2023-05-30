@@ -39,7 +39,7 @@ public sealed class Extern : Expr
     /**
      * Determines whether the expression is external to the given section.
      */
-    public override bool IsExternal(Section section)
+    public override bool IsExternal(Section? section)
     {
         return true;
     }

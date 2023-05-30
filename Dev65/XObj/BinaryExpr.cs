@@ -30,7 +30,7 @@ public abstract class BinaryExpr : Expr
     public override bool IsAbsolute => Lhs?.IsAbsolute == true && Rhs?.IsAbsolute == true;
 
     /// <inheritdoc />
-    public override bool IsExternal(Section section)
+    public override bool IsExternal(Section? section)
     {
         return Lhs?.IsExternal(section) == true || Rhs?.IsExternal(section) == true;
     }

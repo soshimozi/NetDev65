@@ -1128,7 +1128,7 @@ public abstract class Assembler : Application, IAssembler
             return (Expr.Shr(ParseUnary(), SIXTEEN));
         }
 
-        if (currentToken != Strlen) return (ParseValue());
+        if (currentToken != STRLEN) return (ParseValue());
 
         currentToken = NextRealToken();
         if (currentToken != LParen)
@@ -2147,7 +2147,7 @@ public abstract class Assembler : Application, IAssembler
     private string? lastLabel = null;
 
     // the current _label (if any)
-    private Token? label = null;
+    protected Token? label = null;
 
 
     /**

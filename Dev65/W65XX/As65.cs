@@ -455,6 +455,32 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Token VS = new Token(Keyword, "VS");
 
+    private sealed class Jump : Opcode<As65>
+    {
+        private readonly Token? _flag;
+
+        public Jump(string mnemonic, Token? flag): base(Keyword, mnemonic)
+        {
+            _flag = flag;
+        }
+
+        public override bool Compile(As65 assembler)
+        {
+            assembler.currentToken = assembler.NextRealToken();
+
+            var expr = assembler.ParseExpression();
+            if (expr != null)
+                if (_flag != null)
+                    assembler.GenerateBranch(_flag, expr);
+                else
+                    assembler.GenerateJump(expr);
+            else
+                assembler.OnError(ERR_MISSING_EXPRESSION);
+
+            return (true);
+        }
+    }
+
     /// <summary>
     /// An extended Opcode class used to compile RMB and SMB instructions
     /// </summary>
@@ -1806,8 +1832,14 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> NOP = new(Keyword, "NOP", asm =>
     {
-        // put your code here
-        return false;
+        switch (asm.ParseMode(DBANK))
+        {
+            case IMPL: asm.GenerateImplied(0xEA); break;
+            default:
+                asm.OnError(ERR_ILLEGAL_ADDR);
+                break;
+        }
+        return (true);
     });
 
 
@@ -1816,8 +1848,71 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> ORA = new(Keyword, "ORA", asm =>
     {
-        // put your code here
-        return false;
+        switch (asm.ParseMode(DBANK))
+        {
+            case IMMD: asm.GenerateImmediate(0x09, asm.arg, asm.bitsA); break;
+            case DPAG: asm.GenerateDirectPage(0x05, asm.arg); break;
+            case ABSL: asm.GenerateAbsolute(0x0D, asm.arg); break;
+            case DPGX: asm.GenerateDirectPage(0x15, asm.arg); break;
+            case ABSX: asm.GenerateAbsolute(0x1D, asm.arg); break;
+            case DPGY:
+            case ABSY: asm.GenerateAbsolute(0x19, asm.arg); break;
+            case INDX: asm.GenerateDirectPage(0x01, asm.arg); break;
+            case INDY: asm.GenerateDirectPage(0x11, asm.arg); break;
+            case INDI:
+                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x12, asm.arg);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            case ALNG:
+                if ((asm.processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x0F, asm.arg);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            case ALGX:
+                if ((asm.processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x1F, asm.arg);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            case LIND:
+                if ((asm.processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x07, asm.arg);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            case LINY:
+                if ((asm.processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x17, asm.arg);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            case STAC:
+                if ((asm.processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0x03, asm.arg, 8);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            case STKI:
+                if ((asm.processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0x13, asm.arg, 8);
+                else
+                    asm.OnError(ERR_MODE_NOT_SUPPORTED);
+                break;
+
+            default:
+                asm.OnError(ERR_ILLEGAL_ADDR);
+                break;
+        }
+        return (true);
     });
 
 
@@ -1826,8 +1921,22 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> PEA = new(Keyword, "PEA", asm =>
     {
-        // put your code here
-        return false;
+        if ((asm.processor & (M65816 | M65832)) != 0)
+        {
+            switch (asm.ParseMode(DBANK))
+            {
+                case DPAG:
+                case ABSL:
+                case IMMD: asm.GenerateImmediate(0xF4, asm.arg, 16); break;
+                default:
+                    asm.OnError(ERR_ILLEGAL_ADDR);
+                    break;
+            }
+        }
+        else
+            asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
+
+        return (true);
     });
 
 
@@ -1836,8 +1945,20 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> PEI = new(Keyword, "PEI", asm =>
     {
-        // put your code here
-        return false;
+        if ((asm.processor & (M65816 | M65832)) != 0)
+        {
+            switch (asm.ParseMode(DBANK))
+            {
+                case INDI: asm.GenerateImmediate(0xD4, asm.arg, 8); break;
+                default:
+                    asm.OnError(ERR_ILLEGAL_ADDR);
+                    break;
+            }
+        }
+        else
+            asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
+
+        return (true);jkbj
     });
 
 
@@ -1847,7 +1968,22 @@ public sealed class As65 : Assembler
     private readonly Opcode<As65> PER = new(Keyword, "PER", asm =>
     {
         // put your code here
-        return false;
+        if ((asm.processor & (M65816 | M65832)) != 0)
+        {
+            switch (asm.ParseMode(PBANK))
+            {
+                case DPAG:
+                case ABSL:
+                    asm.GenerateRelative(0x62, asm.arg, true); break;
+                default:
+                    asm.OnError(ERR_ILLEGAL_ADDR);
+                    break;
+            }
+        }
+        else
+            asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
+
+        return (true);
     });
 
 
@@ -1856,8 +1992,14 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> PHA = new(Keyword, "PHA", asm =>
     {
-        // put your code here
-        return false;
+        switch (asm.ParseMode(DBANK))
+        {
+            case IMPL: asm.GenerateImplied(0x48); break;
+            default:
+                asm.OnError(ERR_ILLEGAL_ADDR);
+                break;
+        }
+        return (true);
     });
 
 
@@ -1866,8 +2008,20 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> PHB = new(Keyword, "PHB", asm =>
     {
-        // put your code here
-        return false;
+        if ((asm.processor & (M65816 | M65832)) != 0)
+        {
+            switch (asm.ParseMode(DBANK))
+            {
+                case IMPL: asm.GenerateImplied(0x8B); break;
+                default:
+                    asm.OnError(ERR_ILLEGAL_ADDR);
+                    break;
+            }
+        }
+        else
+            asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
+
+        return (true);
     });
 
 
@@ -1876,8 +2030,20 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> PHD = new(Keyword, "PHD", asm =>
     {
-        // put your code here
-        return false;
+        if ((asm.processor & (M65816 | M65832)) != 0)
+        {
+            switch (asm.ParseMode(DBANK))
+            {
+                case IMPL: asm.GenerateImplied(0x0B); break;
+                default:
+                    asm.OnError(ERR_ILLEGAL_ADDR);
+                    break;
+            }
+        }
+        else
+            asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
+
+        return (true);
     });
 
 
@@ -1886,8 +2052,20 @@ public sealed class As65 : Assembler
     /// </summary>				
     private readonly Opcode<As65> PHK = new(Keyword, "PHK", asm =>
     {
-        // put your code here
-        return false;
+        if ((asm.processor & (M65816 | M65832)) != 0)
+        {
+            switch (asm.ParseMode(DBANK))
+            {
+                case IMPL: asm.GenerateImplied(0x4B); break;
+                default:
+                    asm.OnError(ERR_ILLEGAL_ADDR);
+                    break;
+            }
+        }
+        else
+            asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
+
+        return (true);
     });
 
 
@@ -2004,38 +2182,348 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB2 instruction.
     /// </summary>
-    protected readonly Opcode<As65> RMB2 = new BitOperation(Keyword, "RMB2", 0x27);
+    private readonly Opcode<As65> RMB2 = new BitOperation(Keyword, "RMB2", 0x27);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB3 instruction.
     /// </summary>
-    protected readonly Opcode<As65> RMB3 = new BitOperation(Keyword, "RMB3", 0x37);
+    private readonly Opcode<As65> RMB3 = new BitOperation(Keyword, "RMB3", 0x37);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB4 instruction.
     /// </summary>
-    protected readonly Opcode<As65> RMB4 = new BitOperation(Keyword, "RMB4", 0x47);
+    private readonly Opcode<As65> RMB4 = new BitOperation(Keyword, "RMB4", 0x47);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB5 instruction.
     /// </summary>
-    protected readonly Opcode<As65> RMB5 = new BitOperation(Keyword, "RMB5", 0x57);
+    private readonly Opcode<As65> RMB5 = new BitOperation(Keyword, "RMB5", 0x57);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB6 instruction.
     /// </summary>
-    protected readonly Opcode<As65> RMB6 = new BitOperation(Keyword, "RMB6", 0x67);
+    private readonly Opcode<As65> RMB6 = new BitOperation(Keyword, "RMB6", 0x67);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB7 instruction.
     /// </summary>
-    protected readonly Opcode<As65> RMB7 = new BitOperation(Keyword, "RMB7", 0x77);
+    private readonly Opcode<As65> RMB7 = new BitOperation(Keyword, "RMB7", 0x77);
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the ROL instruction.
+    /// </summary>
+    private readonly Opcode<As65> ROL = new (Keyword, "ROL", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the ROR instruction.
+    /// </summary>
+    private readonly Opcode<As65> ROR = new (Keyword, "ROR", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the RTI instruction.
+    /// </summary>
+    private readonly Opcode<As65> RTI = new(Keyword, "RTI", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the RTL instruction.
+    /// </summary>
+    private readonly Opcode<As65> RTL = new (Keyword, "RTL", asm => {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the RTS instruction.
+    /// </summary>
+    private readonly Opcode<As65> RTS = new(Keyword, "RTS", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the SBC instruction.
+    /// </summary>
+    private readonly Opcode<As65> SBC = new(Keyword, "SBC", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the SEC instruction.
+    /// </summary>
+    private readonly Opcode<As65> SEC = new(Keyword, "SEC", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the SED instruction.
+    /// </summary>
+    private readonly Opcode<As65> SED = new(Keyword, "SED", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the SEI instruction.
+    /// </summary>
+    private readonly Opcode<As65> SEI = new(Keyword, "SEI", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the SEP instruction.
+    /// </summary>
+    private readonly Opcode<As65> SEP = new(Keyword, "SEP", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    private readonly Opcode<As65> SMB0 = new BitOperation(Keyword, "SMB0", 0x87);
+    private readonly Opcode<As65> SMB1 = new BitOperation(Keyword, "SMB1", 0X97);
+    private readonly Opcode<As65> SMB2 = new BitOperation(Keyword, "SMB2", 0xA7);
+    private readonly Opcode<As65> SMB3 = new BitOperation(Keyword, "SMB3", 0xB7);
+    private readonly Opcode<As65> SMB4 = new BitOperation(Keyword, "SMB4", 0xC7);
+    private readonly Opcode<As65> SMB5 = new BitOperation(Keyword, "SMB5", 0xD7);
+    private readonly Opcode<As65> SMB6 = new BitOperation(Keyword, "SMB6", 0xE7);
+    private readonly Opcode<As65> SMB7 = new BitOperation(Keyword, "SMB7", 0xF7);
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the STA instruction.
+    /// </summary>
+    private readonly Opcode<As65> STA = new(Keyword, "STA", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the STP instruction.
+    /// </summary>
+    private readonly Opcode<As65> STP = new(Keyword, "STP", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the STX instruction.
+    /// </summary>
+    private readonly Opcode<As65> STX = new(Keyword, "STX", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the STY instruction.
+    /// </summary>
+    private readonly Opcode<As65> STY = new(Keyword, "STY", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the STZ instruction.
+    /// </summary>
+    private readonly Opcode<As65> STZ = new(Keyword, "STZ", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TAX instruction.
+    /// </summary>
+    private readonly Opcode<As65> TAX = new(Keyword, "TAX", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TAY instruction.
+    /// </summary>
+    private readonly Opcode<As65> TAY = new(Keyword, "TAY", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TCD instruction.
+    /// </summary>
+    private readonly Opcode<As65> TCD = new(Keyword, "TCD", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TCS instruction.
+    /// </summary>
+    private readonly Opcode<As65> TCS = new(Keyword, "TCS", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TDC instruction.
+    /// </summary>
+    private readonly Opcode<As65> TDC = new(Keyword, "TDC", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TRB instruction.
+    /// </summary>
+    private readonly Opcode<As65> TRB = new(Keyword, "TRB", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TSB instruction.
+    /// </summary>
+    private readonly Opcode<As65> TSB = new(Keyword, "TSB", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TSC instruction.
+    /// </summary>
+    private readonly Opcode<As65> TSC = new(Keyword, "TSC", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TSX instruction.
+    /// </summary>
+    private readonly Opcode<As65> TSX = new(Keyword, "TSX", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TXA instruction.
+    /// </summary>
+    private readonly Opcode<As65> TXA = new(Keyword, "TXA", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TXS instruction.
+    /// </summary>
+    private readonly Opcode<As65> TXS = new(Keyword, "TXS", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TXY instruction.
+    /// </summary>
+    private readonly Opcode<As65> TXY = new(Keyword, "TXY", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TYA instruction.
+    /// </summary>
+    private readonly Opcode<As65> TYA = new(Keyword, "TYA", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the TYX instruction.
+    /// </summary>
+    private readonly Opcode<As65> TYX = new(Keyword, "TYX", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the WAI instruction.
+    /// </summary>
+    private readonly Opcode<As65> WAI = new(Keyword, "WAI", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the WDM instruction.
+    /// </summary>
+    private readonly Opcode<As65> WDM = new(Keyword, "WDM", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the XBA instruction.
+    /// </summary>
+    private readonly Opcode<As65> XBA = new(Keyword, "XBA", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the XCE instruction.
+    /// </summary>
+    private readonly Opcode<As65> XCE = new(Keyword, "XCE", asm =>
+    {
+        // your code here
+        return false;
+    });
 
 
     /// <summary>
     /// An <code>Opcode</code> that handles the IF structured assembly command..
     /// </summary>				
-    private new readonly Opcode<As65> If = new(Keyword, "IF", asm =>
+    private new readonly Opcode<As65> IF = new(Keyword, "IF", asm =>
     {
         int index = asm.ifIndex++;
 
@@ -2071,10 +2559,146 @@ public sealed class As65 : Assembler
         return (true);
     });
 
+    /// <summary>
+    /// The <code>Opcode</code> to handle the ELSE structured assembly
+    /// command.
+    /// </summary>
+    private new readonly Opcode<As65> ELSE = new(Keyword, "ELSE", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the ENDIF structured assembly
+    /// command.
+    /// </summary>
+    private new readonly Opcode<As65> ENDIF = new(Keyword, "ENDIF", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the REPEAT structured assemlby
+    /// command.
+    /// </summary>
+    private new readonly Opcode<As65> REPEAT = new(Keyword, "REPEAT", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the UNTIL structured assembly
+    /// command.
+    /// </summary>
+    private readonly Opcode<As65> UNTIL = new(Keyword, "UNTIL", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the FOREVER structured assmbly
+    /// command.
+    /// </summary>
+    private readonly Opcode<As65> FOREVER = new(Keyword, "FOREVER", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the WHILE structured assembly
+    /// command.
+    /// </summary>
+    private readonly Opcode<As65> WHILE = new(Keyword, "WHILE", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the ENDW structured assembly
+    /// command.
+    /// </summary>
+    private readonly Opcode<As65> ENDW = new(Keyword, "ENDW", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the CONT structured assembly
+    /// command.
+    /// </summary>
+    private readonly Opcode<As65> CONT = new(Keyword, "CONT", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the BREAK structured assembly
+    /// command.
+    /// </summary>
+    private readonly Opcode<As65> BREAK = new(Keyword, "BREAK", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the A2STR instruction.
+    /// </summary>
+    private readonly Opcode<As65> A2STR = new(Keyword, "A2STR", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the HSTR instruction.
+    /// </summary>
+    private readonly Opcode<As65> HSTR = new(Keyword, "HSTR", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    /// <summary>
+    /// The <code>Opcode</code> to handle the PSTR instruction.
+    /// </summary>
+    private readonly Opcode<As65> PSTR = new(Keyword, "PSTR", asm =>
+    {
+        // your code here
+        return false;
+    });
+
+    private readonly Opcode<As65> JCC;
+    private readonly Opcode<As65> JCS;
+    private readonly Opcode<As65> JEQ;
+    private readonly Opcode<As65> JMI;
+    private readonly Opcode<As65> JNE;
+    private readonly Opcode<As65> JPL;
+    private readonly Opcode<As65> JVC;
+    private readonly Opcode<As65> JVS;
+    private readonly Opcode<As65> JPA;
 
     private As65() : base(new Module("65XX", false))
     {
         SetMemoryModel(new MemoryModelByte());
+
+        JCC = new Jump("JCC", CC);
+        JCS = new Jump("JCS", CS);
+        JEQ = new Jump("JEQ", EQ);
+        JMI = new Jump("JMI", MI);
+        JNE = new Jump("JNE", NE);
+        JPL = new Jump("JPL", PL);
+        JVC = new Jump("JVC", VC);
+        JVS = new Jump("JVS", VS);
+        JPA = new Jump("JPA", null);
     }
 
     protected override void StartUp()
@@ -2118,7 +2742,7 @@ public sealed class As65 : Assembler
         AddToken(IFDEF);
         AddToken(IFNDEF);
         AddToken(INCLUDE);
-        AddToken(Append);
+        AddToken(APPEND);
         AddToken(INSERT);
         AddToken(LONGA);
         AddToken(LONGI);
@@ -2281,7 +2905,7 @@ public sealed class As65 : Assembler
         // Structured Assembly
         if (!traditionalOption.IsPresent)
         {
-            AddToken(If);
+            AddToken(IF);
             AddToken(ELSE);
             AddToken(ENDIF);
             AddToken(REPEAT);
@@ -2322,7 +2946,69 @@ public sealed class As65 : Assembler
 
     protected override string FormatListing()
     {
-        throw new NotImplementedException();
+        var byteCount = memory?.ByteCount;
+
+        output.Clear();
+
+        switch (lineType)
+        {
+            case '=':
+                output.Append("         ");
+                if (addr == null)
+                    OnError("Addr is null");
+                output.Append(Hex.ToHex(addr?.Resolve() ?? 0, 8));
+                output.Append(addr?.IsAbsolute ?? false ? "  " : "' ");
+                output.Append("        ");
+                output.Append(lineType);
+                output.Append(' ');
+                break;
+
+            case ' ':
+                output.Append("         ");
+                output.Append("        ");
+                output.Append("  ");
+                output.Append("        ");
+                output.Append(lineType);
+                output.Append(' ');
+                break;
+
+            default:
+                if (IsActive && (addr != null) && ((label != null) || (lineType == ':') || (byteCount > 0)))
+                {
+                    long value = addr.Resolve();
+                    output.Append(Hex.ToHex(value >> 16, 2));
+                    output.Append(":");
+                    output.Append(Hex.ToHex(value, 4));
+                    output.Append(addr?.IsAbsolute == true ? "  " : "' ");
+
+                    for (int index = 0; index < 8; ++index)
+                    {
+                        if (index < byteCount)
+                        {
+                            var code = memory?.GetByte(index) ?? 0;
+
+                            if (code >= 0)
+                                output.Append(Hex.ToHex(code, 2));
+                            else
+                                output.Append("??");
+                        }
+                        else
+                            output.Append("  ");
+                    }
+                    output.Append((byteCount > 8) ? "> " : "  ");
+                    output.Append(lineType);
+                    output.Append(' ');
+                }
+                else
+                {
+                    output.Append("                           ");
+                    output.Append(lineType);
+                    output.Append(' ');
+                }
+                break;
+        }
+
+        return (output.ToString());
     }
 
     protected override void StartPass()
@@ -2819,7 +3505,7 @@ public sealed class As65 : Assembler
     private static readonly Value HI_BIT = new Value(null, 0x80);
 
     // A constant value used in bank number calculations.
-    private static readonly Value BANK = new Value(null, 0x00ff0000);
+    private new static readonly Value BANK = new Value(null, 0x00ff0000);
 
     // A constant value used in bank offset calculations.
     private static readonly Value OFFSET = new Value(null, 0x0000ffff);
