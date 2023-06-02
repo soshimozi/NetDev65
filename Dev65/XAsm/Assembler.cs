@@ -2202,7 +2202,7 @@ public abstract class Assembler : Application, IAssembler
     private Module? module;
 
     // The current sections.
-    private Section? section;
+    protected Section? section;
 
     private string? sectionName = null;
 
