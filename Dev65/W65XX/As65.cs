@@ -415,17 +415,17 @@ public sealed class As65 : Assembler
     /// <summary>
     /// A <see cref="Token"/> representing the CC keyword.
     /// </summary>
-    private readonly Token CC = new (Keyword, "CC");
+    private readonly Token CC = new(Keyword, "CC");
 
     /// <summary>
     /// A <see cref="Token"/> representing the CS keyword.
     /// </summary>
-    private readonly Token CS = new (Keyword, "CS");
+    private readonly Token CS = new(Keyword, "CS");
 
     /// <summary>
     /// A <see cref="Token"/> representing the PL keyword.
     /// </summary>
-    private readonly Token PL = new (Keyword, "PL");
+    private readonly Token PL = new(Keyword, "PL");
 
     /// <summary>
     /// A <see cref="Token"/> representing the MI keyword.
@@ -446,7 +446,7 @@ public sealed class As65 : Assembler
     {
         private readonly Token? _flag;
 
-        public Jump(string mnemonic, Token? flag): base(Keyword, mnemonic)
+        public Jump(string mnemonic, Token? flag) : base(Keyword, mnemonic)
         {
             _flag = flag;
         }
@@ -1136,7 +1136,7 @@ public sealed class As65 : Assembler
         return (true);
     });
 
-    
+
     /// <summary>
     /// An <code>Opcode</code> that handles the CLD instruction.
     /// </summary>				
@@ -1152,7 +1152,7 @@ public sealed class As65 : Assembler
         return (true);
     });
 
-    
+
     /// <summary>
     /// An <code>Opcode</code> that handles the CLI instruction.
     /// </summary>				
@@ -1314,7 +1314,7 @@ public sealed class As65 : Assembler
         }
         return (true);
     });
-    
+
     /// <summary>
     /// An <code>Opcode</code> that handles the DEC instruction.
     /// </summary>				
@@ -1355,7 +1355,7 @@ public sealed class As65 : Assembler
         return (true);
     });
 
-    
+
     /// <summary>
     /// An <code>Opcode</code> that handles the DEY instruction.
     /// </summary>				
@@ -1471,9 +1471,9 @@ public sealed class As65 : Assembler
                 break;
         }
         return (true);
-    
+
     });
-    
+
     /// <summary>
     /// An <code>Opcode</code> that handles the INX instruction.
     /// </summary>				
@@ -2156,7 +2156,7 @@ public sealed class As65 : Assembler
                     asm.OnError(ERR_ILLEGAL_ADDR); break;
 
             }
-            
+
         }
         else
         {
@@ -2338,7 +2338,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the ROL instruction.
     /// </summary>
-    private readonly Opcode<As65> ROL = new (Keyword, "ROL", asm =>
+    private readonly Opcode<As65> ROL = new(Keyword, "ROL", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2370,7 +2370,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the ROR instruction.
     /// </summary>
-    private readonly Opcode<As65> ROR = new (Keyword, "ROR", asm =>
+    private readonly Opcode<As65> ROR = new(Keyword, "ROR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2423,7 +2423,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTL instruction.
     /// </summary>
-    private readonly Opcode<As65> RTL = new (Keyword, "RTL", asm => {
+    private readonly Opcode<As65> RTL = new(Keyword, "RTL", asm => {
         if ((asm.processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
@@ -2707,7 +2707,7 @@ public sealed class As65 : Assembler
                 }
                 else
                 {
-                    
+
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 }
 
@@ -2807,7 +2807,7 @@ public sealed class As65 : Assembler
         {
             asm.OnError(ERR_OPCODE_NOT_SUPPORTED);
         }
-            
+
         return true;
     });
 
@@ -3395,7 +3395,7 @@ public sealed class As65 : Assembler
 
             asm.GenerateJump(target);
 
-            asm.endAddr[index] = asm.section.GetOrigin();
+            asm.endAddr[index] = asm.section?.GetOrigin();
         }
         else
             asm.OnError(ERR_NO_ACTIVE_REPEAT);
@@ -3409,8 +3409,35 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> WHILE = new(Keyword, "WHILE", asm =>
     {
-        // your code here
-        return false;
+        var index = asm.loopIndex++;
+
+        asm.loops.Push(index);
+
+        if (asm.GetPass() == Pass.FIRST)
+        {
+            asm.loopAddr.Add(asm.section?.GetOrigin());
+            asm.endAddr.Add(null);
+        }
+        else
+            asm.loopAddr[index] = asm.section?.GetOrigin();
+
+        asm.currentToken = asm.NextRealToken();
+
+        var target = asm.endAddr[index];
+        if (target == null) target = asm.GetOrigin();
+
+        if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.NE, target);
+        else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.EQ, target);
+        else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.CS, target);
+        else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.CC, target);
+        else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.MI, target);
+        else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.PL, target);
+        else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.VS, target);
+        else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.VC, target);
+        else
+            asm.OnError(ERR_INVALID_CONDITIONAL);
+
+        return (true);
     });
 
     /// <summary>
@@ -3419,8 +3446,21 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> ENDW = new(Keyword, "ENDW", asm =>
     {
-        // your code here
-        return false;
+        if (asm.loops.Count > 0)
+        {
+            int index = asm.loops.Pop();
+
+            var target = asm.loopAddr[index];
+            if (target == null) target = asm.section?.GetOrigin();
+
+            asm.GenerateJump(target);
+
+            asm.endAddr[index] = asm.section?.GetOrigin();
+        }
+        else
+            asm.OnError(ERR_NO_ACTIVE_WHILE);
+
+        return (true);
     });
 
     /// <summary>
@@ -3429,8 +3469,31 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> CONT = new(Keyword, "CONT", asm =>
     {
-        // your code here
-        return false;
+        if (asm.loops.Count > 0)
+        {
+            int index = asm.loops.Peek();
+
+            asm.currentToken = asm.NextRealToken();
+
+            var target = asm.loopAddr[index];
+            if (target == null) target = asm.GetOrigin();
+
+            if (asm.currentToken == EOL) asm.GenerateJump(target);
+            else if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.currentToken, target);
+            else
+                asm.OnError(ERR_INVALID_CONDITIONAL);
+        }
+        else
+            asm.OnError(ERR_NO_ACTIVE_LOOP);
+
+        return (true);
     });
 
     /// <summary>
@@ -3439,8 +3502,31 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> BREAK = new(Keyword, "BREAK", asm =>
     {
-        // your code here
-        return false;
+        if (asm.loops.Count > 0)
+        {
+            var index = asm.loops.Peek();
+
+            asm.currentToken = asm.NextRealToken();
+
+            var target = asm.endAddr[index];
+            if (target == null) target = asm.GetOrigin();
+
+            if (asm.currentToken == EOL) asm.GenerateJump(target);
+            else if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.currentToken, target);
+            else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.currentToken, target);
+            else
+                asm.OnError(ERR_INVALID_CONDITIONAL);
+        }
+        else
+            asm.OnError(ERR_NO_ACTIVE_LOOP);
+
+        return (true);
     });
 
     /// <summary>
@@ -3448,8 +3534,31 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> A2STR = new(Keyword, "A2STR", asm =>
     {
-        // your code here
-        return false;
+        do {
+            asm.currentToken = asm.NextRealToken();
+            if (asm.currentToken?.Kind == String)
+            {
+                var value = asm.currentToken.Text;
+
+                for (int index = 0; index < value.Length; ++index)
+                    asm.AddByte((byte)(value[index] | 0x80));
+
+                asm.currentToken = asm.NextRealToken();
+            }
+            else
+            {
+                var expr = asm.ParseExpression();
+
+                if (expr != null)
+                    asm.AddByte(Expr.Or(expr, HI_BIT));
+                else
+                    asm.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+            }
+        } while (asm.currentToken == Comma);
+
+        if (asm.currentToken != EOL) asm.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        return (true);
+
     });
 
     /// <summary>
@@ -3457,8 +3566,25 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> HSTR = new(Keyword, "HSTR", asm =>
     {
-        // your code here
-        return false;
+        asm.currentToken = asm.NextRealToken();
+
+        if (asm.currentToken?.Kind == String)
+        {
+            var value = asm.currentToken.Text;
+
+            for (int index = 0; index < value.Length;)
+            {
+                char ch = value[index++];
+
+                asm.AddByte((byte)(ch | ((index < value.Length) ? 0x00 : 0x80)));
+            }
+
+            asm.currentToken = asm.NextRealToken();
+        }
+        else
+            asm.OnError(".HSTR must have a string argument");
+
+        return (true);
     });
 
     /// <summary>
@@ -3466,8 +3592,28 @@ public sealed class As65 : Assembler
     /// </summary>
     private readonly Opcode<As65> PSTR = new(Keyword, "PSTR", asm =>
     {
-        // your code here
-        return false;
+        asm.currentToken = asm.NextRealToken();
+
+        if (asm.currentToken?.Kind == String)
+        {
+            String value = asm.currentToken.Text;
+
+            if (value.Length > 255)
+            {
+                asm.OnError("String is too long for a Pascal string");
+                return (true);
+            }
+
+            asm.AddByte((byte)(value.Length));
+            for (int index = 0; index < value.Length; ++index)
+                asm.AddByte((byte)value[index]);
+
+            asm.currentToken = asm.NextRealToken();
+        }
+        else
+            asm.OnError(".PSTR must have a string argument");
+
+        return (true);
     });
 
     private readonly Opcode<As65> JCC;
@@ -4932,9 +5078,5 @@ public sealed class As65 : Assembler
     {
         return ((directPage <= value) && (value <= (directPage + 0xff)));
     }
-
-
-
-
 
 }
