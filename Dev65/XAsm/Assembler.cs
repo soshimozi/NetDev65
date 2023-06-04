@@ -1,20 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Numerics;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Reflection.Metadata;
-using System.Text;
+﻿using System.Text;
 using Dev65.XApp;
 using Dev65.XObj;
-using static System.Collections.Specialized.BitVector32;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static Dev65.XObj.BinaryExpr;
-using Application = Dev65.XApp.Application;
-using Module = Dev65.XObj.Module;
-using Section = Dev65.XObj.Section;
 
 namespace Dev65.XAsm;
 
@@ -135,7 +121,7 @@ public abstract class Assembler : Application, IAssembler
 
     // Opcode that handles .INCLUDE directives.
     public static readonly Token INCLUDE = new Opcode(Keyword, ".INCLUDE",
-        (assembler) =>
+        assembler =>
         {
             assembler.CurrentToken = assembler.NextRealToken();
             if (assembler.CurrentToken?.Kind == String)
@@ -164,7 +150,7 @@ public abstract class Assembler : Application, IAssembler
     /**
 	 * An <CODE>Opcode</CODE> that handles .APPEND directives
 	 */
-    public static readonly Token APPEND = new Opcode(Keyword, ".APPEND", (assembler) => 
+    public static readonly Token APPEND = new Opcode(Keyword, ".APPEND", assembler => 
     {
             if (assembler.CurrentToken?.Kind == String)
             {
@@ -741,39 +727,39 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode CODE = new Opcode(Keyword, ".CODE", assembler =>
+    protected readonly Opcode CODE = new(Keyword, ".CODE", assembler =>
     {
         assembler.SetSection(".code");
         return (false);
     });
 
-    protected readonly Opcode DATA = new Opcode(Keyword, ".DATA", assembler =>
+    protected readonly Opcode DATA = new (Keyword, ".DATA", assembler =>
     {
         assembler.SetSection(".data");
         return (false);
     });
 
-    protected readonly Opcode BSS = new Opcode(Keyword, ".BSS", assembler =>
+    protected readonly Opcode BSS = new (Keyword, ".BSS", assembler =>
     {
         assembler.SetSection(".bss");
         return (false);
     });
 
-    protected readonly Opcode ORG = new Opcode(Keyword, ".ORG", assembler =>
+    protected readonly Opcode ORG = new (Keyword, ".ORG", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
-        Expr? expr = assembler.ParseExpression();
+        var expr = assembler.ParseExpression();
 
         if (expr is { IsAbsolute: true })
         {
-            assembler.Sections.SafeAdd(assembler.SectionName, assembler.Section = assembler.Section?.SetOrigin(expr.Resolve()));
+            assembler.Sections.SafeAdd(assembler.SectionName ?? string.Empty, assembler.Section = assembler.Section?.SetOrigin(expr.Resolve()));
         }
         else
             assembler.OnError(ErrorMessage.ERR_CONSTANT_EXPR);
         return (true);
     });
 
-    protected readonly Opcode EXTERN = new Opcode(Keyword, ".EXTERN", assembler =>
+    protected readonly Opcode EXTERN = new (Keyword, ".EXTERN", assembler =>
     {
         if (assembler.Pass== Pass.FIRST)
         {
@@ -842,7 +828,7 @@ public abstract class Assembler : Application, IAssembler
     {
             assembler.CurrentToken = assembler.NextRealToken();
 
-            assembler.Title = assembler.CurrentToken.Text;
+            assembler.Title = assembler?.CurrentToken?.Text;
             return (false);
     });
 
@@ -895,19 +881,9 @@ public abstract class Assembler : Application, IAssembler
         Memory?.AddWord(Module, Section, expr);
     }
 
-    public void AddWord(long value)
-    {
-        Memory?.AddWord(Module, Section, value);
-    }
-
     public void AddLong(Expr? expr)
     {
         Memory?.AddLong(Module, Section, expr);
-    }
-
-    public void AddLong(long value)
-    {
-        Memory?.AddLong(Module, Section, value);
     }
 
     /**
@@ -919,7 +895,7 @@ public abstract class Assembler : Application, IAssembler
     public bool IsActive => Status.Count == 0 || Status.Peek();
 
     public Stack<bool> Status { get; } = new();
-    public string MacroName { get; set; }
+    public string? MacroName { get; set; }
     public TextSource? SavedLines { get; set; }
     public Dictionary<string, TextSource> Macros { get; } = new();
     public Dictionary<string, Section?> Sections { get; } = new();
@@ -927,9 +903,9 @@ public abstract class Assembler : Application, IAssembler
     public Module? Module { get; set; }
     public Section? Section { get; set; }
     public HashSet<string> Globals { get; } = new();
-    public string SectionName { get; set; }
+    public string? SectionName { get; set; }
     public bool Listing { get; set; }
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     public Expr? ParseExpression()
     {
@@ -945,7 +921,6 @@ public abstract class Assembler : Application, IAssembler
         return (ZERO);
     }
 
-    public abstract Expr? ParseImmediate();
     public abstract int DataBank { get; set; }
 
     private Expr? ParseLogical()
@@ -995,7 +970,7 @@ public abstract class Assembler : Application, IAssembler
 
     private Expr? ParseEquality()
     {
-        Expr? expr = ParseInequality();
+        var expr = ParseInequality();
 
         while ((CurrentToken == EQ) || (CurrentToken == NE))
         {
@@ -1015,7 +990,7 @@ public abstract class Assembler : Application, IAssembler
 
     private Expr? ParseInequality()
     {
-        Expr? expr = ParseShift();
+        var expr = ParseShift();
 
         while ((CurrentToken == Lt) || (CurrentToken == Le) || (CurrentToken == Gt) || (CurrentToken == Ge))
         {
@@ -1045,7 +1020,7 @@ public abstract class Assembler : Application, IAssembler
 
     private Expr? ParseShift()
     {
-        Expr? expr = ParseAddSub();
+        var expr = ParseAddSub();
 
         while ((CurrentToken == RShift) || (CurrentToken == LShift))
         {
@@ -1065,7 +1040,7 @@ public abstract class Assembler : Application, IAssembler
 
     private Expr? ParseAddSub()
     {
-        Expr? expr = ParseMulDiv();
+        var expr = ParseMulDiv();
 
         while ((CurrentToken == Plus) || (CurrentToken == Minus))
         {
@@ -1085,7 +1060,7 @@ public abstract class Assembler : Application, IAssembler
 
     private Expr? ParseMulDiv()
     {
-        Expr? expr = ParseUnary();
+        var expr = ParseUnary();
 
         while ((CurrentToken == Times) || (CurrentToken == Divide) || (CurrentToken == Modulo))
         {
@@ -1209,8 +1184,8 @@ public abstract class Assembler : Application, IAssembler
         {
             if (CurrentToken.Text[0] == '.' && !NotLocal.Contains(CurrentToken.Text))
             {
-                if (lastLabel != null)
-                    expr = Symbols[lastLabel + CurrentToken.Text];
+                if (_lastLabel != null)
+                    expr = Symbols[_lastLabel + CurrentToken.Text];
                 else
                     OnError(ErrorMessage.ERR_NO_GLOBAL);
             }
@@ -1247,17 +1222,17 @@ public abstract class Assembler : Application, IAssembler
     {
         Memory = memoryModel;
 
-        memoryModel.AssemblerError += (sender, args) => OnError(args.Message);
-        memoryModel.AssemblerWarning += (sender, args) => OnWarning(args.Message);
+        memoryModel.AssemblerError += (_, args) => OnError(args.Message);
+        memoryModel.AssemblerWarning += (_, args) => OnWarning(args.Message);
     }
 
     protected override void StartUp()
     {
         base.StartUp();
 
-        if (defineOption.IsPresent)
+        if (_defineOption.IsPresent)
         {
-            var defines = defineOption.Value?.Split(",");
+            var defines = _defineOption.Value?.Split(",");
 
             for (var index = 0; index < defines?.Length; ++index)
             {
@@ -1328,7 +1303,7 @@ public abstract class Assembler : Application, IAssembler
 
     protected override void CleanUp()
     {
-        if (errors > 0) System.Environment.Exit(-1);
+        if (_errors > 0) Environment.Exit(-1);
     }
 
     /// <summary>
@@ -1337,9 +1312,9 @@ public abstract class Assembler : Application, IAssembler
     /// </summary>
     protected virtual void StartPass()
     {
-        listing = true;
+        _listing = true;
         Title = "";
-        lineCount = 0;
+        _lineCount = 0;
         ThrowPage = false;
 
         Sections.Clear();
@@ -1357,7 +1332,6 @@ public abstract class Assembler : Application, IAssembler
             {
                 var source = Sources.Pop();
                 source.Dispose();
-                source = null;
 
                 continue;
             }
@@ -1381,17 +1355,17 @@ public abstract class Assembler : Application, IAssembler
     protected string ExpandText()
     {
         Buffer.Clear();
-        for (int index = 0; index < text?.Length; ++index)
+        for (var index = 0; index < _text?.Length; ++index)
         {
-            if (text[index] == '\t')
+            if (_text[index] == '\t')
             {
                 do
                 {
                     Buffer.Append(" ");
-                } while (Buffer.Length % tabSize != 0);
+                } while (Buffer.Length % ERR_TAB_SIZE != 0);
             }
             else
-                Buffer.Append(text[index]);
+                Buffer.Append(_text[index]);
         }
         return (Buffer.ToString());
     }
@@ -1403,17 +1377,14 @@ public abstract class Assembler : Application, IAssembler
     /// <param name="nextLine">The next <see cref="Line"/> to be processed.</param>
     protected virtual void Process(Line nextLine)
     {
-        if (Sources.Peek() is TextSource)
-            LineType = '+';
-        else
-            LineType = ' ';
+        LineType = Sources.Peek() is TextSource ? '+' : ' ';
 
         Memory?.Clear();
 
         Label = null;
-        line = nextLine;
-        text = line.Text.ToCharArray();
-        offset = 0;
+        _line = nextLine;
+        _text = _line.Text.ToCharArray();
+        _offset = 0;
 
         Addr = Origin = Section?.GetOrigin();
 
@@ -1447,45 +1418,49 @@ public abstract class Assembler : Application, IAssembler
         {
             if (opcode.IsAlwaysActive || IsActive)
             {
-                if (savedLines != null)
+                if (_savedLines != null)
                 {
-                    if (savedLines is RepeatSource)
+                    switch (_savedLines)
                     {
-                        if (opcode == ENDR)
+                        case RepeatSource:
                         {
-                            if (--repeatDepth == 0)
+                            if (opcode == ENDR)
                             {
-                                opcode.Compile(this);
-                                return;
+                                if (--_repeatDepth == 0)
+                                {
+                                    opcode.Compile(this);
+                                    return;
+                                }
                             }
-                        }
 
-                        if (opcode == REPEAT)
-                            repeatDepth++;
+                            if (opcode == REPEAT)
+                                _repeatDepth++;
+                            break;
+                        }
+                        case MacroSource:
+                        {
+                            if (opcode == ENDM)
+                            {
+                                if (--_macroDepth == 0)
+                                {
+                                    opcode.Compile(this);
+                                    return;
+                                }
+                            }
+
+                            if (opcode == MACRO)
+                                _macroDepth++;
+                            break;
+                        }
                     }
 
-                    if (savedLines is MacroSource)
-                    {
-                        if (opcode == ENDM)
-                        {
-                            if (--macroDepth == 0)
-                            {
-                                opcode.Compile(this);
-                                return;
-                            }
-                        }
-
-                        if (opcode == MACRO)
-                            macroDepth++;
-                    }
-
-                    savedLines.AddLine(line);
+                    _savedLines.AddLine(_line);
                     return;
                 }
 
                 if (opcode == MACRO)
                 {
-                    if (macroDepth++ == 0)
+                    if (_macroDepth++ == 0)
                     {
                         opcode.Compile(this);
                         LineType = ' ';
@@ -1495,27 +1470,25 @@ public abstract class Assembler : Application, IAssembler
 
                 if (opcode == REPEAT)
                 {
-                    if (repeatDepth++ == 0)
+                    if (_repeatDepth++ == 0)
                     {
                         opcode.Compile(this);
 
-                        if (Label != null)
+                        if (Label == null) return;
+                        if (Origin != null)
                         {
-                            if (Origin != null)
+                            if (Label.Text[0] == '.')
                             {
-                                if (Label.Text[0] == '.')
-                                {
-                                    if (lastLabel != null)
-                                        SetLabel(lastLabel + Label.Text, Origin);
-                                }
+                                if (_lastLabel != null)
+                                    SetLabel(_lastLabel + Label.Text, Origin);
                             }
-                            else
-                            {
-                                OnError(ErrorMessage.ERR_NO_SECTION);
-                            }
-
-                            if (LineType == ' ') LineType = ':';
                         }
+                        else
+                        {
+                            OnError(ErrorMessage.ERR_NO_SECTION);
+                        }
+
+                        if (LineType == ' ') LineType = ':';
 
                         return;
                     }
@@ -1534,9 +1507,9 @@ public abstract class Assembler : Application, IAssembler
                     {
                         if (Label.Text[0] == '.')
                         {
-                            if (lastLabel != null)
+                            if (_lastLabel != null)
                             {
-                                SetLabel($"{lastLabel}{Label.Text}", Origin);
+                                SetLabel($"{_lastLabel}{Label.Text}", Origin);
                             }
                             else
                             {
@@ -1545,8 +1518,8 @@ public abstract class Assembler : Application, IAssembler
                         }
                         else
                         {
-                            lastLabel = Label.Text;
-                            SetLabel(lastLabel, Origin);
+                            _lastLabel = Label.Text;
+                            SetLabel(_lastLabel, Origin);
                         }
                     }
                     else
@@ -1555,16 +1528,9 @@ public abstract class Assembler : Application, IAssembler
                     }
                 }
 
-                if (opcode.Compile(this))
-                {
-                    if (Memory?.ByteCount > 0)
-                    {
-                        if (Sources.Peek() is TextSource)
-                            LineType = '+';
-                        else
-                            LineType = ':';
-                    }
-                }
+                if (!opcode.Compile(this)) return;
+                if (!(Memory?.ByteCount > 0)) return;
+                LineType = Sources.Peek() is TextSource ? '+' : ':';
             }
             else
                 LineType = '-';
@@ -1575,9 +1541,9 @@ public abstract class Assembler : Application, IAssembler
         }
 
         // are we saving lines for later?
-        if (savedLines != null)
+        if (_savedLines != null)
         {
-            savedLines.AddLine(line);
+            _savedLines.AddLine(_line);
             return;
         }
 
@@ -1586,25 +1552,25 @@ public abstract class Assembler : Application, IAssembler
         {
             var values = new List<string>();
             int start;
-            int end;
 
             // Skip any leading whitespace
             do
             {
-                start = offset;
+                start = _offset;
                 CurrentToken = NextToken();
             } while (CurrentToken == WhiteSpace);
 
             while (CurrentToken != EOL)
             {
+                int end;
                 do
                 {
-                    end = offset;
+                    end = _offset;
                     if ((CurrentToken = NextRealToken()) == EOL) break;
                 } while (CurrentToken != Comma);
 
-                values.Add(new string(text, start, end - start));
-                start = offset;
+                values.Add(new string(_text, start, end - start));
+                start = _offset;
             }
 
             if (Label != null)
@@ -1613,9 +1579,9 @@ public abstract class Assembler : Application, IAssembler
                 {
                     if (Label.Text[0] == '.')
                     {
-                        if (lastLabel != null)
+                        if (_lastLabel != null)
                         {
-                            SetLabel($"{lastLabel}{Label.Text}", Origin);
+                            SetLabel($"{_lastLabel}{Label.Text}", Origin);
                         }
                         else
                         {
@@ -1624,8 +1590,8 @@ public abstract class Assembler : Application, IAssembler
                     }
                     else
                     {
-                        lastLabel = Label.Text;
-                        SetLabel(lastLabel, Origin);
+                        _lastLabel = Label.Text;
+                        SetLabel(_lastLabel, Origin);
 
                     }
                 }
@@ -1635,7 +1601,7 @@ public abstract class Assembler : Application, IAssembler
                 }
             }
 
-            Sources.Push(source.Invoke(++instance, values));
+            Sources.Push(source.Invoke(++_instance, values));
             return;
         }
 
@@ -1645,8 +1611,8 @@ public abstract class Assembler : Application, IAssembler
             {
                 if (Label.Text[0] == '.')
                 {
-                    if (lastLabel != null)
-                        SetLabel($"{lastLabel}{Label.Text}", Origin);
+                    if (_lastLabel != null)
+                        SetLabel($"{_lastLabel}{Label.Text}", Origin);
                     else
                     {
                         OnError(ErrorMessage.ERR_NO_GLOBAL);
@@ -1654,8 +1620,8 @@ public abstract class Assembler : Application, IAssembler
                 }
                 else
                 {
-                    lastLabel = Label.Text;
-                    SetLabel(lastLabel, Origin);
+                    _lastLabel = Label.Text;
+                    SetLabel(_lastLabel, Origin);
                 }
             }
             else
@@ -1701,7 +1667,7 @@ public abstract class Assembler : Application, IAssembler
         }
 
         // Write the object module
-        if (errors == 0)
+        if (_errors == 0)
         {
             try
             {
@@ -1709,7 +1675,7 @@ public abstract class Assembler : Application, IAssembler
 
                 Module?.SetName(new FileInfo(objectName).Name);
 
-                using StreamWriter stream = new StreamWriter(objectName);
+                using var stream = new StreamWriter(objectName);
                 stream.WriteLine("<?xml version='1.0'?>" + Module);
 
             }
@@ -1721,7 +1687,7 @@ public abstract class Assembler : Application, IAssembler
         }
 
         // Dump symbol table
-        if (lineCount != 0)
+        if (_lineCount != 0)
         {
             ThrowPage = true;
             Paginate("");
@@ -1731,11 +1697,11 @@ public abstract class Assembler : Application, IAssembler
         Paginate("");
 
         // Sort by name
-        string[] keys = Symbols.Keys.ToArray();
+        var keys = Symbols.Keys.ToArray();
         Array.Sort(keys);
 
         // Sort by value
-        string[] values = (string[])keys.Clone();
+        var values = (string[])keys.Clone();
         Array.Sort(values, Comparer<string>.Create((arg0, arg1) =>
         {
             var lhs = Symbols[arg0]?.Resolve();
@@ -1743,7 +1709,7 @@ public abstract class Assembler : Application, IAssembler
 
             if (lhs == rhs)
             {
-                return arg0?.CompareTo(arg1) ?? 0;
+                return string.Compare(arg0, arg1, StringComparison.Ordinal);
             }
 
 
@@ -1791,12 +1757,9 @@ public abstract class Assembler : Application, IAssembler
             Paginate(lhs + " | " + rhs);
         }
 
-        if (listFile != null)
-        {
-            listFile.Close();
-        }
+        _listFile?.Close();
 
-        return (errors == 0);
+        return (_errors == 0);
     }
 
     /**
@@ -1818,14 +1781,13 @@ public abstract class Assembler : Application, IAssembler
 
         Module?.Clear();
 
-        errors = 0;
-        warnings = 0;
-        lastLabel = null;
+        _errors = 0;
+        _lastLabel = null;
 
-        savedLines = null;
-        repeatDepth = 0;
-        macroDepth = 0;
-        instance = 0;
+        _savedLines = null;
+        _repeatDepth = 0;
+        _macroDepth = 0;
+        _instance = 0;
 
         SetSection(".code");
 
@@ -1833,7 +1795,7 @@ public abstract class Assembler : Application, IAssembler
         {
             if (pass == Pass.FINAL)
             {
-                listFile = new StreamWriter(File.OpenWrite(GetListingFile(fileName)), System.Text.Encoding.GetEncoding("ISO-8859-1"));
+                _listFile = new StreamWriter(File.OpenWrite(GetListingFile(fileName)), Encoding.GetEncoding("ISO-8859-1"));
             }
 
             Sources.Push(new FileSource(fileName, new FileStream(fileName, FileMode.Open)));
@@ -1852,7 +1814,7 @@ public abstract class Assembler : Application, IAssembler
 
         EndPass();
 
-        return (errors == 0);
+        return (_errors == 0);
     }
 
     /// <summary>
@@ -1878,13 +1840,13 @@ public abstract class Assembler : Application, IAssembler
     /// <param name="message">The _text for the error message.</param>
     public void OnError(string message)
     {
-        var msg = $"Error: {line?.FileName} ({line?.LineNumber}) {message}";
+        var msg = $"Error: {_line?.FileName} ({_line?.LineNumber}) {message}";
 
         Console.Error.WriteLine(msg);
         if (Pass == Pass.FINAL)
             Paginate(msg);
 
-        errors++;
+        _errors++;
     }
 
     /// <summary>
@@ -1893,13 +1855,11 @@ public abstract class Assembler : Application, IAssembler
     /// <param name="message">The _text for the warning message.</param>
     public void OnWarning(string message)
     {
-        var msg = $"Warning: {line?.FileName} ({line?.LineNumber}) {message}";
+        var msg = $"Warning: {_line?.FileName} ({_line?.LineNumber}) {message}";
 
         Console.Error.WriteLine(msg);
         if (Pass == Pass.FINAL)
             Paginate(msg);
-
-        warnings++;
     }
 
     public abstract int DirectPage { get; set; }
@@ -1920,8 +1880,6 @@ public abstract class Assembler : Application, IAssembler
     public abstract void GenerateIndirect(int opcode, Expr? expr, bool isLong);
     public abstract void GenerateRelative(int opcode, Expr? expr, bool isLong);
     public abstract void GenerateLong(int opcode, Expr? expr);
-    public abstract bool IsShortDistance(Expr? target);
-    public abstract bool HasShortBranch();
 
     /// <summary>
     /// Output a _line of _text to the listing, trimming trailing spaces.
@@ -1929,15 +1887,15 @@ public abstract class Assembler : Application, IAssembler
     /// <param name="message">The _text to output.</param>
     private void Paginate(string message)
     {
-        if (listFile == null || !listing) return;
+        if (_listFile == null || !_listing) return;
 
-        if (lineCount == 0)
+        if (_lineCount == 0)
         {
-            listFile.WriteLine();
-            listFile.WriteLine(Title);
-            listFile.WriteLine();
+            _listFile.WriteLine();
+            _listFile.WriteLine(Title);
+            _listFile.WriteLine();
 
-            lineCount += 3;
+            _lineCount += 3;
         }
 
         int len;
@@ -1949,19 +1907,17 @@ public abstract class Assembler : Application, IAssembler
 
         if (len > 0)
         {
-            listFile.WriteLine(message[..len]);
+            _listFile.WriteLine(message[..len]);
         }
         else
         {
-            listFile.WriteLine();
+            _listFile.WriteLine();
         }
 
-        if (ThrowPage || (++lineCount == (linesPerPage - 3)))
-        {
-            listFile.Write('\f');
-            lineCount = 0;
-            ThrowPage = false;
-        }
+        if (!ThrowPage && (++_lineCount != (ERR_LINES_PER_PAGE - 3))) return;
+        _listFile.Write('\f');
+        _lineCount = 0;
+        ThrowPage = false;
     }
 
     /// <summary>
@@ -1981,7 +1937,7 @@ public abstract class Assembler : Application, IAssembler
     /// </summary>
     /// <param name="filename">The source file name</param>
     /// <returns>The name of the list file</returns>
-    public string GetListingFile(string filename)
+    public static string GetListingFile(string filename)
     {
         return Path.ChangeExtension(filename, "lst");
     }
@@ -1991,7 +1947,7 @@ public abstract class Assembler : Application, IAssembler
     /// </summary>
     /// <param name="filename"></param>
     /// <returns></returns>
-    private string GetObjectFile(string filename)
+    private static string GetObjectFile(string filename)
     {
         return Path.ChangeExtension(filename, "obj");
     }
@@ -2020,20 +1976,7 @@ public abstract class Assembler : Application, IAssembler
     /// <returns>The next <see cref="Token"/> to be processed.</returns>
     private Token? NextToken()
     {
-        if (Tokens.Count != 0)
-            return Tokens.Pop();
-
-        return (ReadToken());
-    }
-
-    /**
-	 * Pushes a <CODE>Token</CODE> on the stack so that it can be reread.
-	 * 
-	 * @param 	CurrentToken			The <CODE>Token</CODE> to be reprocessed.
-	 */
-    protected void PushToken(Token token)
-    {
-        Tokens.Push(token);
+        return Tokens.Count != 0 ? Tokens.Pop() : ReadToken();
     }
 
     /**
@@ -2045,7 +1988,7 @@ public abstract class Assembler : Application, IAssembler
     {
         var ch = PeekChar();
 
-        if (ch != '\0') ++offset;
+        if (ch != '\0') ++_offset;
         return (ch);
     }
 
@@ -2056,7 +1999,7 @@ public abstract class Assembler : Application, IAssembler
 	 */
     protected char PeekChar()
     {
-        return ((offset < text?.Length) ? text[offset] : '\0');
+        return ((_offset < _text?.Length) ? _text[_offset] : '\0');
     }
 
     /// <summary>
@@ -2139,8 +2082,6 @@ public abstract class Assembler : Application, IAssembler
         return ch is >= '0' and <= '9' or >= 'A' and <= 'Z' or >= 'a' and <= 'z';
     }
 
-    public abstract void AddToken(Token token);
-
     /// <summary>
     /// Sets the value of a symbol to the given expression value.
     /// </summary>
@@ -2183,8 +2124,8 @@ public abstract class Assembler : Application, IAssembler
 
     private static readonly StringBuilder Buffer = new();
 
-    private readonly Option defineOption = new("-define", "Define symbols", "(symbol|symbol=value)(,..)*");
-    private readonly Option includeOption = new("-include", "Define include path", "path[,path]*");
+    private readonly Option _defineOption = new("-define", "Define symbols", "(symbol|symbol=value)(,..)*");
+    private readonly Option _includeOption = new("-include", "Define include path", "path[,path]*");
 
 
     /**
@@ -2196,7 +2137,7 @@ public abstract class Assembler : Application, IAssembler
     protected abstract Token? ReadToken();
 
 
-    private string? lastLabel = null;
+    private string? _lastLabel;
 
     // the current _label (if any)
     //protected Token? label = null;
@@ -2211,62 +2152,45 @@ public abstract class Assembler : Application, IAssembler
     protected MemoryModel? Memory;
 
     // Tab expansion size.
-    private readonly int tabSize = 8;
+    private const int ERR_TAB_SIZE = 8;
 
     // Flag determining listing on/off state
-    private bool listing;
+    private bool _listing;
 
     // The current output _line count
-    private int lineCount;
+    private int _lineCount;
 
     // The number of lines on a page (A4 = 60)
-    private int linesPerPage = 60;
+    private const int ERR_LINES_PER_PAGE = 60;
 
     // Writer assigned to listing file in final pass.
-    private StreamWriter? listFile = null;
+    private StreamWriter? _listFile;
 
     // The current _line being assembled.
-    private Line? line = null;
+    private Line? _line;
 
     // The characters comprising the _line being assembled.
-    private char[]? text;
+    private char[]? _text;
 
     // The offset of the next character in the current _line.
-    private int offset;
+    private int _offset;
 
     // The number of errors seen during the current pass.
-    private int errors;
+    private int _errors;
 
     // The number of warnings seen during the current pass.
-    private int warnings;
-
-    // The subset of symbols that may be redefined.
-
-    // The set of symbols which will be exported.
-    //private HashSet<string> globals = new();
-
-    // The set of symbols starting with '.' that are not local labels
-    //private HashSet<string> notLocal = new();
-
-    // The set of symbol which have been imported.
-
-    // The set of defined macros.
-    //private readonly Dictionary<string, TextSource> macros = new();
-
-    // The name of the current macro
-    //private string? macroName = null;
 
     // The TextSource used to capture macro or repeat lines.
-    private TextSource? savedLines = null;
+    private TextSource? _savedLines;
 
     // Count macro definition depth.
-    private int macroDepth = 0;
+    private int _macroDepth;
 
     // Counts repeat section depth.
-    private int repeatDepth = 0;
+    private int _repeatDepth;
 
     // Macro instance counter.
-    private int instance = 0;
+    private int _instance;
 
     /// <summary>
     /// Locates a file with the given name, optionally searching the include path for it.
@@ -2282,9 +2206,9 @@ public abstract class Assembler : Application, IAssembler
         }
         catch (FileNotFoundException)
         {
-            if (search && includeOption?.Value != null)
+            if (search && _includeOption.Value != null)
             {
-                var paths = includeOption.Value?.Split(',') ?? Array.Empty<string>();
+                var paths = _includeOption.Value.Split(',');
 
                 foreach (var path in paths)
                 {

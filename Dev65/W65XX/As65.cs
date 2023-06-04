@@ -4753,7 +4753,7 @@ public sealed class As65 : Assembler
     /// string literals as well as numbers.
     /// </summary>
     /// <returns>An expression containing the immediate value.</returns>
-    public override Expr? ParseImmediate()
+    public Expr? ParseImmediate()
     {
         if (CurrentToken?.Kind == String)
         {
@@ -4950,7 +4950,7 @@ public sealed class As65 : Assembler
         }
     }
 
-    public override List<Value?> EndAddr { get; }
+    public override List<Value?> EndAddr { get; } = new();
 
     /// <summary>
     /// Generates a jump to a target address using BRA if supported
@@ -4976,7 +4976,7 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="target">The target address.</param>
     /// <returns>return <code>true</code> if the target address is near</returns>
-    public override bool IsShortDistance(Expr? target)
+    public bool IsShortDistance(Expr? target)
     {
         var offset = Expr.Sub(target, Expr.Add(Origin, TWO));
 
@@ -4990,7 +4990,7 @@ public sealed class As65 : Assembler
     /// Determines if the current processor supports the BRA opcode.
     /// </summary>
     /// <returns><code>true</code> if BRA is supported.</returns>
-    public override bool HasShortBranch()
+    public bool HasShortBranch()
     {
         return ((Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0);
     }
@@ -5053,7 +5053,7 @@ public sealed class As65 : Assembler
     /// Adds a CurrentToken to the hash table indexed by its text in UPPER case.
     /// </summary>
     /// <param name="token">The Token to add</param>
-    public override void AddToken(Token token)
+    public void AddToken(Token token)
     {
         var key = token.Text.ToUpper();
         tokenDictionary.SafeAdd(key, token);

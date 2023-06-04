@@ -123,7 +123,7 @@ public abstract class UnaryExpr : Expr
     /**
      * {@inheritDoc}
      */
-    public sealed override bool IsExternal(Section section)
+    public sealed override bool IsExternal(Section? section)
     {
         return Exp?.IsExternal(section) == true;
     }
