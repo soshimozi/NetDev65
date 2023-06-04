@@ -48,7 +48,7 @@ public sealed class MacroSource : TextSource
     /// <summary>
     /// Fetches the next line of source text from the underlying storage, expands the macros, and bundles it with its origin details.
     /// </summary>
-    /// <returns>The next line of source text or <c>null</c> if the end of this <see cref="Source"/> has been reached.</returns>
+    /// <returns>The next line of source text or <c>null</c> if the end of this <see cref="ISource"/> has been reached.</returns>
     public override Line? NextLine()
     {
         var line = base.NextLine();

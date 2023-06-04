@@ -4,11 +4,11 @@ namespace Dev65.XAsm;
 using System.IO;
 
 /// <summary>
-/// The <see cref="FileSource"/> class implements a <see cref="Source"/> that reads from a file.
+/// The <see cref="FileSource"/> class implements a <see cref="ISource"/> that reads from a file.
 /// </summary>
 /// <author>Andrew Jacobs</author>
 /// <version>$Id$</version>
-public sealed class FileSource : Source
+public sealed class FileSource : ISource, IDisposable
 {
     private readonly StreamReader reader;
     private readonly string fileName;
@@ -45,5 +45,10 @@ public sealed class FileSource : Source
         }
 
         return null;
+    }
+
+    public void Dispose()
+    {
+        reader.Dispose();
     }
 }

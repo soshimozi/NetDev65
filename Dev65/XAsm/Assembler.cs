@@ -28,124 +28,124 @@ public abstract class Assembler : Application, IAssembler
     protected static readonly TokenKind String = new("STRING");
     protected static readonly TokenKind Unknown = new("UNKNOWN");
 
-    protected Dictionary<string, Expr?> symbols = new();
+    //protected Dictionary<string, Expr?> symbols = new();
 
-    protected static readonly Token WhiteSpace = new(Unknown, "#SPACE");
+    public static readonly Token WhiteSpace = new(Unknown, "#SPACE");
 
-    protected static readonly Opcode<Assembler> EOL = new(Unknown, "#EOL", _ => true);
+    public static readonly Opcode EOL = new(Unknown, "#EOL", _ => true);
 
     /// <summary>
     /// A <see cref="Token"/> representing the origin (e.g. $ or @).
     /// </summary>
-    protected static readonly Token Origin = new(Keyword, "ORIGIN");
+    public static readonly Token OriginToken = new(Keyword, "ORIGIN");
 
     /// <summary>
     /// A <see cref="Token"/> representing a comma.
     /// </summary>
-    protected static readonly Token Comma = new(Keyword, ",");
+    public static readonly Token Comma = new(Keyword, ",");
 
     /// <summary>
     /// A <see cref="Token"/> representing a colon.
     /// </summary>
-    protected static readonly Token Colon = new(Keyword, ":");
+    public static readonly Token Colon = new(Keyword, ":");
 
     /// <summary>
     /// A <see cref="Token"/> representing addition.
     /// </summary>
-    protected static readonly Token Plus = new(Keyword, "+");
+    public static readonly Token Plus = new(Keyword, "+");
 
     /// <summary>
     /// A <see cref="Token"/> representing subtraction.
     /// </summary>
-    protected static readonly Token Minus = new(Keyword, "-");
+    public static readonly Token Minus = new(Keyword, "-");
 
     /// <summary>
     /// A <see cref="Token"/> representing multiply.
     /// </summary>
-    protected static readonly Token Times = new(Keyword, "*");
+    public static readonly Token Times = new(Keyword, "*");
 
     // Token representing divide.
-    protected readonly Token Divide = new(Operator, "/");
+    public static readonly Token Divide = new(Operator, "/");
 
     // Token representing modulo.
-    protected readonly Token Modulo = new(Operator, "%");
+    public static readonly Token Modulo = new(Operator, "%");
 
     // Token representing complement.
-    protected readonly Token Complement = new(Operator, "~");
+    public static readonly Token Complement = new(Operator, "~");
 
     // Token representing binary and.
-    protected readonly Token BinaryAnd = new(Operator, "&");
+    public static readonly Token BinaryAnd = new(Operator, "&");
 
     // Token representing binary or.
-    protected readonly Token BinaryOr = new(Operator, "|");
+    public static readonly Token BinaryOr = new(Operator, "|");
 
     // Token representing binary xor.
-    protected readonly Token BinaryXor = new(Operator, "^");
+    public static readonly Token BinaryXor = new(Operator, "^");
 
     // Token representing logical not.
-    protected readonly Token LogicalNot = new(Operator, "!");
+    public static readonly Token LogicalNot = new(Operator, "!");
 
     // Token representing logical and.
-    protected readonly Token LogicalAnd = new(Operator, "&&");
+    public static readonly Token LogicalAnd = new(Operator, "&&");
 
     // Token representing logical or.
-    protected readonly Token LogicalOr = new(Operator, "||");
+    public static readonly Token LogicalOr = new(Operator, "||");
 
     // Token representing equal.
-    protected readonly Token EQ = new(Operator, "=");
+    public static readonly Token EQ = new(Operator, "=");
 
     // Token representing not equal.
-    protected readonly Token NE = new(Operator, "!=");
+    public static readonly Token NE = new(Operator, "!=");
 
     // Token representing less than.
-    protected readonly Token Lt = new(Operator, "<");
+    public static readonly Token Lt = new(Operator, "<");
 
     // Token representing less than or equal.
-    protected readonly Token Le = new(Operator, "<=");
+    public static readonly Token Le = new(Operator, "<=");
 
     // Token representing greater than.
-    protected readonly Token Gt = new(Operator, ">");
+    public static readonly Token Gt = new(Operator, ">");
 
     // Token representing greater than or equal.
-    protected readonly Token Ge = new(Operator, ">=");
+    public static readonly Token Ge = new(Operator, ">=");
 
     // Token representing a left shift.
-    protected readonly Token LShift = new(Operator, "<<");
+    public static readonly Token LShift = new(Operator, "<<");
 
     // Token representing a right shift.
-    protected readonly Token RShift = new(Operator, ">>");
+    public static readonly Token RShift = new(Operator, ">>");
 
     // Token representing an opening parenthesis.
-    protected readonly Token LParen = new(Operator, "(");
+    public static readonly Token LParen = new(Operator, "(");
 
     // Token representing a closing parenthesis.
-    protected readonly Token RParen = new(Operator, ")");
+    public static readonly Token RParen = new(Operator, ")");
 
     // Token representing the LO function.
-    protected readonly Token LO = new(Keyword, "LO");
+    public static readonly Token LO = new(Keyword, "LO");
 
     // Token representing the HI function.
-    protected readonly Token HI = new(Keyword, "HI");
+    public static readonly Token HI = new(Keyword, "HI");
 
     // Token representing the STRLEN function.
-    protected readonly Token STRLEN = new(Keyword, "STRLEN");
+    public static readonly Token STRLEN = new(Keyword, "STRLEN");
 
     // Token representing the BANK function.
-    protected readonly Token BANK = new(Keyword, "BANK");
+    public static readonly Token BANK = new(Keyword, "BANK");
 
     // Opcode that handles .INCLUDE directives.
-    protected readonly Token INCLUDE = new Opcode<Assembler>(Keyword, ".INCLUDE",
+    public static readonly Token INCLUDE = new Opcode(Keyword, ".INCLUDE",
         (assembler) =>
         {
-            assembler.currentToken = assembler.NextRealToken();
-            if (assembler.currentToken?.Kind == String)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken?.Kind == String)
             {
-                var filename = assembler.currentToken.Text;
+                var filename = assembler.CurrentToken.Text;
                 var stream = assembler.FindFile(filename, true);
 
                 if (stream != null)
                 {
-                    assembler.sources.Push(new FileSource(filename, stream));
+                    assembler.Sources.Push(new FileSource(filename, stream));
                 }
                 else
                 {
@@ -164,17 +164,17 @@ public abstract class Assembler : Application, IAssembler
     /**
 	 * An <CODE>Opcode</CODE> that handles .APPEND directives
 	 */
-    protected readonly Token APPEND = new Opcode<Assembler>(Keyword, ".APPEND", (assembler) => 
+    public static readonly Token APPEND = new Opcode(Keyword, ".APPEND", (assembler) => 
     {
-            if (assembler.currentToken?.Kind == String)
+            if (assembler.CurrentToken?.Kind == String)
             {
-                var filename = assembler.currentToken.Text;
+                var filename = assembler.CurrentToken.Text;
                 var stream = assembler.FindFile(filename, false);
 
                 if (stream != null)
                 {
-                    assembler.sources.Pop();
-                    assembler.sources.Push(new FileSource(filename, stream));
+                    assembler.Sources.Pop();
+                    assembler.Sources.Push(new FileSource(filename, stream));
                 }
                 else
                     assembler.OnError($"{ErrorMessage.ERR_FAILED_TO_FIND_FILE} ({filename})");
@@ -185,11 +185,11 @@ public abstract class Assembler : Application, IAssembler
             return (false);
     });
 
-    protected readonly Token INSERT = new Opcode<Assembler>(Keyword, ".INSERT", assembler =>
+    public static readonly Token INSERT = new Opcode(Keyword, ".INSERT", assembler =>
     {
-        if (assembler.currentToken?.Kind == String)
+        if (assembler.CurrentToken?.Kind == String)
         {
-            var filename = assembler.currentToken?.Text;
+            var filename = assembler.CurrentToken?.Text;
             var stream = assembler.FindFile(filename ?? string.Empty, false);
 
             if (stream != null)
@@ -218,36 +218,36 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> End = new(Keyword, ".END", assembler => {
-        assembler.sources.Clear();
+    public static readonly Opcode End = new(Keyword, ".END", assembler => {
+        assembler.Sources.Clear();
         return false;
     });
 
-    protected readonly Opcode<Assembler> Equ = new(Keyword, ".EQU", assembler =>
+    public static readonly Opcode Equ = new(Keyword, ".EQU", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
-        assembler.addr = assembler.ParseExpression();
+        assembler.CurrentToken = assembler.NextRealToken();
+        assembler.Addr = assembler.ParseExpression();
 
-        if (assembler.label != null)
+        if (assembler.Label != null)
         {
-            if (assembler.pass == Pass.FIRST)
+            if (assembler.Pass == Pass.FIRST)
             {
-                if (assembler.variable.Contains(assembler.label.Text))
+                if (assembler.Variable.Contains(assembler.Label.Text))
                 {
                     assembler.OnError("Symbol has already been defined with .SET");
                     return (false);
                 }
-                if (assembler.symbols.ContainsKey(assembler.label.Text))
+                if (assembler.Symbols.ContainsKey(assembler.Label.Text))
                 {
                     assembler.OnError(ErrorMessage.ERR_LABEL_REDEFINED);
                     return (false);
                 }
 
-                if (assembler.label.Text[0] == '.')
-                    assembler.notLocal.Add(assembler.label.Text);
+                if (assembler.Label.Text[0] == '.')
+                    assembler.NotLocal.Add(assembler.Label.Text);
             }
 
-            assembler.symbols.Add(assembler.label.Text, assembler.addr);
+            assembler.Symbols.SafeAdd(assembler.Label.Text, assembler.Addr);
         }
         else
             assembler.OnError("No symbol name defined for .EQU");
@@ -255,28 +255,28 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Set = new(Keyword, ".SET", assembler =>
+    public static readonly Opcode Set = new(Keyword, ".SET", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
-        assembler.addr = assembler.ParseExpression();
+        assembler.CurrentToken = assembler.NextRealToken();
+        assembler.Addr = assembler.ParseExpression();
 
-        if (assembler.label != null)
+        if (assembler.Label != null)
         {
-            if (assembler.pass == Pass.FIRST)
+            if (assembler.Pass == Pass.FIRST)
             {
-                if (assembler.symbols.ContainsKey(assembler.label.Text) && !assembler.variable.Contains(assembler.label.Text))
+                if (assembler.Symbols.ContainsKey(assembler.Label.Text) && !assembler.Variable.Contains(assembler.Label.Text))
                 {
                     assembler.OnError("Symbol has already been defined with .EQU");
                     return (false);
                 }
 
-                if (assembler.label.Text[0] == '.')
-                    assembler.notLocal.Add(assembler.label.Text);
+                if (assembler.Label.Text[0] == '.')
+                    assembler.NotLocal.Add(assembler.Label.Text);
 
-                assembler.variable.Add(assembler.label.Text);
+                assembler.Variable.Add(assembler.Label.Text);
             }
 
-            assembler.symbols.Add(assembler.label.Text, assembler.addr);
+            assembler.Symbols.Add(assembler.Label.Text, assembler.Addr);
         }
         else
             assembler.OnError("No symbol name defined for .SET");
@@ -284,9 +284,9 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> Space = new(Keyword, ".SPACE", assembler =>
+    public static readonly Opcode Space = new(Keyword, ".SPACE", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
+        assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
 
         if (expr != null)
@@ -307,15 +307,15 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode<Assembler> Align = new(Keyword, ".ALIGN", assembler =>
+    public static readonly Opcode Align = new(Keyword, ".ALIGN", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
+        assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
 
         if (expr?.IsAbsolute == true)
         {
             var value = expr.Resolve();
-            var count = assembler.origin?.Resolve() % value;
+            var count = assembler.Origin?.Resolve() % value;
 
             while ((count > 0) && (count++ != value))
                 assembler?.AddByte(0);
@@ -326,18 +326,18 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode<Assembler> Dcb = new(Keyword, ".DCB", assembler =>
+    public static readonly Opcode Dcb = new(Keyword, ".DCB", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
+        assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
 
         if (expr?.IsAbsolute == true)
         {
             var value = expr.Resolve();
 
-            if (assembler.currentToken == Comma)
+            if (assembler.CurrentToken == Comma)
             {
-                assembler.currentToken = assembler.NextRealToken();
+                assembler.CurrentToken = assembler.NextRealToken();
                 expr = assembler.ParseExpression();
 
                 if (expr?.IsAbsolute == true)
@@ -360,19 +360,19 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode<Assembler> Byte = new(Keyword, ".BYTE", assembler =>
+    public static readonly Opcode Byte = new(Keyword, ".BYTE", assembler =>
     {
         do
         {
-            assembler.currentToken = assembler.NextRealToken();
-            if (assembler.currentToken?.Kind == String)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken?.Kind == String)
             {
-                var value = assembler.currentToken.Text;
+                var value = assembler.CurrentToken.Text;
 
                 foreach (var t in value)
                     assembler.AddByte((byte)t);
 
-                assembler.currentToken = assembler.NextRealToken();
+                assembler.CurrentToken = assembler.NextRealToken();
             }
             else
             {
@@ -383,17 +383,17 @@ public abstract class Assembler : Application, IAssembler
                 else
                     assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
             }
-        } while (assembler.currentToken == Comma);
+        } while (assembler.CurrentToken == Comma);
 
-        if (assembler.currentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        if (assembler.CurrentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
         return (true);
     });
 
-    protected readonly Opcode<Assembler> DByte = new(Keyword, ".DBYTE", assembler =>
+    public static readonly Opcode DByte = new(Keyword, ".DBYTE", assembler =>
     {
         do
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
             var expr = assembler.ParseExpression();
 
             if (expr != null)
@@ -403,51 +403,51 @@ public abstract class Assembler : Application, IAssembler
             }
             else
                 assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
-        } while (assembler.currentToken == Comma);
+        } while (assembler.CurrentToken == Comma);
 
-        if (assembler.currentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        if (assembler.CurrentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
         return (true);
     });
 
-    protected readonly Opcode<Assembler> Word = new(Keyword, ".WORD", assembler =>
+    public static readonly Opcode Word = new(Keyword, ".WORD", assembler =>
     {
         do
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
             var expr = assembler.ParseExpression();
 
             if (expr != null)
                 assembler.AddWord(expr);
             else
                 assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
-        } while (assembler.currentToken == Comma);
+        } while (assembler.CurrentToken == Comma);
 
-        if (assembler.currentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        if (assembler.CurrentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
         return (true);
     });
 
-    protected readonly Opcode<Assembler> LONG = new(Keyword, ".LONG", assembler =>
+    public static readonly Opcode LONG = new(Keyword, ".LONG", assembler =>
     {
         do
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
             var expr = assembler.ParseExpression();
 
             if (expr != null)
                 assembler.AddLong(expr);
             else
                 assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
-        } while (assembler.currentToken == Comma);
+        } while (assembler.CurrentToken == Comma);
 
-        if (assembler.currentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        if (assembler.CurrentToken != EOL) assembler.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
         return (true);
     });
 
-    protected readonly Opcode<Assembler> IF = new(Keyword, ".IF", assembler =>
+    public static readonly Opcode IF = new(Keyword, ".IF", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
             var expr = assembler.ParseExpression();
 
@@ -460,22 +460,22 @@ public abstract class Assembler : Application, IAssembler
             if (expr.IsAbsolute)
             {
                 var state = expr.Resolve() != 0;
-                assembler.status.Push((assembler.IsActive && state));
+                assembler.Status.Push((assembler.IsActive && state));
             }
             else
                 assembler.OnError(ErrorMessage.ERR_CONSTANT_EXPR);
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IFABS = new(Keyword, ".IFABS", assembler =>
+    public static readonly Opcode IFABS = new(Keyword, ".IFABS", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
             var expr = assembler.ParseExpression();
 
@@ -485,19 +485,19 @@ public abstract class Assembler : Application, IAssembler
                 return (false);
             }
 
-            assembler.status.Push(expr.IsAbsolute);
+            assembler.Status.Push(expr.IsAbsolute);
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IFNABS = new(Keyword, ".IFNABS", assembler =>
+    public static readonly Opcode IFNABS = new(Keyword, ".IFNABS", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
             var expr = assembler.ParseExpression();
 
@@ -507,19 +507,19 @@ public abstract class Assembler : Application, IAssembler
                 return (false);
             }
 
-            assembler.status.Push(!expr.IsAbsolute);
+            assembler.Status.Push(!expr.IsAbsolute);
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IFREL = new(Keyword, ".IFREL", assembler =>
+    public static readonly Opcode IFREL = new(Keyword, ".IFREL", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
             var expr = assembler.ParseExpression();
 
@@ -529,19 +529,19 @@ public abstract class Assembler : Application, IAssembler
                 return (false);
             }
 
-            assembler.status.Push(expr.IsRelative);
+            assembler.Status.Push(expr.IsRelative);
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> IFNREL = new(Keyword, ".IFNREL", assembler =>
+    public static readonly Opcode IFNREL = new(Keyword, ".IFNREL", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
             var expr = assembler.ParseExpression();
 
@@ -551,62 +551,62 @@ public abstract class Assembler : Application, IAssembler
                 return (false);
             }
 
-            assembler.status.Push(!expr.IsRelative);
+            assembler.Status.Push(!expr.IsRelative);
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return (false);
     }, true);
-    
-    protected readonly Opcode<Assembler> IFDEF = new (Keyword, ".IFDEF", assembler =>
+
+    public static readonly Opcode IFDEF = new (Keyword, ".IFDEF", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
-            if (assembler.currentToken?.Kind != Symbol)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken?.Kind != Symbol)
             {
                 assembler.OnError("Expected a symbol");
                 return false;
             }
 
-            assembler.status.Push(assembler.symbols.ContainsKey(assembler.currentToken.Text));
+            assembler.Status.Push(assembler.Symbols.ContainsKey(assembler.CurrentToken.Text));
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return false;
 
     }, true);
 
 
-    protected readonly Opcode<Assembler> IFNDEF = new(Keyword, ".IFNDEF", assembler =>
+    public static readonly Opcode IFNDEF = new(Keyword, ".IFNDEF", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
-            if (assembler.currentToken?.Kind != Symbol)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken?.Kind != Symbol)
             {
                 assembler.OnError("Expected a symbol");
                 return false;
             }
 
-            assembler.status.Push(!assembler.symbols.ContainsKey(assembler.currentToken.Text));
+            assembler.Status.Push(!assembler.Symbols.ContainsKey(assembler.CurrentToken.Text));
         }
         else
-            assembler.status.Push(false);
+            assembler.Status.Push(false);
 
         return false;
 
     }, true);
 
 
-    protected readonly Opcode<Assembler> ELSE = new(Keyword, ".ELSE", assembler =>
+    public static readonly Opcode ELSE = new(Keyword, ".ELSE", assembler =>
     {
-        if (assembler.status.Count != 0)
+        if (assembler.Status.Count != 0)
         {
-            var state = assembler.status.Pop();
-            assembler.status.Push((assembler.IsActive && !state) ? true : false);
+            var state = assembler.Status.Pop();
+            assembler.Status.Push((assembler.IsActive && !state) ? true : false);
         }
         else
             assembler.OnError(ErrorMessage.ERR_NO_OPEN_IF);
@@ -614,10 +614,10 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Opcode<Assembler> ENDIF = new(Keyword, ".ENDIF", assembler =>
+    public static readonly Opcode ENDIF = new(Keyword, ".ENDIF", assembler =>
     {
-        if (assembler.status.Count != 0)
-            assembler.status.Pop();
+        if (assembler.Status.Count != 0)
+            assembler.Status.Pop();
         else
             assembler.OnError(ErrorMessage.ERR_NO_OPEN_IF);
 
@@ -625,14 +625,14 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    protected readonly Opcode<Assembler> ERROR = new(Keyword, ".ERROR", assembler =>
+    public static readonly Opcode ERROR = new(Keyword, ".ERROR", assembler =>
     {
         if (assembler.IsActive)
         {
-            assembler.currentToken = assembler.NextRealToken();
-            if (assembler.currentToken?.Kind == String)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken?.Kind == String)
             {
-                assembler.OnError(assembler.currentToken.Text);
+                assembler.OnError(assembler.CurrentToken.Text);
             }
             else
                 assembler.OnError(ErrorMessage.ERR_EXPECTED_QUOTED_MESSAGE);
@@ -642,14 +642,14 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    protected readonly Opcode<Assembler> WARN = new(Keyword, ".WARN", assembler =>
+    public static readonly Opcode WARN = new(Keyword, ".WARN", assembler =>
     {
         if (!assembler.IsActive) return (false);
 
-        assembler.currentToken = assembler.NextRealToken();
-        if (assembler.currentToken?.Kind == String)
+        assembler.CurrentToken = assembler.NextRealToken();
+        if (assembler.CurrentToken?.Kind == String)
         {
-            assembler.OnWarning(assembler.currentToken.Text);
+            assembler.OnWarning(assembler.CurrentToken.Text);
         }
         else
             assembler.OnError(ErrorMessage.ERR_EXPECTED_QUOTED_MESSAGE);
@@ -657,33 +657,33 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    protected readonly Token MACRO = new Opcode<Assembler>(Keyword, ".MACRO", assembler =>
+    public static readonly Token MACRO = new Opcode(Keyword, ".MACRO", assembler =>
     {
-        if ((assembler.label != null) && ((assembler.macroName = assembler.label.Text) != null))
+        if ((assembler.Label != null) && ((assembler.MacroName = assembler.Label.Text) != null))
         {
             var arguments = new List<string>();
 
             for (; ; )
             {
-                if ((assembler.currentToken = assembler.NextRealToken()) == EOL) break;
+                if ((assembler.CurrentToken = assembler.NextRealToken()) == EOL) break;
 
-                if ((assembler.currentToken?.Kind == Symbol) || (assembler.currentToken?.Kind == Keyword))
-                    arguments.Add(assembler.currentToken.Text);
+                if ((assembler.CurrentToken?.Kind == Symbol) || (assembler.CurrentToken?.Kind == Keyword))
+                    arguments.Add(assembler.CurrentToken.Text);
                 else
                 {
                     assembler.OnError("Illegal macro argument");
                     break;
                 }
 
-                if ((assembler.currentToken = assembler.NextRealToken()) == EOL) break;
+                if ((assembler.CurrentToken = assembler.NextRealToken()) == EOL) break;
 
-                if (assembler.currentToken == Comma) continue;
+                if (assembler.CurrentToken == Comma) continue;
 
-                assembler.OnError("Unexpected currentToken after macro argument");
+                assembler.OnError("Unexpected CurrentToken after macro argument");
                 break;
             }
 
-            assembler.savedLines = new MacroSource(arguments);
+            assembler.SavedLines = new MacroSource(arguments);
         }
         else
             assembler.OnError("No macro name has been specified");
@@ -692,12 +692,12 @@ public abstract class Assembler : Application, IAssembler
 
     });
 
-    protected readonly Token ENDM = new Opcode<Assembler>(Keyword, ".ENDM", assembler =>
+    public static readonly Token ENDM = new Opcode(Keyword, ".ENDM", assembler =>
     {
-        if (assembler.savedLines != null)
+        if (assembler.SavedLines != null)
         {
-            assembler.macros.Add(assembler.macroName ?? string.Empty, assembler.savedLines);
-            assembler.savedLines = null;
+            assembler.Macros.Add(assembler.MacroName, assembler.SavedLines);
+            assembler.SavedLines = null;
         }
         else
             assembler.OnError(".ENDM without a preceding .MACRO");
@@ -705,22 +705,22 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Token EXITM = new Opcode<Assembler>(Keyword, ".EXITM", assembler =>
+    public static readonly Token EXITM = new Opcode(Keyword, ".EXITM", assembler =>
     {
-        while (assembler.sources.Peek() is MacroSource)
-            assembler.sources.Pop();
+        while (assembler.Sources.Peek() is MacroSource)
+            assembler.Sources.Pop();
 			
         return (false);
     });
 
-    protected readonly Token REPEAT = new Opcode<Assembler>(Keyword, ".REPEAT", assembler =>
+    public static readonly Token REPEAT = new Opcode(Keyword, ".REPEAT", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
+        assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
 
         if (expr?.IsAbsolute == true)
         {
-            assembler.savedLines = new RepeatSource((int)expr.Resolve());
+            assembler.SavedLines = new RepeatSource((int)expr.Resolve());
         }
         else
             assembler.OnError(ErrorMessage.ERR_CONSTANT_EXPR);
@@ -728,12 +728,12 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Token ENDR = new Opcode<Assembler>(Keyword, ".ENDR", assembler =>
+    public static readonly Token ENDR = new Opcode(Keyword, ".ENDR", assembler =>
     {
-        if (assembler.savedLines != null)
+        if (assembler.SavedLines != null)
         {
-            assembler.sources.Push(assembler.savedLines);
-            assembler.savedLines = null;
+            assembler.Sources.Push(assembler.SavedLines);
+            assembler.SavedLines = null;
         }
         else
             assembler.OnError(".ENDR without preceding .REPEAT");
@@ -741,108 +741,108 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode<Assembler> CODE = new Opcode<Assembler>(Keyword, ".CODE", assembler =>
+    protected readonly Opcode CODE = new Opcode(Keyword, ".CODE", assembler =>
     {
         assembler.SetSection(".code");
         return (false);
     });
 
-    protected readonly Opcode<Assembler> DATA = new Opcode<Assembler>(Keyword, ".DATA", assembler =>
+    protected readonly Opcode DATA = new Opcode(Keyword, ".DATA", assembler =>
     {
         assembler.SetSection(".data");
         return (false);
     });
 
-    protected readonly Opcode<Assembler> BSS = new Opcode<Assembler>(Keyword, ".BSS", assembler =>
+    protected readonly Opcode BSS = new Opcode(Keyword, ".BSS", assembler =>
     {
         assembler.SetSection(".bss");
         return (false);
     });
 
-    protected readonly Opcode<Assembler> ORG = new Opcode<Assembler>(Keyword, ".ORG", assembler =>
+    protected readonly Opcode ORG = new Opcode(Keyword, ".ORG", assembler =>
     {
-        assembler.currentToken = assembler.NextRealToken();
+        assembler.CurrentToken = assembler.NextRealToken();
         Expr? expr = assembler.ParseExpression();
 
         if (expr is { IsAbsolute: true })
         {
-            assembler.sections.Add(assembler.sectionName ?? "", assembler.section = assembler.section?.SetOrigin(expr.Resolve()));
+            assembler.Sections.SafeAdd(assembler.SectionName, assembler.Section = assembler.Section?.SetOrigin(expr.Resolve()));
         }
         else
             assembler.OnError(ErrorMessage.ERR_CONSTANT_EXPR);
         return (true);
     });
 
-    protected readonly Opcode<Assembler> EXTERN = new Opcode<Assembler>(Keyword, ".EXTERN", assembler =>
+    protected readonly Opcode EXTERN = new Opcode(Keyword, ".EXTERN", assembler =>
     {
-        if (assembler.pass == Pass.FIRST)
+        if (assembler.Pass== Pass.FIRST)
         {
             do
             {
-                assembler.currentToken = assembler.NextRealToken();
-                if (assembler.currentToken?.Kind != Symbol)
+                assembler.CurrentToken = assembler.NextRealToken();
+                if (assembler.CurrentToken?.Kind != Symbol)
                 {
                     assembler.OnError("Expected a list of symbols");
                     return (false);
                 }
 
-                var name = assembler.currentToken.Text;
-                assembler.externs.Add(name);
-                if (!assembler.symbols.ContainsKey(name))
-                    assembler.symbols.Add(name, new Extern(name));
-                assembler.currentToken = assembler.NextRealToken();
-            } while (assembler.currentToken == Comma);
+                var name = assembler.CurrentToken.Text;
+                assembler.Externals.Add(name);
+                if (!assembler.Symbols.ContainsKey(name))
+                    assembler.Symbols.Add(name, new Extern(name));
+                assembler.CurrentToken = assembler.NextRealToken();
+            } while (assembler.CurrentToken == Comma);
         }
 
         return (false);
     });
 
-    protected readonly Opcode<Assembler> GLOBAL = new Opcode<Assembler>(Keyword, ".GLOBAL", assembler =>
+    protected readonly Opcode GLOBAL = new Opcode(Keyword, ".GLOBAL", assembler =>
     {
-        if (assembler.pass == Pass.FIRST)
+        if (assembler.Pass == Pass.FIRST)
         {
             do
             {
-                assembler.currentToken = assembler.NextRealToken();
-                if (assembler.currentToken?.Kind != Symbol)
+                assembler.CurrentToken = assembler.NextRealToken();
+                if (assembler.CurrentToken?.Kind != Symbol)
                 {
                     assembler.OnError("Expected a list of symbols");
                     return (false);
                 }
 
-                var name = assembler.currentToken.Text;
-                assembler.globals.Add(name);
+                var name = assembler.CurrentToken.Text;
+                assembler.Globals.Add(name);
 
-                assembler.currentToken = assembler.NextRealToken();
-            } while (assembler.currentToken == Comma);
+                assembler.CurrentToken = assembler.NextRealToken();
+            } while (assembler.CurrentToken == Comma);
         }
 
         return (false);
     });
 
-    protected readonly Opcode<Assembler> LIST = new Opcode<Assembler>(Keyword, ".LIST", assembler =>
+    protected readonly Opcode LIST = new Opcode(Keyword, ".LIST", assembler =>
     {
-        assembler.listing = true;
+        assembler.Listing = true;
         return (false);
     });
 
-    protected readonly Opcode<Assembler> NOLIST = new Opcode<Assembler>(Keyword, ".NOLIST", assembler => 
+    protected readonly Opcode NOLIST = new Opcode(Keyword, ".NOLIST", assembler => 
     {
-            assembler.listing = false;
+            assembler.Listing = false;
             return (false);
     });
 
-    protected readonly Opcode<Assembler> PAGE = new Opcode<Assembler>(Keyword, ".PAGE", assembler => 
+    protected readonly Opcode PAGE = new Opcode(Keyword, ".PAGE", assembler => 
     {
-            assembler.throwPage = true;
+            assembler.ThrowPage = true;
             return (false);
     });
 
-    protected Opcode<Assembler> TITLE = new Opcode<Assembler>(Keyword, ".TITLE", assembler => 
+    protected Opcode TITLE = new Opcode(Keyword, ".TITLE", assembler => 
     {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
-            assembler.title = assembler.currentToken?.Text;
+            assembler.Title = assembler.CurrentToken.Text;
             return (false);
     });
 
@@ -854,18 +854,18 @@ public abstract class Assembler : Application, IAssembler
  */
     public void AddByte(Expr? expr)
     {
-        memory?.AddByte(module, section, expr);
+        Memory?.AddByte(Module, Section, expr);
     }
 
     private void SetLabel(string name, Value value)
     {
-        if ((pass == Pass.FIRST) && symbols.ContainsKey(name))
+        if ((Pass == Pass.FIRST) && Symbols.ContainsKey(name))
         {
             OnError($"{ErrorMessage.ERR_LABEL_REDEFINED}{name}");
         }
         else
         {
-            symbols.Add(name, value);
+            Symbols.SafeAdd(name, value);
         }
     }
     /**
@@ -882,27 +882,32 @@ public abstract class Assembler : Application, IAssembler
     */
     public void AddByte(byte value)
     {
-        memory?.AddByte(module, section, value);
+        Memory?.AddByte(Module, Section, value);
     }
 
-    protected void AddWord(Expr? expr)
+    public abstract int ParseMode(int bank);
+    public abstract void GenerateImmediate(int opcode, Expr? expr, int bits);
+    public abstract void GenerateImplied(int opcode);
+    public abstract Expr? Arg { get; set; }
+
+    public void AddWord(Expr? expr)
     {
-        memory?.AddWord(module, section, expr);
+        Memory?.AddWord(Module, Section, expr);
     }
 
-    protected void AddWord(long value)
+    public void AddWord(long value)
     {
-        memory?.AddWord(module, section, value);
+        Memory?.AddWord(Module, Section, value);
     }
 
-    protected void AddLong(Expr? expr)
+    public void AddLong(Expr? expr)
     {
-        memory?.AddLong(module, section, expr);
+        Memory?.AddLong(Module, Section, expr);
     }
 
-    protected void AddLong(long value)
+    public void AddLong(long value)
     {
-        memory?.AddLong(module, section, value);
+        Memory?.AddLong(Module, Section, value);
     }
 
     /**
@@ -911,7 +916,21 @@ public abstract class Assembler : Application, IAssembler
 	 * 
 	 * @return <CODE>true</CODE> if source lines should be processed.
 	 */
-    protected bool IsActive => status.Count == 0 || status.Peek();
+    public bool IsActive => Status.Count == 0 || Status.Peek();
+
+    public Stack<bool> Status { get; } = new();
+    public string MacroName { get; set; }
+    public TextSource? SavedLines { get; set; }
+    public Dictionary<string, TextSource> Macros { get; } = new();
+    public Dictionary<string, Section?> Sections { get; } = new();
+    public bool ThrowPage { get; set; }
+    public Module? Module { get; set; }
+    public Section? Section { get; set; }
+    public HashSet<string> Globals { get; } = new();
+    public string SectionName { get; set; }
+    public bool Listing { get; set; }
+    public string Title { get; set; }
+
     public Expr? ParseExpression()
     {
         try
@@ -926,22 +945,23 @@ public abstract class Assembler : Application, IAssembler
         return (ZERO);
     }
 
-
+    public abstract Expr? ParseImmediate();
+    public abstract int DataBank { get; set; }
 
     private Expr? ParseLogical()
     {
         var expr = ParseBinary();
 
-        while ((currentToken == LogicalAnd) || (currentToken == LogicalOr))
+        while ((CurrentToken == LogicalAnd) || (CurrentToken == LogicalOr))
         {
-            if (currentToken == LogicalAnd)
+            if (CurrentToken == LogicalAnd)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.LogicalAnd(expr, ParseBinary());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.LogicalOr(expr, ParseBinary());
             }
         }
@@ -952,21 +972,21 @@ public abstract class Assembler : Application, IAssembler
     {
         var expr = ParseEquality();
 
-        while ((currentToken == BinaryAnd) || (currentToken == BinaryOr) || (currentToken == BinaryXor))
+        while ((CurrentToken == BinaryAnd) || (CurrentToken == BinaryOr) || (CurrentToken == BinaryXor))
         {
-            if (currentToken == BinaryAnd)
+            if (CurrentToken == BinaryAnd)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.And(expr, ParseEquality());
             }
-            else if (currentToken == BinaryOr)
+            else if (CurrentToken == BinaryOr)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Or(expr, ParseEquality());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Xor(expr, ParseEquality());
             }
         }
@@ -977,16 +997,16 @@ public abstract class Assembler : Application, IAssembler
     {
         Expr? expr = ParseInequality();
 
-        while ((currentToken == EQ) || (currentToken == NE))
+        while ((CurrentToken == EQ) || (CurrentToken == NE))
         {
-            if (currentToken == EQ)
+            if (CurrentToken == EQ)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Eq(expr, ParseInequality());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Ne(expr, ParseInequality());
             }
         }
@@ -997,26 +1017,26 @@ public abstract class Assembler : Application, IAssembler
     {
         Expr? expr = ParseShift();
 
-        while ((currentToken == Lt) || (currentToken == Le) || (currentToken == Gt) || (currentToken == Ge))
+        while ((CurrentToken == Lt) || (CurrentToken == Le) || (CurrentToken == Gt) || (CurrentToken == Ge))
         {
-            if (currentToken == Lt)
+            if (CurrentToken == Lt)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Lt(expr, ParseShift());
             }
-            else if (currentToken == Le)
+            else if (CurrentToken == Le)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Le(expr, ParseShift());
             }
-            else if (currentToken == Gt)
+            else if (CurrentToken == Gt)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Gt(expr, ParseShift());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Ge(expr, ParseShift());
             }
         }
@@ -1027,16 +1047,16 @@ public abstract class Assembler : Application, IAssembler
     {
         Expr? expr = ParseAddSub();
 
-        while ((currentToken == RShift) || (currentToken == LShift))
+        while ((CurrentToken == RShift) || (CurrentToken == LShift))
         {
-            if (currentToken == RShift)
+            if (CurrentToken == RShift)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Shr(expr, ParseAddSub());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Shl(expr, ParseAddSub());
             }
         }
@@ -1047,16 +1067,16 @@ public abstract class Assembler : Application, IAssembler
     {
         Expr? expr = ParseMulDiv();
 
-        while ((currentToken == Plus) || (currentToken == Minus))
+        while ((CurrentToken == Plus) || (CurrentToken == Minus))
         {
-            if (currentToken == Plus)
+            if (CurrentToken == Plus)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Add(expr, ParseMulDiv());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Sub(expr, ParseMulDiv());
             }
         }
@@ -1067,21 +1087,21 @@ public abstract class Assembler : Application, IAssembler
     {
         Expr? expr = ParseUnary();
 
-        while ((currentToken == Times) || (currentToken == Divide) || (currentToken == Modulo))
+        while ((CurrentToken == Times) || (CurrentToken == Divide) || (CurrentToken == Modulo))
         {
-            if (currentToken == Times)
+            if (CurrentToken == Times)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Mul(expr, ParseUnary());
             }
-            else if (currentToken == Divide)
+            else if (CurrentToken == Divide)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Div(expr, ParseUnary());
             }
             else
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 expr = Expr.Mod(expr, ParseUnary());
             }
         }
@@ -1090,69 +1110,69 @@ public abstract class Assembler : Application, IAssembler
 
     private Expr? ParseUnary()
     {
-        if (currentToken == Minus)
+        if (CurrentToken == Minus)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (Expr.Neg(ParseUnary()));
         }
 
-        if (currentToken == Plus)
+        if (CurrentToken == Plus)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (ParseUnary());
         }
 
-        if (currentToken == Complement)
+        if (CurrentToken == Complement)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (Expr.Cpl(ParseUnary()));
         }
-        if (currentToken == LogicalNot)
+        if (CurrentToken == LogicalNot)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (Expr.LogicalNot(ParseUnary()));
         }
-        if (currentToken == LO)
+        if (CurrentToken == LO)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (Expr.And(ParseUnary(), MASK));
         }
-        if (currentToken == HI)
+        if (CurrentToken == HI)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (Expr.And(Expr.Shr(ParseUnary(), EIGHT), MASK));
         }
-        if (currentToken == BANK)
+        if (CurrentToken == BANK)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             return (Expr.Shr(ParseUnary(), SIXTEEN));
         }
 
-        if (currentToken != STRLEN) return (ParseValue());
+        if (CurrentToken != STRLEN) return (ParseValue());
 
-        currentToken = NextRealToken();
-        if (currentToken != LParen)
+        CurrentToken = NextRealToken();
+        if (CurrentToken != LParen)
         {
             OnError("Expected open parenthesis");
             return (null);
         }
 
-        currentToken = NextRealToken();
-        if ((currentToken == null) || (currentToken.Kind != String))
+        CurrentToken = NextRealToken();
+        if ((CurrentToken == null) || (CurrentToken.Kind != String))
         {
             OnError("Expected string value in STRLEN");
             return (null);
         }
 
-        var value = new Value(null, currentToken.Text.Length);
+        var value = new Value(null, CurrentToken.Text.Length);
 
-        currentToken = NextRealToken();
-        if (currentToken != RParen)
+        CurrentToken = NextRealToken();
+        if (CurrentToken != RParen)
         {
             OnError("Expected close parenthesis");
             return (null);
         }
-        currentToken = NextRealToken();
+        CurrentToken = NextRealToken();
 
         return (value);
 
@@ -1166,45 +1186,45 @@ public abstract class Assembler : Application, IAssembler
     {
         Expr? expr = null;
 
-        if (currentToken == Origin || currentToken == Times)
+        if (CurrentToken == OriginToken || CurrentToken == Times)
         {
-            expr = origin;
-            currentToken = NextRealToken();
+            expr = Origin;
+            CurrentToken = NextRealToken();
         }
-        else if (currentToken == LParen)
+        else if (CurrentToken == LParen)
         {
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
             expr = ParseExpression();
-            if (currentToken != RParen)
+            if (CurrentToken != RParen)
                 OnError(ErrorMessage.ERR_CLOSING_PAREN);
             else
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
         }
-        else if (currentToken?.Kind == Number)
+        else if (CurrentToken?.Kind == Number)
         {
-            expr = new Value(null, ((int)((currentToken?.Value) ?? 0)));
-            currentToken = NextRealToken();
+            expr = new Value(null, ((int)((CurrentToken?.Value) ?? 0)));
+            CurrentToken = NextRealToken();
         }
-        else if (currentToken?.Kind == Symbol || currentToken?.Kind == Keyword)
+        else if (CurrentToken?.Kind == Symbol || CurrentToken?.Kind == Keyword)
         {
-            if (currentToken.Text[0] == '.' && !notLocal.Contains(currentToken.Text))
+            if (CurrentToken.Text[0] == '.' && !NotLocal.Contains(CurrentToken.Text))
             {
                 if (lastLabel != null)
-                    expr = symbols[lastLabel + currentToken.Text];
+                    expr = Symbols[lastLabel + CurrentToken.Text];
                 else
                     OnError(ErrorMessage.ERR_NO_GLOBAL);
             }
             else
-                expr = symbols[currentToken.Text];
+                Symbols.TryGetValue(CurrentToken.Text, out expr);
 
             if (expr == null)
             {
-                if (pass == Pass.FINAL)
-                    OnError(ErrorMessage.ERR_UNDEF_SYMBOL + currentToken.Text);
+                if (Pass == Pass.FINAL)
+                    OnError(ErrorMessage.ERR_UNDEF_SYMBOL + CurrentToken.Text);
                 expr = ZERO;
             }
 
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
         }
 
         return expr;
@@ -1214,9 +1234,9 @@ public abstract class Assembler : Application, IAssembler
     /// Constructs an <see cref="Assembler"/> that adds code to the given module.
     /// </summary>
     /// <param name="module">The object module</param>
-    protected Assembler(Module module)
+    protected Assembler(Module? module)
     {
-        this.module = module;
+        Module = module;
     }
 
     /// <summary>
@@ -1225,7 +1245,7 @@ public abstract class Assembler : Application, IAssembler
     /// <param name="memoryModel">The <see cref="MemoryModel"/> instance</param>
     protected void SetMemoryModel(MemoryModel memoryModel)
     {
-        memory = memoryModel;
+        Memory = memoryModel;
 
         memoryModel.AssemblerError += (sender, args) => OnError(args.Message);
         memoryModel.AssemblerWarning += (sender, args) => OnWarning(args.Message);
@@ -1318,30 +1338,33 @@ public abstract class Assembler : Application, IAssembler
     protected virtual void StartPass()
     {
         listing = true;
-        title = "";
+        Title = "";
         lineCount = 0;
-        throwPage = false;
+        ThrowPage = false;
 
-        sections.Clear();
-        sections.Add(".code", module?.FindSection(".code"));
-        sections.Add(".data", module?.FindSection(".data"));
-        sections.Add(".bss", module?.FindSection(".bss"));
+        Sections.Clear();
+        Sections.Add(".code", Module?.FindSection(".code"));
+        Sections.Add(".data", Module?.FindSection(".data"));
+        Sections.Add(".bss", Module?.FindSection(".bss"));
     }
 
     protected void Process()
     {
-        while ((sources.Count != 0))
+        while ((Sources.Count != 0))
         {
             Line? nextLine;
             if ((nextLine = GetNextLine()) == null)
             {
-                sources.Pop();
+                var source = Sources.Pop();
+                source.Dispose();
+                source = null;
+
                 continue;
             }
 
             Process(nextLine);
 
-            if (pass == Pass.FINAL)
+            if (Pass == Pass.FINAL)
             {
                 Paginate(FormatListing() + ExpandText());
             }
@@ -1380,47 +1403,47 @@ public abstract class Assembler : Application, IAssembler
     /// <param name="nextLine">The next <see cref="Line"/> to be processed.</param>
     protected virtual void Process(Line nextLine)
     {
-        if (sources.Peek() is TextSource)
-            lineType = '+';
+        if (Sources.Peek() is TextSource)
+            LineType = '+';
         else
-            lineType = ' ';
+            LineType = ' ';
 
-        memory?.Clear();
+        Memory?.Clear();
 
-        label = null;
+        Label = null;
         line = nextLine;
         text = line.Text.ToCharArray();
         offset = 0;
 
-        addr = origin = section?.GetOrigin();
+        Addr = Origin = Section?.GetOrigin();
 
-        if ((currentToken = NextToken()) == EOL) return;
+        if ((CurrentToken = NextToken()) == EOL) return;
 
         // Extract and save the labels
-        if (currentToken != WhiteSpace)
+        if (CurrentToken != WhiteSpace)
         {
-            label = currentToken;
-            if (label?.Kind != Symbol)
+            Label = CurrentToken;
+            if (Label?.Kind != Symbol)
             {
-                if (pass == Pass.FIRST)
+                if (Pass == Pass.FIRST)
                 {
-                    OnWarning($"{ErrorMessage.WRN_LABEL_IS_A_RESERVED_WORD} ({label?.Text})");
+                    OnWarning($"{ErrorMessage.WRN_LABEL_IS_A_RESERVED_WORD} ({Label?.Text})");
                 }
             }
 
-            if ((currentToken = NextToken()) == Colon)
+            if ((CurrentToken = NextToken()) == Colon)
             {
-                currentToken = NextToken();
+                CurrentToken = NextToken();
             }
         }
 
-        if (currentToken == WhiteSpace) currentToken = NextRealToken();
+        if (CurrentToken == WhiteSpace) CurrentToken = NextRealToken();
 
         // Map = to .SET when used as an opcode
-        if (currentToken == EQ)
-            currentToken = Set;
+        if (CurrentToken == EQ)
+            CurrentToken = Set;
 
-        if (currentToken is Opcode<Assembler> opcode)
+        if (CurrentToken is Opcode opcode)
         {
             if (opcode.IsAlwaysActive || IsActive)
             {
@@ -1465,7 +1488,7 @@ public abstract class Assembler : Application, IAssembler
                     if (macroDepth++ == 0)
                     {
                         opcode.Compile(this);
-                        lineType = ' ';
+                        LineType = ' ';
                         return;
                     }
                 }
@@ -1476,14 +1499,14 @@ public abstract class Assembler : Application, IAssembler
                     {
                         opcode.Compile(this);
 
-                        if (label != null)
+                        if (Label != null)
                         {
-                            if (origin != null)
+                            if (Origin != null)
                             {
-                                if (label.Text[0] == '.')
+                                if (Label.Text[0] == '.')
                                 {
                                     if (lastLabel != null)
-                                        SetLabel(lastLabel + label.Text, origin);
+                                        SetLabel(lastLabel + Label.Text, Origin);
                                 }
                             }
                             else
@@ -1491,7 +1514,7 @@ public abstract class Assembler : Application, IAssembler
                                 OnError(ErrorMessage.ERR_NO_SECTION);
                             }
 
-                            if (lineType == ' ') lineType = ':';
+                            if (LineType == ' ') LineType = ':';
                         }
 
                         return;
@@ -1501,19 +1524,19 @@ public abstract class Assembler : Application, IAssembler
                 if (opcode == Equ || opcode == Set)
                 {
                     opcode.Compile(this);
-                    lineType = '=';
+                    LineType = '=';
                     return;
                 }
 
-                if (label != null)
+                if (Label != null)
                 {
-                    if (origin != null)
+                    if (Origin != null)
                     {
-                        if (label.Text[0] == '.')
+                        if (Label.Text[0] == '.')
                         {
                             if (lastLabel != null)
                             {
-                                SetLabel($"{lastLabel}{label.Text}", origin);
+                                SetLabel($"{lastLabel}{Label.Text}", Origin);
                             }
                             else
                             {
@@ -1522,8 +1545,8 @@ public abstract class Assembler : Application, IAssembler
                         }
                         else
                         {
-                            lastLabel = label.Text;
-                            SetLabel(lastLabel, origin);
+                            lastLabel = Label.Text;
+                            SetLabel(lastLabel, Origin);
                         }
                     }
                     else
@@ -1534,17 +1557,17 @@ public abstract class Assembler : Application, IAssembler
 
                 if (opcode.Compile(this))
                 {
-                    if (memory?.ByteCount > 0)
+                    if (Memory?.ByteCount > 0)
                     {
-                        if (sources.Peek() is TextSource)
-                            lineType = '+';
+                        if (Sources.Peek() is TextSource)
+                            LineType = '+';
                         else
-                            lineType = ':';
+                            LineType = ':';
                     }
                 }
             }
             else
-                lineType = '-';
+                LineType = '-';
 
 
             return;
@@ -1558,7 +1581,7 @@ public abstract class Assembler : Application, IAssembler
             return;
         }
 
-        var source = (MacroSource?)macros.GetValueOrDefault(currentToken?.Text ?? string.Empty);
+        var source = (MacroSource?)Macros.GetValueOrDefault(CurrentToken?.Text ?? string.Empty);
         if (source != null)
         {
             var values = new List<string>();
@@ -1569,30 +1592,30 @@ public abstract class Assembler : Application, IAssembler
             do
             {
                 start = offset;
-                currentToken = NextToken();
-            } while (currentToken == WhiteSpace);
+                CurrentToken = NextToken();
+            } while (CurrentToken == WhiteSpace);
 
-            while (currentToken != EOL)
+            while (CurrentToken != EOL)
             {
                 do
                 {
                     end = offset;
-                    if ((currentToken = NextRealToken()) == EOL) break;
-                } while (currentToken != Comma);
+                    if ((CurrentToken = NextRealToken()) == EOL) break;
+                } while (CurrentToken != Comma);
 
                 values.Add(new string(text, start, end - start));
                 start = offset;
             }
 
-            if (label != null)
+            if (Label != null)
             {
-                if (origin != null)
+                if (Origin != null)
                 {
-                    if (label.Text[0] == '.')
+                    if (Label.Text[0] == '.')
                     {
                         if (lastLabel != null)
                         {
-                            SetLabel($"{lastLabel}{label.Text}", origin);
+                            SetLabel($"{lastLabel}{Label.Text}", Origin);
                         }
                         else
                         {
@@ -1601,8 +1624,8 @@ public abstract class Assembler : Application, IAssembler
                     }
                     else
                     {
-                        lastLabel = label.Text;
-                        SetLabel(lastLabel, origin);
+                        lastLabel = Label.Text;
+                        SetLabel(lastLabel, Origin);
 
                     }
                 }
@@ -1612,18 +1635,18 @@ public abstract class Assembler : Application, IAssembler
                 }
             }
 
-            sources.Push(source.Invoke(++instance, values));
+            Sources.Push(source.Invoke(++instance, values));
             return;
         }
 
-        if (label != null)
+        if (Label != null)
         {
-            if (origin != null)
+            if (Origin != null)
             {
-                if (label.Text[0] == '.')
+                if (Label.Text[0] == '.')
                 {
                     if (lastLabel != null)
-                        SetLabel($"{lastLabel}{label.Text}", origin);
+                        SetLabel($"{lastLabel}{Label.Text}", Origin);
                     else
                     {
                         OnError(ErrorMessage.ERR_NO_GLOBAL);
@@ -1631,8 +1654,8 @@ public abstract class Assembler : Application, IAssembler
                 }
                 else
                 {
-                    lastLabel = label.Text;
-                    SetLabel(lastLabel, origin);
+                    lastLabel = Label.Text;
+                    SetLabel(lastLabel, Origin);
                 }
             }
             else
@@ -1640,7 +1663,7 @@ public abstract class Assembler : Application, IAssembler
                 OnError(ErrorMessage.ERR_NO_SECTION);
             }
 
-            if (lineType == ' ') lineType = ':';
+            if (LineType == ' ') LineType = ':';
         }
 
         if (IsActive) OnError(ErrorMessage.ERR_UNKNOWN_OPCODE);
@@ -1667,12 +1690,12 @@ public abstract class Assembler : Application, IAssembler
         if (!Assemble(Pass.FINAL, fileName)) return (false);
 
         // Add globally define symbols to the object module. 
-        foreach (var name in globals)
+        foreach (var name in Globals)
         {
-            var expr = symbols.GetValueOrDefault(name);
+            var expr = Symbols.GetValueOrDefault(name);
 
             if (expr != null)
-                module?.AddGlobal(name, expr);
+                Module?.AddGlobal(name, expr);
             else
                 OnError($"Undefined global symbol: {name}");
         }
@@ -1684,10 +1707,10 @@ public abstract class Assembler : Application, IAssembler
             {
                 var objectName = GetObjectFile(fileName);
 
-                module?.SetName(new FileInfo(objectName).Name);
+                Module?.SetName(new FileInfo(objectName).Name);
 
                 using StreamWriter stream = new StreamWriter(objectName);
-                stream.WriteLine("<?xml version='1.0'?>" + module);
+                stream.WriteLine("<?xml version='1.0'?>" + Module);
 
             }
             catch (Exception)
@@ -1700,7 +1723,7 @@ public abstract class Assembler : Application, IAssembler
         // Dump symbol table
         if (lineCount != 0)
         {
-            throwPage = true;
+            ThrowPage = true;
             Paginate("");
         }
 
@@ -1708,15 +1731,15 @@ public abstract class Assembler : Application, IAssembler
         Paginate("");
 
         // Sort by name
-        string[] keys = symbols.Keys.ToArray();
+        string[] keys = Symbols.Keys.ToArray();
         Array.Sort(keys);
 
         // Sort by value
         string[] values = (string[])keys.Clone();
         Array.Sort(values, Comparer<string>.Create((arg0, arg1) =>
         {
-            var lhs = symbols[arg0]?.Resolve();
-            var rhs = symbols[arg1]?.Resolve();
+            var lhs = Symbols[arg0]?.Resolve();
+            var rhs = Symbols[arg1]?.Resolve();
 
             if (lhs == rhs)
             {
@@ -1731,15 +1754,12 @@ public abstract class Assembler : Application, IAssembler
         {
             string lhs;
             string rhs;
-            string name;
-            Expr? expr;
-            long value;
 
             // Format name sice
-            name = keys[index];
+            var name = keys[index];
 
-            expr = symbols.GetValueOrDefault(name);
-            value = expr?.Resolve() ?? 0;
+            var expr = Symbols.GetValueOrDefault(name);
+            var value = expr?.Resolve() ?? 0;
 
             name = (name + "                                ")[..32];
 
@@ -1754,7 +1774,7 @@ public abstract class Assembler : Application, IAssembler
 
             // Format value side
             name = values[index];
-            expr = symbols.GetValueOrDefault(name);
+            expr = Symbols.GetValueOrDefault(name);
             value = expr?.Resolve() ?? 0;
 
             name = (name + "                                ")[..32];
@@ -1789,14 +1809,14 @@ public abstract class Assembler : Application, IAssembler
      */
     private bool Assemble(Pass pass, string fileName)
     {
-        if (!IsSupportedPass(this.pass = pass))
+        if (!IsSupportedPass(Pass = pass))
         {
             return true;
         }
 
         StartPass();
 
-        module?.Clear();
+        Module?.Clear();
 
         errors = 0;
         warnings = 0;
@@ -1816,7 +1836,7 @@ public abstract class Assembler : Application, IAssembler
                 listFile = new StreamWriter(File.OpenWrite(GetListingFile(fileName)), System.Text.Encoding.GetEncoding("ISO-8859-1"));
             }
 
-            sources.Push(new FileSource(fileName, new FileStream(fileName, FileMode.Open)));
+            Sources.Push(new FileSource(fileName, new FileStream(fileName, FileMode.Open)));
             Process();
         }
         catch (FileNotFoundException)
@@ -1848,7 +1868,7 @@ public abstract class Assembler : Application, IAssembler
     /// <returns>The next source nextLine.</returns>
     private Line? GetNextLine()
     {
-        return sources.Count == 0 ? null : sources.Peek().NextLine();
+        return Sources.Count == 0 ? null : Sources.Peek().NextLine();
     }
 
 
@@ -1856,12 +1876,12 @@ public abstract class Assembler : Application, IAssembler
     /// Print an error message.
     /// </summary>
     /// <param name="message">The _text for the error message.</param>
-    protected void OnError(string message)
+    public void OnError(string message)
     {
         var msg = $"Error: {line?.FileName} ({line?.LineNumber}) {message}";
 
         Console.Error.WriteLine(msg);
-        if (pass == Pass.FINAL)
+        if (Pass == Pass.FINAL)
             Paginate(msg);
 
         errors++;
@@ -1871,16 +1891,37 @@ public abstract class Assembler : Application, IAssembler
     /// Print a warning message.
     /// </summary>
     /// <param name="message">The _text for the warning message.</param>
-    private void OnWarning(string message)
+    public void OnWarning(string message)
     {
         var msg = $"Warning: {line?.FileName} ({line?.LineNumber}) {message}";
 
         Console.Error.WriteLine(msg);
-        if (pass == Pass.FINAL)
+        if (Pass == Pass.FINAL)
             Paginate(msg);
 
         warnings++;
     }
+
+    public abstract int DirectPage { get; set; }
+    public abstract void AddAddress(Expr? expr);
+    public abstract int IfIndex { get; set; }
+    public abstract int LoopIndex { get; set; }
+    public abstract Stack<int> Ifs { get; }
+    public abstract Stack<int> Loops { get; }
+    public abstract List<Value?> ElseAddr { get; }
+    public abstract List<Value?> EndIfAddr { get; }
+    public abstract List<Value?> LoopAddr { get; }
+    public abstract List<Value?> EndAddr { get; }
+
+    public abstract void GenerateJump(Expr? target);
+    public abstract void GenerateDirectPage(int opcode, Expr? expr);
+    public abstract void GenerateBranch(Token condition, Expr? target);
+    public abstract void GenerateAbsolute(int opcode, Expr? expr);
+    public abstract void GenerateIndirect(int opcode, Expr? expr, bool isLong);
+    public abstract void GenerateRelative(int opcode, Expr? expr, bool isLong);
+    public abstract void GenerateLong(int opcode, Expr? expr);
+    public abstract bool IsShortDistance(Expr? target);
+    public abstract bool HasShortBranch();
 
     /// <summary>
     /// Output a _line of _text to the listing, trimming trailing spaces.
@@ -1893,7 +1934,7 @@ public abstract class Assembler : Application, IAssembler
         if (lineCount == 0)
         {
             listFile.WriteLine();
-            listFile.WriteLine(title);
+            listFile.WriteLine(Title);
             listFile.WriteLine();
 
             lineCount += 3;
@@ -1915,11 +1956,11 @@ public abstract class Assembler : Application, IAssembler
             listFile.WriteLine();
         }
 
-        if (throwPage || (++lineCount == (linesPerPage - 3)))
+        if (ThrowPage || (++lineCount == (linesPerPage - 3)))
         {
             listFile.Write('\f');
             lineCount = 0;
-            throwPage = false;
+            ThrowPage = false;
         }
     }
 
@@ -1927,17 +1968,20 @@ public abstract class Assembler : Application, IAssembler
     /// Returns the current pass
     /// </summary>
     /// <returns>The current pass</returns>
-    protected Pass? GetPass()
+    public Pass? Pass
     {
-        return pass;
+        get;
+        set;
     }
+
+    public Token? CurrentToken { get; set; }
 
     /// <summary>
     /// Derives the name of the listing file from the source file.
     /// </summary>
     /// <param name="filename">The source file name</param>
     /// <returns>The name of the list file</returns>
-    protected string GetListingFile(string filename)
+    public string GetListingFile(string filename)
     {
         return Path.ChangeExtension(filename, "lst");
     }
@@ -1947,7 +1991,7 @@ public abstract class Assembler : Application, IAssembler
     /// </summary>
     /// <param name="filename"></param>
     /// <returns></returns>
-    protected string GetObjectFile(string filename)
+    private string GetObjectFile(string filename)
     {
         return Path.ChangeExtension(filename, "obj");
     }
@@ -1957,7 +2001,7 @@ public abstract class Assembler : Application, IAssembler
     /// Fetches the next <see cref="Token"/> skipping any pseudo whitespace.
     /// </summary>
     /// <returns>The next <see cref="Token"/> to be processed.</returns>
-    protected Token? NextRealToken()
+    public Token? NextRealToken()
     {
         var token = NextToken();
 
@@ -1967,6 +2011,8 @@ public abstract class Assembler : Application, IAssembler
         return (token);
     }
 
+    public int Processor { get; set; }
+
     /// <summary>
     /// Fetches the next <see cref="Token"/> consuming any that have been
     /// pushed back first
@@ -1974,8 +2020,8 @@ public abstract class Assembler : Application, IAssembler
     /// <returns>The next <see cref="Token"/> to be processed.</returns>
     private Token? NextToken()
     {
-        if (tokens.Count != 0)
-            return tokens.Pop();
+        if (Tokens.Count != 0)
+            return Tokens.Pop();
 
         return (ReadToken());
     }
@@ -1983,11 +2029,11 @@ public abstract class Assembler : Application, IAssembler
     /**
 	 * Pushes a <CODE>Token</CODE> on the stack so that it can be reread.
 	 * 
-	 * @param 	currentToken			The <CODE>Token</CODE> to be reprocessed.
+	 * @param 	CurrentToken			The <CODE>Token</CODE> to be reprocessed.
 	 */
     protected void PushToken(Token token)
     {
-        tokens.Push(token);
+        Tokens.Push(token);
     }
 
     /**
@@ -2017,9 +2063,10 @@ public abstract class Assembler : Application, IAssembler
     /// Returns the current section origin.
     /// </summary>
     /// <returns>The origin for the current _line.</returns>
-    protected Value? GetOrigin()
+    public Value? Origin
     {
-        return origin;
+        get;
+        set;
     }
 
     /// <summary>
@@ -2092,35 +2139,40 @@ public abstract class Assembler : Application, IAssembler
         return ch is >= '0' and <= '9' or >= 'A' and <= 'Z' or >= 'a' and <= 'z';
     }
 
+    public abstract void AddToken(Token token);
+
     /// <summary>
     /// Sets the value of a symbol to the given expression value.
     /// </summary>
     /// <param name="label">The symbol name.</param>
     /// <param name="value">The associated value.</param>
-    protected void DoSet(string label, Expr value)
+    public void DoSet(string label, Expr? value)
     {
-        if (symbols.ContainsKey(label))
+        if (Symbols.ContainsKey(label))
         {
-            if (variable.Contains(label))
-                symbols[label] = value;
+            if (Variable.Contains(label))
+                Symbols[label] = value;
             else
                 OnError("Symbol has already been defined.");
         }
         else
         {
-            symbols[label] = value;
-            variable.Add(label);
+            Symbols[label] = value;
+            Variable.Add(label);
         }
     }
+
+    public abstract int BitsA { get; set; }
+    public abstract int BitsI { get; set; }
 
     /**
     * Allows a derived class to modify the active section name.
     * 
     * @param 	name			The name of the section to activate.
     */
-    protected void SetSection(string name)
+    public void SetSection(string name)
     {
-        section = sections[sectionName = name];
+        Section = Sections[SectionName = name];
     }
 
     private static readonly Value MASK = new(null, 0xFF);
@@ -2147,38 +2199,16 @@ public abstract class Assembler : Application, IAssembler
     private string? lastLabel = null;
 
     // the current _label (if any)
-    protected Token? label = null;
+    //protected Token? label = null;
 
 
     /**
 	 * The type of _line we are compiling (for the listing).
 	 */
-    protected char? lineType;
-
-    /**
-	 * The address of the _line.
-	 */
-    protected Expr? addr;
-
-    /**
-	 * Title string for listing output
-	 */
-    protected string? title;
-
-    /**
- * The current <CODE>Token</CODE> under consideration.
- */
-    protected Token? currentToken;
+    protected char? LineType;
 
 
-    protected MemoryModel? memory = null;
-
-
-    /**
-	 * The collection of named sections.
-	 */
-    protected Dictionary<string, Section?> sections = new();
-
+    protected MemoryModel? Memory;
 
     // Tab expansion size.
     private readonly int tabSize = 8;
@@ -2194,32 +2224,6 @@ public abstract class Assembler : Application, IAssembler
 
     // Writer assigned to listing file in final pass.
     private StreamWriter? listFile = null;
-
-    // Indicates that a page should be thrown after the next output _line.
-    private bool throwPage;
-
-    // The module being generated.
-    private Module? module;
-
-    // The current sections.
-    protected Section? section;
-
-    private string? sectionName = null;
-
-    // The current pass.
-    private Pass? pass;
-
-    // Holds the origin of the current instruction.
-    private Value? origin;
-
-    // A Stack used to store the active code sources.
-    private Stack<Source> sources = new();
-
-    // A Stack used to store previously processed tokens
-    private Stack<Token> tokens = new();
-
-    // A Stack used record conditional status
-    private Stack<bool> status = new();
 
     // The current _line being assembled.
     private Line? line = null;
@@ -2237,22 +2241,20 @@ public abstract class Assembler : Application, IAssembler
     private int warnings;
 
     // The subset of symbols that may be redefined.
-    private HashSet<string> variable = new();
 
     // The set of symbols which will be exported.
-    private HashSet<string> globals = new();
+    //private HashSet<string> globals = new();
 
     // The set of symbols starting with '.' that are not local labels
-    private HashSet<string> notLocal = new();
+    //private HashSet<string> notLocal = new();
 
     // The set of symbol which have been imported.
-    private HashSet<string> externs = new();
 
     // The set of defined macros.
-    private readonly Dictionary<string, TextSource> macros = new();
+    //private readonly Dictionary<string, TextSource> macros = new();
 
     // The name of the current macro
-    private string? macroName = null;
+    //private string? macroName = null;
 
     // The TextSource used to capture macro or repeat lines.
     private TextSource? savedLines = null;
@@ -2302,14 +2304,18 @@ public abstract class Assembler : Application, IAssembler
 
         return null;
     }
-    
-    /// <summary>
-    /// Provides access to the output module.
-    /// </summary>
-    /// <returns>The current module.</returns>
-    protected Module? GetModule()
-    {
-        return (module);
-    }
+
+    public Stack<ISource> Sources { get; } = new();
+
+    public Expr? Addr { get; set; }
+
+    public Token? Label { get; set; }
+    public HashSet<string> Variable { get; } = new();
+
+    public Dictionary<string, Expr?> Symbols { get; } = new();
+
+    public HashSet<string> NotLocal { get; } = new();
+    public HashSet<string> Externals { get; } = new();
+    public Stack<Token> Tokens { get; } = new();
 
 }
