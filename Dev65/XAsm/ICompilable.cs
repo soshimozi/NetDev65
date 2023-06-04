@@ -1,6 +1,6 @@
 ﻿namespace Dev65.XAsm;
 
-public interface ICompilable<in TAssembler>
+public interface ICompilable
 {
-    bool Compile(TAssembler assembler);
+    bool Compile(IAssembler assembler);
 }

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 /// <author>Andrew Jacobs</author>
 /// <version>$Id$</version>
-public abstract class TextSource : Source
+public abstract class TextSource : ISource
 {
     /// <summary>
     /// A <see cref="List{T}"/> of stored source lines.
@@ -31,7 +31,7 @@ public abstract class TextSource : Source
     /// <summary>
     /// Fetches the next line of source text from the underlying storage and bundles it with its origin details.
     /// </summary>
-    /// <returns>The next line of source text or <c>null</c> if the end of this <see cref="Source"/> has been reached.</returns>
+    /// <returns>The next line of source text or <c>null</c> if the end of this <see cref="ISource"/> has been reached.</returns>
     public virtual Line? NextLine()
     {
         if (nextLine < lines.Count)
@@ -64,5 +64,9 @@ public abstract class TextSource : Source
     protected void Reset()
     {
         nextLine = 0;
+    }
+
+    public void Dispose()
+    {
     }
 }

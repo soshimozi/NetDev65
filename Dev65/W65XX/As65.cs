@@ -13,6 +13,11 @@ namespace Dev65.W65XX;
 /// </summary>
 public sealed class As65 : Assembler
 {
+    public static void AssemblerMain(string[] args)
+    {
+        new As65().Run(args);
+    }
+
     // Bit mask for 6501 processor.
     private const int M6501 = 1 << 0;
 
@@ -32,9 +37,11 @@ public sealed class As65 : Assembler
     private const int M65832 = 1 << 5;
 
     // Patern to match any processor type
+    // ReSharper disable once UnusedMember.Local
     private const int ANY = M6501 | M6502 | M65C02 | M65SC02 | M65816 | M65832;
 
     // Indicates that address mode is being parsed for bank 0
+    // ReSharper disable once UnusedMember.Local
     private const int BANK0 = 0;
 
     // Indicates that address mode is being parsed for the current data back.
@@ -44,13 +51,10 @@ public sealed class As65 : Assembler
     private const int PBANK = 2;
 
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .6501 directives.
-    /// </summary>
-    private readonly Opcode<As65> P6501 = new(Keyword, ".6501",
+    private readonly Opcode P6501 = new(Keyword, ".6501",
         assembler =>
         {
-            assembler.processor = M6501;
+            assembler.Processor = M6501;
 
             assembler.DoSet("__6501__", True);
             assembler.DoSet("__6502__", False);
@@ -59,18 +63,15 @@ public sealed class As65 : Assembler
             assembler.DoSet("__65816__", False);
             assembler.DoSet("__65832__", False);
 
-            assembler.bitsA = 8;
-            assembler.bitsI = 8;
+            assembler.BitsA = 8;
+            assembler.BitsI = 8;
 
             return false;
         });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .6502 directives.
-    /// </summary>
-    private readonly Opcode<As65> P6502 = new(Keyword, ".65O2", as65 =>
+    private readonly Opcode P6502 = new(Keyword, ".6502", as65 =>
     {
-        as65.processor = M6502;
+        as65.Processor = M6502;
 
         as65.DoSet("__6501__", False);
         as65.DoSet("__6502__", True);
@@ -79,19 +80,16 @@ public sealed class As65 : Assembler
         as65.DoSet("__65816__", False);
         as65.DoSet("__65832__", False);
 
-        as65.bitsA = 8;
-        as65.bitsI = 8;
+        as65.BitsA = 8;
+        as65.BitsI = 8;
 
         return (false);
     });
 
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .65C02 directives.
-    /// </summary>
-    private readonly Opcode<As65> P65C02 = new(Keyword, ".65C02", as65 =>
+    private readonly Opcode P65C02 = new(Keyword, ".65C02", as65 =>
     {
-        as65.processor = M65C02;
+        as65.Processor = M65C02;
 
         as65.DoSet("__6501__", False);
         as65.DoSet("__6502__", False);
@@ -100,18 +98,15 @@ public sealed class As65 : Assembler
         as65.DoSet("__65816__", False);
         as65.DoSet("__65832__", False);
 
-        as65.bitsA = 8;
-        as65.bitsI = 8;
+        as65.BitsA = 8;
+        as65.BitsI = 8;
 
         return (false);
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .65CS02 directives.
-    /// </summary>
-    private readonly Opcode<As65> P65SC02 = new(Keyword, ".65SC02", as65 =>
+    private readonly Opcode P65SC02 = new(Keyword, ".65SC02", as65 =>
     {
-        as65.processor = M65SC02;
+        as65.Processor = M65SC02;
 
         as65.DoSet("__6501__", False);
         as65.DoSet("__6502__", False);
@@ -120,19 +115,16 @@ public sealed class As65 : Assembler
         as65.DoSet("__65816__", False);
         as65.DoSet("__65832__", False);
 
-        as65.bitsA = 8;
-        as65.bitsI = 8;
+        as65.BitsA = 8;
+        as65.BitsI = 8;
 
         return (false);
 
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .65816 directives.
-    /// </summary>
-    private readonly Opcode<As65> P65816 = new(Keyword, ".65816", as65 =>
+    private readonly Opcode P65816 = new(Keyword, ".65816", as65 =>
     {
-        as65.processor = M65816;
+        as65.Processor = M65816;
         as65.DoSet("__6501__", False);
         as65.DoSet("__6502__", False);
         as65.DoSet("__65C02__", False);
@@ -140,8 +132,8 @@ public sealed class As65 : Assembler
         as65.DoSet("__65816__", True);
         as65.DoSet("__65832__", False);
 
-        as65.bitsA = 8;
-        as65.bitsI = 8;
+        as65.BitsA = 8;
+        as65.BitsI = 8;
 
         return (false);
     });
@@ -150,9 +142,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .65832 directives.
     /// </summary>
-    private readonly Opcode<As65> P65832 = new(Keyword, ".65832", as65 =>
+    private readonly Opcode P65832 = new(Keyword, ".65832", as65 =>
     {
-        as65.processor = M65816;
+        as65.Processor = M65816;
         as65.DoSet("__6501__", False);
         as65.DoSet("__6502__", False);
         as65.DoSet("__65C02__", False);
@@ -160,8 +152,8 @@ public sealed class As65 : Assembler
         as65.DoSet("__65816__", False);
         as65.DoSet("__65832__", True);
 
-        as65.bitsA = 8;
-        as65.bitsI = 8;
+        as65.BitsA = 8;
+        as65.BitsI = 8;
 
         return (false);
     });
@@ -169,7 +161,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .PAGE0 directives.
     /// </summary>
-    private readonly Opcode<As65> PAGE0 = new(Keyword, ".PAGE0", as65 =>
+    private readonly Opcode PAGE0 = new(Keyword, ".PAGE0", as65 =>
     {
         as65.SetSection(".page0");
         return false;
@@ -178,15 +170,15 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .DBREG directives.
     /// </summary>
-    private readonly Opcode<As65> DBREG = new(Keyword, ".DBREG", as65 =>
+    private readonly Opcode DBREG = new(Keyword, ".DBREG", as65 =>
     {
-        if ((as65.processor & (M65816 | M65832)) != 0)
+        if ((as65.Processor & (M65816 | M65832)) != 0)
         {
-            as65.currentToken = as65.NextRealToken();
+            as65.CurrentToken = as65.NextRealToken();
             var expr = as65.ParseExpression();
 
             if (expr?.IsAbsolute == true)
-                as65.dataBank = (int)expr.Resolve() & 0xff;
+                as65.DataBank = (int)expr.Resolve() & 0xff;
             else
                 as65.OnError(ErrorMessage.ERR_CONSTANT_EXPR);
         }
@@ -199,15 +191,15 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .DPAGE directives.
     /// </summary>
-    private readonly Opcode<As65> DPAGE = new(Keyword, ".DPAGE", as65 =>
+    private readonly Opcode DPAGE = new(Keyword, ".DPAGE", as65 =>
     {
-        if ((as65.processor & (M65816 | M65832)) != 0)
+        if ((as65.Processor & (M65816 | M65832)) != 0)
         {
-            as65.currentToken = as65.NextRealToken();
+            as65.CurrentToken = as65.NextRealToken();
             var expr = as65.ParseExpression();
 
             if (expr?.IsAbsolute == true)
-                as65.directPage = (int)expr.Resolve() & 0xffff;
+                as65.DirectPage = (int)expr.Resolve() & 0xffff;
             else
                 as65.OnError(ErrorMessage.ERR_CONSTANT_EXPR);
         }
@@ -220,26 +212,26 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .LONGA directives.
     /// </summary>
-    private readonly Opcode<As65> LONGA = new(Keyword, ".LONGA", as65 =>
+    private readonly Opcode LONGA = new(Keyword, ".LONGA", assembler =>
     {
-        if ((as65.processor & (M65816 | M65832)) != 0)
+        if ((assembler.Processor & (M65816 | M65832)) != 0)
         {
-            as65.currentToken = as65.NextRealToken();
-            if (as65.currentToken == as65.QUESTION)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken == As65.QUESTION)
             {
-                as65.bitsA = -1;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsA = -1;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
-            else if ((as65.currentToken == as65.ON) || (as65.currentToken == as65.Off))
+            else if ((assembler.CurrentToken == As65.ON) || (assembler.CurrentToken == As65.Off))
             {
-                as65.bitsA = (as65.currentToken == as65.ON) ? 16 : 8;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsA = (assembler.CurrentToken == As65.ON) ? 16 : 8;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
             else
-                as65.OnError(ERR_EXPECTED_ON_OR_OFF);
+                assembler.OnError(ERR_EXPECTED_ON_OR_OFF);
         }
         else
-            as65.OnError(ERR_65816_ONLY);
+            assembler.OnError(ERR_65816_ONLY);
 
         return (false);
 
@@ -248,26 +240,26 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .LONGI directives.
     /// </summary>
-    private readonly Opcode<As65> LONGI = new(Keyword, ".LONGI", as65 =>
+    private readonly Opcode LONGI = new(Keyword, ".LONGI", assembler =>
     {
-        if ((as65.processor & (M65816 | M65832)) != 0)
+        if ((assembler.Processor & (M65816 | M65832)) != 0)
         {
-            as65.currentToken = as65.NextRealToken();
-            if (as65.currentToken == as65.QUESTION)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken == As65.QUESTION)
             {
-                as65.bitsI = -1;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsI = -1;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
-            else if ((as65.currentToken == as65.ON) || (as65.currentToken == as65.Off))
+            else if ((assembler.CurrentToken == As65.ON) || (assembler.CurrentToken == As65.Off))
             {
-                as65.bitsI = (as65.currentToken == as65.ON) ? 16 : 8;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsI = (assembler.CurrentToken == As65.ON) ? 16 : 8;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
             else
-                as65.OnError(ERR_EXPECTED_ON_OR_OFF);
+                assembler.OnError(ERR_EXPECTED_ON_OR_OFF);
         }
         else
-            as65.OnError(ERR_65816_ONLY);
+            assembler.OnError(ERR_65816_ONLY);
 
         return (false);
 
@@ -276,27 +268,27 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .WIDEA directives.
     /// </summary>
-    private readonly Opcode<As65> WIDEA = new(Keyword, ".WIDEA", as65 =>
+    private readonly Opcode WIDEA = new(Keyword, ".WIDEA", assembler =>
     {
-        if (as65.processor == M65832)
+        if (assembler.Processor == M65832)
         {
-            as65.currentToken = as65.NextRealToken();
-            if (as65.currentToken == as65.QUESTION)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken == As65.QUESTION)
             {
-                as65.bitsA = -1;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsA = -1;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
 
-            if ((as65.currentToken == as65.ON) || (as65.currentToken == as65.Off))
+            if ((assembler.CurrentToken == As65.ON) || (assembler.CurrentToken == As65.Off))
             {
-                as65.bitsA = (as65.currentToken == as65.ON) ? 32 : 8;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsA = (assembler.CurrentToken == As65.ON) ? 32 : 8;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
             else
-                as65.OnError(ERR_EXPECTED_ON_OR_OFF);
+                assembler.OnError(ERR_EXPECTED_ON_OR_OFF);
         }
         else
-            as65.OnError(ERR_65832_ONLY);
+            assembler.OnError(ERR_65832_ONLY);
 
         return (false);
     });
@@ -304,29 +296,29 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .WIDEI directives.
     /// </summary>
-    private readonly Opcode<As65> WIDEI = new(Keyword, ".WIDEI", as65 =>
+    private readonly Opcode WIDEI = new(Keyword, ".WIDEI", assembler =>
     {
-        if (as65.processor == M65832)
+        if (assembler.Processor == M65832)
         {
-            as65.currentToken = as65.NextRealToken();
-            if (as65.currentToken == as65.QUESTION)
+            assembler.CurrentToken = assembler.NextRealToken();
+            if (assembler.CurrentToken == As65.QUESTION)
             {
-                as65.bitsA = -1;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsA = -1;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
-            else if (as65.currentToken == as65.ON || as65.currentToken == as65.Off)
+            else if (assembler.CurrentToken == As65.ON || assembler.CurrentToken == As65.Off)
             {
-                as65.bitsI = (as65.currentToken == as65.ON) ? 32 : 8;
-                as65.currentToken = as65.NextRealToken();
+                assembler.BitsI = (assembler.CurrentToken == As65.ON) ? 32 : 8;
+                assembler.CurrentToken = assembler.NextRealToken();
             }
             else
             {
-                as65.OnError(ERR_EXPECTED_ON_OR_OFF);
+                assembler.OnError(ERR_EXPECTED_ON_OR_OFF);
             }
         }
         else
         {
-            as65.OnError(ERR_65832_ONLY);
+            assembler.OnError(ERR_65832_ONLY);
         }
 
         return false;
@@ -335,114 +327,114 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <see cref="Opcode&lt;As65&gt;"/> that handles .ADDR directives.
     /// </summary>
-    private readonly Opcode<As65> ADDR = new(Keyword, ".ADDR", as65 =>
+    private readonly Opcode ADDR = new(Keyword, ".ADDR", as65 =>
     {
         do
         {
-            as65.currentToken = as65.NextRealToken();
+            as65.CurrentToken = as65.NextRealToken();
             var expr = as65.ParseExpression();
 
             if (expr != null)
                 as65.AddAddress(expr);
             else
                 as65.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
-        } while (as65.currentToken == Comma);
+        } while (as65.CurrentToken == Comma);
 
-        if (as65.currentToken != EOL) as65.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        if (as65.CurrentToken != EOL) as65.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
         return (true);
     });
 
     /// <summary>
     /// A <see cref="Token"/> representing the '?' character.
     /// </summary>
-    private readonly Token QUESTION = new(Keyword, "?");
+    public static readonly Token QUESTION = new(Keyword, "?");
 
     /// <summary>
     /// A <see cref="Token"/> representing the '#' character.
     /// </summary>
-    private readonly Token HASH = new(Keyword, "#");
+    public static readonly Token HASH = new(Keyword, "#");
 
     /// <summary>
     /// A <see cref="Token"/> representing the A register.
     /// </summary>
-    private readonly Token A = new(Keyword, "A");
+    public static readonly Token A = new(Keyword, "A");
 
     /// <summary>
     /// A <see cref="Token"/> representing the S register.
     /// </summary>
-    private readonly Token S = new(Keyword, "S");
+    public static readonly Token S = new(Keyword, "S");
 
     /// <summary>
     /// A <see cref="Token"/> representing the X register.
     /// </summary>
-    private readonly Token X = new(Keyword, "X");
+    public static readonly Token X = new(Keyword, "X");
 
     /// <summary>
     /// A <see cref="Token"/> representing the Y register.
     /// </summary>
-    private readonly Token Y = new(Keyword, "Y");
+    public static readonly Token Y = new(Keyword, "Y");
 
     /// <summary>
     /// A <see cref="Token"/> representing the ON keyword.
     /// </summary>
-    private readonly Token ON = new(Keyword, "ON");
+    public static readonly Token ON = new(Keyword, "ON");
 
     /// <summary>
     /// A <see cref="Token"/> representing the OFF keyword.
     /// </summary>
-    private readonly Token Off = new(Keyword, "OFF");
+    public static readonly Token Off = new(Keyword, "OFF");
 
     /// <summary>
     /// A <see cref="Token"/> representing the '[' character.
     /// </summary>
-    private readonly Token LBRACKET = new(Keyword, "[");
+    public static readonly Token LBRACKET = new(Keyword, "[");
 
     /// <summary>
     /// A <see cref="Token"/> representing the ']' character.
     /// </summary>
-    private readonly Token RBRACKET = new(Keyword, "]");
+    public static readonly Token RBRACKET = new(Keyword, "]");
 
     /// <summary>
     /// A <see cref="Token"/> representing the EQ keyword.
     /// </summary>
-    private new readonly Token EQ = new(Keyword, "EQ");
+    public static new readonly Token EQ = new(Keyword, "EQ");
 
     /// <summary>
     /// A <see cref="Token"/> representing the NE keyword.
     /// </summary>
-    private new readonly Token NE = new(Keyword, "NE");
+    public static new readonly Token NE = new(Keyword, "NE");
 
     /// <summary>
     /// A <see cref="Token"/> representing the CC keyword.
     /// </summary>
-    private readonly Token CC = new(Keyword, "CC");
+    public static readonly Token CC = new(Keyword, "CC");
 
     /// <summary>
     /// A <see cref="Token"/> representing the CS keyword.
     /// </summary>
-    private readonly Token CS = new(Keyword, "CS");
+    public static readonly Token CS = new(Keyword, "CS");
 
     /// <summary>
     /// A <see cref="Token"/> representing the PL keyword.
     /// </summary>
-    private readonly Token PL = new(Keyword, "PL");
+    public static readonly Token PL = new(Keyword, "PL");
 
     /// <summary>
     /// A <see cref="Token"/> representing the MI keyword.
     /// </summary>
-    private readonly Token MI = new(Keyword, "MI");
+    public static readonly Token MI = new(Keyword, "MI");
 
     /// <summary>
     /// A <see cref="Token"/> representing the VC keyword.
     /// </summary>
-    private readonly Token VC = new(Keyword, "VC");
+    public static readonly Token VC = new(Keyword, "VC");
 
     /// <summary>
     /// A <see cref="Token"/> representing the VS keyword.
     /// </summary>
-    private readonly Token VS = new(Keyword, "VS");
+    public static readonly Token VS = new(Keyword, "VS");
 
-    private sealed class Jump : Opcode<As65>
+    private sealed class Jump : Opcode
     {
         private readonly Token? _flag;
 
@@ -451,9 +443,9 @@ public sealed class As65 : Assembler
             _flag = flag;
         }
 
-        public override bool Compile(As65 assembler)
+        public override bool Compile(IAssembler assembler)
         {
-            assembler.currentToken = assembler.NextRealToken();
+            assembler.CurrentToken = assembler.NextRealToken();
 
             var expr = assembler.ParseExpression();
             if (expr != null)
@@ -471,7 +463,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An extended Opcode class used to compile RMB and SMB instructions
     /// </summary>
-    private sealed class BitOperation : Opcode<As65>
+    private sealed class BitOperation : Opcode
     {
         private readonly int _opcode;
 
@@ -480,13 +472,13 @@ public sealed class As65 : Assembler
             _opcode = opcode;
         }
 
-        public override bool Compile(As65 assembler)
+        public override bool Compile(IAssembler assembler)
         {
-            if ((assembler.processor & (M6501 | M65C02)) != 0)
+            if ((assembler.Processor & (M6501 | M65C02)) != 0)
             {
-                assembler.currentToken = assembler.NextRealToken();
+                assembler.CurrentToken = assembler.NextRealToken();
                 var addr = assembler.ParseExpression();
-                if (assembler.GetOrigin() != null)
+                if (assembler.Origin != null)
                 {
                     assembler.AddByte((byte)_opcode);
                     assembler.AddByte(addr);
@@ -508,7 +500,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An extended Opcode class used to compile BBR and BBS instructions
     /// </summary>
-    private sealed class BitBranch : Opcode<As65>
+    private sealed class BitBranch : Opcode
     {
         private readonly int _opcode;
 
@@ -517,17 +509,17 @@ public sealed class As65 : Assembler
             _opcode = opcode;
         }
 
-        public override bool Compile(As65 assembler)
+        public override bool Compile(IAssembler assembler)
         {
-            if ((assembler.processor & (M6501 | M65C02)) != 0)
+            if ((assembler.Processor & (M6501 | M65C02)) != 0)
             {
-                assembler.currentToken = assembler.NextRealToken();
+                assembler.CurrentToken = assembler.NextRealToken();
 
                 var addr = assembler.ParseExpression();
 
-                if (assembler.currentToken == Comma)
+                if (assembler.CurrentToken == Comma)
                 {
-                    assembler.currentToken = assembler.NextRealToken();
+                    assembler.CurrentToken = assembler.NextRealToken();
                 }
                 else
                 {
@@ -535,7 +527,7 @@ public sealed class As65 : Assembler
                 }
 
                 var jump = assembler.ParseExpression();
-                var origin = assembler.GetOrigin();
+                var origin = assembler.Origin;
 
                 if (origin != null)
                 {
@@ -561,80 +553,80 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the ADC instruction.
     /// </summary>
-    private readonly Opcode<As65> ADC = new(Keyword, "ADC", as65 =>
+    private readonly Opcode ADC = new(Keyword, "ADC", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
             case IMMD:
-                as65.GenerateImmediate(0x69, as65.arg, as65.bitsA);
+                as65.GenerateImmediate(0x69, as65.Arg, as65.BitsA);
                 break;
             case DPAG:
-                as65.GenerateDirectPage(0x65, as65.arg);
+                as65.GenerateDirectPage(0x65, as65.Arg);
                 break;
             case ABSL:
-                as65.GenerateAbsolute(0x6d, as65.arg);
+                as65.GenerateAbsolute(0x6d, as65.Arg);
                 break;
             case DPGX:
-                as65.GenerateDirectPage(0x75, as65.arg);
+                as65.GenerateDirectPage(0x75, as65.Arg);
                 break;
             case ABSX:
-                as65.GenerateAbsolute(0x7d, as65.arg);
+                as65.GenerateAbsolute(0x7d, as65.Arg);
                 break;
             case DPGY:
             case ABSY:
-                as65.GenerateAbsolute(0x79, as65.arg);
+                as65.GenerateAbsolute(0x79, as65.Arg);
                 break;
             case INDX:
-                as65.GenerateDirectPage(0x61, as65.arg);
+                as65.GenerateDirectPage(0x61, as65.Arg);
                 break;
             case INDY:
-                as65.GenerateDirectPage(0x71, as65.arg);
+                as65.GenerateDirectPage(0x71, as65.Arg);
                 break;
             case INDI:
-                if ((as65.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x72, as65.arg);
+                if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x72, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALNG:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateLong(0x6f, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateLong(0x6f, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALGX:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateLong(0x7f, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateLong(0x7f, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LIND:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x67, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x67, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LINY:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x77, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x77, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STAC:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateImmediate(0x63, as65.arg, 8);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateImmediate(0x63, as65.Arg, 8);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STKI:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateImmediate(0x73, as65.arg, 8);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateImmediate(0x73, as65.Arg, 8);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -650,80 +642,80 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the AND instruction.
     /// </summary>
-    private readonly Opcode<As65> AND = new(Keyword, "AND", as65 =>
+    private readonly Opcode AND = new(Keyword, "AND", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
             case IMMD:
-                as65.GenerateImmediate(0x29, as65.arg, as65.bitsA);
+                as65.GenerateImmediate(0x29, as65.Arg, as65.BitsA);
                 break;
             case DPAG:
-                as65.GenerateDirectPage(0x25, as65.arg);
+                as65.GenerateDirectPage(0x25, as65.Arg);
                 break;
             case ABSL:
-                as65.GenerateAbsolute(0x2d, as65.arg);
+                as65.GenerateAbsolute(0x2d, as65.Arg);
                 break;
             case DPGX:
-                as65.GenerateDirectPage(0x35, as65.arg);
+                as65.GenerateDirectPage(0x35, as65.Arg);
                 break;
             case ABSX:
-                as65.GenerateAbsolute(0x3d, as65.arg);
+                as65.GenerateAbsolute(0x3d, as65.Arg);
                 break;
             case DPGY:
             case ABSY:
-                as65.GenerateAbsolute(0x39, as65.arg);
+                as65.GenerateAbsolute(0x39, as65.Arg);
                 break;
             case INDX:
-                as65.GenerateDirectPage(0x21, as65.arg);
+                as65.GenerateDirectPage(0x21, as65.Arg);
                 break;
             case INDY:
-                as65.GenerateDirectPage(0x31, as65.arg);
+                as65.GenerateDirectPage(0x31, as65.Arg);
                 break;
             case INDI:
-                if ((as65.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x32, as65.arg);
+                if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x32, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALNG:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateLong(0x2f, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateLong(0x2f, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALGX:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateLong(0x3f, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateLong(0x3f, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LIND:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x27, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x27, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LINY:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x37, as65.arg);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x37, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STAC:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateImmediate(0x23, as65.arg, 8);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateImmediate(0x23, as65.Arg, 8);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STKI:
-                if ((as65.processor & (M65816 | M65832)) != 0)
-                    as65.GenerateImmediate(0x33, as65.arg, 8);
+                if ((as65.Processor & (M65816 | M65832)) != 0)
+                    as65.GenerateImmediate(0x33, as65.Arg, 8);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -739,7 +731,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the ASL instruction.
     /// </summary>
-    private readonly Opcode<As65> ASL = new(Keyword, "ASL", as65 =>
+    private readonly Opcode ASL = new(Keyword, "ASL", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
@@ -748,16 +740,16 @@ public sealed class As65 : Assembler
                 as65.GenerateImplied(0x0a);
                 break;
             case DPAG:
-                as65.GenerateDirectPage(0x06, as65.arg);
+                as65.GenerateDirectPage(0x06, as65.Arg);
                 break;
             case ABSL:
-                as65.GenerateAbsolute(0x0e, as65.arg);
+                as65.GenerateAbsolute(0x0e, as65.Arg);
                 break;
             case DPGX:
-                as65.GenerateDirectPage(0x16, as65.arg);
+                as65.GenerateDirectPage(0x16, as65.Arg);
                 break;
             case ABSX:
-                as65.GenerateAbsolute(0x1e, as65.arg);
+                as65.GenerateAbsolute(0x1e, as65.Arg);
                 break;
 
             default:
@@ -771,95 +763,95 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR0 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR0 = new BitBranch(Keyword, "BBR0", 0x0f);
+    private readonly Opcode BBR0 = new BitBranch(Keyword, "BBR0", 0x0f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR1 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR1 = new BitBranch(Keyword, "BBR1", 0x1f);
+    private readonly Opcode BBR1 = new BitBranch(Keyword, "BBR1", 0x1f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR2 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR2 = new BitBranch(Keyword, "BBR2", 0x2f);
+    private readonly Opcode BBR2 = new BitBranch(Keyword, "BBR2", 0x2f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR3 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR3 = new BitBranch(Keyword, "BBR3", 0x3f);
+    private readonly Opcode BBR3 = new BitBranch(Keyword, "BBR3", 0x3f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR4 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR4 = new BitBranch(Keyword, "BBR4", 0x4f);
+    private readonly Opcode BBR4 = new BitBranch(Keyword, "BBR4", 0x4f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR5 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR5 = new BitBranch(Keyword, "BBR5", 0x5f);
+    private readonly Opcode BBR5 = new BitBranch(Keyword, "BBR5", 0x5f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR6 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR6 = new BitBranch(Keyword, "BBR6", 0x6f);
+    private readonly Opcode BBR6 = new BitBranch(Keyword, "BBR6", 0x6f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR7 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBR7 = new BitBranch(Keyword, "BBR7", 0x7f);
+    private readonly Opcode BBR7 = new BitBranch(Keyword, "BBR7", 0x7f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS0 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS0 = new BitBranch(Keyword, "BBS0", 0x8f);
+    private readonly Opcode BBS0 = new BitBranch(Keyword, "BBS0", 0x8f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS1 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS1 = new BitBranch(Keyword, "BBS1", 0x9F);
+    private readonly Opcode BBS1 = new BitBranch(Keyword, "BBS1", 0x9F);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS2 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS2 = new BitBranch(Keyword, "BBS2", 0xAF);
+    private readonly Opcode BBS2 = new BitBranch(Keyword, "BBS2", 0xAF);
 
     /// <summary>
     /// An<code> Opcode</code> that handles the BBS4 instruction. 
     /// </summary>
-    private readonly Opcode<As65> BBS3 = new BitBranch(Keyword, "BBS3", 0xBF);
+    private readonly Opcode BBS3 = new BitBranch(Keyword, "BBS3", 0xBF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS4 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS4 = new BitBranch(Keyword, "BBS4", 0xCF);
+    private readonly Opcode BBS4 = new BitBranch(Keyword, "BBS4", 0xCF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS5 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS5 = new BitBranch(Keyword, "BBS5", 0xDF);
+    private readonly Opcode BBS5 = new BitBranch(Keyword, "BBS5", 0xDF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS6 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS6 = new BitBranch(Keyword, "BBS6", 0xEF);
+    private readonly Opcode BBS6 = new BitBranch(Keyword, "BBS6", 0xEF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS7 instruction.
     /// </summary>
-    private readonly Opcode<As65> BBS7 = new BitBranch(Keyword, "BBS7", 0xFF);
+    private readonly Opcode BBS7 = new BitBranch(Keyword, "BBS7", 0xFF);
 
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BCC instruction.
     /// </summary>
-    private readonly Opcode<As65> BCC = new(Keyword, "BCC", as65 =>
+    private readonly Opcode BCC = new(Keyword, "BCC", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                as65.GenerateRelative(0x90, as65.arg, false);
+                as65.GenerateRelative(0x90, as65.Arg, false);
                 break;
             default:
                 as65.OnError(ERR_ILLEGAL_ADDR);
@@ -872,14 +864,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BCS instruction.
     /// </summary>
-    private readonly Opcode<As65> BCS = new(Keyword, "BCS", as65 =>
+    private readonly Opcode BCS = new(Keyword, "BCS", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                as65.GenerateRelative(0xb0, as65.arg, false);
+                as65.GenerateRelative(0xb0, as65.Arg, false);
                 break;
             default:
                 as65.OnError(ERR_ILLEGAL_ADDR);
@@ -892,14 +884,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BEQ instruction.
     /// </summary>
-    private readonly Opcode<As65> BEQ = new(Keyword, "BEQ", as65 =>
+    private readonly Opcode BEQ = new(Keyword, "BEQ", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                as65.GenerateRelative(0xf0, as65.arg, false);
+                as65.GenerateRelative(0xf0, as65.Arg, false);
                 break;
             default:
                 as65.OnError(ERR_ILLEGAL_ADDR);
@@ -912,33 +904,33 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BIT instruction.
     /// </summary>
-    private readonly Opcode<As65> BIT = new(Keyword, "BIT", as65 =>
+    private readonly Opcode BIT = new(Keyword, "BIT", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
             case DPAG:
-                as65.GenerateDirectPage(0x24, as65.arg);
+                as65.GenerateDirectPage(0x24, as65.Arg);
                 break;
             case ABSL:
-                as65.GenerateAbsolute(0x2c, as65.arg);
+                as65.GenerateAbsolute(0x2c, as65.Arg);
                 break;
             case IMMD:
-                if ((as65.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    as65.GenerateImmediate(0x89, as65.arg, as65.bitsA);
+                if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    as65.GenerateImmediate(0x89, as65.Arg, as65.BitsA);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case DPGX:
-                if ((as65.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    as65.GenerateDirectPage(0x34, as65.arg);
+                if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    as65.GenerateDirectPage(0x34, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ABSX:
-                if ((as65.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    as65.GenerateAbsolute(0x3c, as65.arg);
+                if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    as65.GenerateAbsolute(0x3c, as65.Arg);
                 else
                     as65.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -954,14 +946,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BMI instruction.
     /// </summary>
-    private readonly Opcode<As65> BMI = new(Keyword, "BMI", as65 =>
+    private readonly Opcode BMI = new(Keyword, "BMI", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                as65.GenerateRelative(0x30, as65.arg, false);
+                as65.GenerateRelative(0x30, as65.Arg, false);
                 break;
             default:
                 as65.OnError(ERR_ILLEGAL_ADDR);
@@ -974,14 +966,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BNE instruction.
     /// </summary>
-    private readonly Opcode<As65> BNE = new(Keyword, "BNE", as65 =>
+    private readonly Opcode BNE = new(Keyword, "BNE", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                as65.GenerateRelative(0xd0, as65.arg, false);
+                as65.GenerateRelative(0xd0, as65.Arg, false);
                 break;
             default:
                 as65.OnError(ERR_ILLEGAL_ADDR);
@@ -993,14 +985,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BPL instruction.
     /// </summary>
-    private readonly Opcode<As65> BPL = new(Keyword, "BPL", as65 =>
+    private readonly Opcode BPL = new(Keyword, "BPL", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                as65.GenerateRelative(0x10, as65.arg, false);
+                as65.GenerateRelative(0x10, as65.Arg, false);
                 break;
             default:
                 as65.OnError(ERR_ILLEGAL_ADDR);
@@ -1012,16 +1004,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BRA instruction.
     /// </summary>
-    private readonly Opcode<As65> BRA = new(Keyword, "BRA", as65 =>
+    private readonly Opcode BRA = new(Keyword, "BRA", as65 =>
     {
-        if ((as65.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (as65.ParseMode(PBANK))
             {
                 case DPAG:
                 case ABSL:
                 case ALNG:
-                    as65.GenerateRelative(0x80, as65.arg, false);
+                    as65.GenerateRelative(0x80, as65.Arg, false);
                     break;
                 default:
                     as65.OnError(ERR_ILLEGAL_ADDR);
@@ -1038,11 +1030,11 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BRK instruction.
     /// </summary>
-    private readonly Opcode<As65> BRK = new(Keyword, "BRK", asm =>
+    private readonly Opcode BRK = new(Keyword, "BRK", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0x00, asm.arg, 8); break;
+            case IMMD: asm.GenerateImmediate(0x00, asm.Arg, 8); break;
             case IMPL: asm.GenerateImplied(0x00); break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -1055,16 +1047,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BRL instruction.
     /// </summary>
-    private readonly Opcode<As65> BRL = new(Keyword, "BRL", asm =>
+    private readonly Opcode BRL = new(Keyword, "BRL", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(PBANK))
             {
                 case DPAG:
                 case ABSL:
                 case ALNG:
-                    asm.GenerateRelative(0x82, asm.arg, true);
+                    asm.GenerateRelative(0x82, asm.Arg, true);
                     break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
@@ -1081,14 +1073,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BVC instruction.
     /// </summary>				
-    private readonly Opcode<As65> BVC = new(Keyword, "BVC", asm =>
+    private readonly Opcode BVC = new(Keyword, "BVC", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                asm.GenerateRelative(0x50, asm.arg, false);
+                asm.GenerateRelative(0x50, asm.Arg, false);
                 break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -1103,14 +1095,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BVS instruction.
     /// </summary>				
-    private readonly Opcode<As65> BVS = new(Keyword, "BVS", asm =>
+    private readonly Opcode BVS = new(Keyword, "BVS", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
             case ALNG:
-                asm.GenerateRelative(0x70, asm.arg, false);
+                asm.GenerateRelative(0x70, asm.Arg, false);
                 break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -1124,7 +1116,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLC instruction.
     /// </summary>				
-    private readonly Opcode<As65> CLC = new(Keyword, "CLC", asm =>
+    private readonly Opcode CLC = new(Keyword, "CLC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1140,7 +1132,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLD instruction.
     /// </summary>				
-    private readonly Opcode<As65> CLD = new(Keyword, "CLD", asm =>
+    private readonly Opcode CLD = new(Keyword, "CLD", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1156,7 +1148,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLI instruction.
     /// </summary>				
-    private readonly Opcode<As65> CLI = new(Keyword, "CLI", asm =>
+    private readonly Opcode CLI = new(Keyword, "CLI", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1173,7 +1165,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLV instruction.
     /// </summary>				
-    private readonly Opcode<As65> CLV = new(Keyword, "CLV", asm =>
+    private readonly Opcode CLV = new(Keyword, "CLV", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1188,64 +1180,64 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CMP instruction.
     /// </summary>				
-    private readonly Opcode<As65> CMP = new(Keyword, "CMP", asm =>
+    private readonly Opcode CMP = new(Keyword, "CMP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0xc9, asm.arg, asm.bitsA); break;
-            case DPAG: asm.GenerateDirectPage(0xc5, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xcd, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0xd5, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0xdd, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0xc9, asm.Arg, asm.BitsA); break;
+            case DPAG: asm.GenerateDirectPage(0xc5, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xcd, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0xd5, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0xdd, asm.Arg); break;
             case DPGY:
-            case ABSY: asm.GenerateAbsolute(0xd9, asm.arg); break;
-            case INDX: asm.GenerateDirectPage(0xc1, asm.arg); break;
-            case INDY: asm.GenerateDirectPage(0xd1, asm.arg); break;
+            case ABSY: asm.GenerateAbsolute(0xd9, asm.Arg); break;
+            case INDX: asm.GenerateDirectPage(0xc1, asm.Arg); break;
+            case INDY: asm.GenerateDirectPage(0xd1, asm.Arg); break;
             case INDI:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0xd2, asm.arg);
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0xd2, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0xcf, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0xcf, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALGX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0xdf, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0xdf, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0xc7, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0xc7, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LINY:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0xd7, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0xd7, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STAC:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0xc3, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0xc3, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STKI:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0xd3, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0xd3, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -1262,13 +1254,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the COP instruction.
     /// </summary>				
-    private readonly Opcode<As65> COP = new(Keyword, "COP", asm =>
+    private readonly Opcode COP = new(Keyword, "COP", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
-                case IMMD: asm.GenerateImmediate(0x02, asm.arg, 8); break;
+                case IMMD: asm.GenerateImmediate(0x02, asm.Arg, 8); break;
                 case IMPL: asm.GenerateImplied(0x02); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
@@ -1284,13 +1276,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CPX instruction.
     /// </summary>				
-    private readonly Opcode<As65> CPX = new(Keyword, "CPX", asm =>
+    private readonly Opcode CPX = new(Keyword, "CPX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0xe0, asm.arg, asm.bitsI); break;
-            case DPAG: asm.GenerateDirectPage(0xe4, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xec, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0xe0, asm.Arg, asm.BitsI); break;
+            case DPAG: asm.GenerateDirectPage(0xe4, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xec, asm.Arg); break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
                 break;
@@ -1301,13 +1293,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CPY instruction.
     /// </summary>				
-    private readonly Opcode<As65> CPY = new(Keyword, "CPY", asm =>
+    private readonly Opcode CPY = new(Keyword, "CPY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0xc0, asm.arg, asm.bitsI); break;
-            case DPAG: asm.GenerateDirectPage(0xc4, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xcc, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0xc0, asm.Arg, asm.BitsI); break;
+            case DPAG: asm.GenerateDirectPage(0xc4, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xcc, asm.Arg); break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
                 break;
@@ -1318,16 +1310,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the DEC instruction.
     /// </summary>				
-    private readonly Opcode<As65> DEC = new(Keyword, "DEC", asm =>
+    private readonly Opcode DEC = new(Keyword, "DEC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case DPAG: asm.GenerateDirectPage(0xC6, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xCE, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0xD6, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0xDE, asm.arg); break;
+            case DPAG: asm.GenerateDirectPage(0xC6, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xCE, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0xD6, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0xDE, asm.Arg); break;
             case ACCM:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
                     asm.GenerateImplied(0x3a);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
@@ -1343,7 +1335,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the DEX instruction.
     /// </summary>				
-    private readonly Opcode<As65> DEX = new(Keyword, "DEX", asm =>
+    private readonly Opcode DEX = new(Keyword, "DEX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1359,7 +1351,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the DEY instruction.
     /// </summary>				
-    private readonly Opcode<As65> DEY = new(Keyword, "DEY", asm =>
+    private readonly Opcode DEY = new(Keyword, "DEY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1376,64 +1368,64 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the EOR instruction.
     /// </summary>				
-    private readonly Opcode<As65> EOR = new(Keyword, "EOR", asm =>
+    private readonly Opcode EOR = new(Keyword, "EOR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0x49, asm.arg, asm.bitsA); break;
-            case DPAG: asm.GenerateDirectPage(0x45, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0x4d, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0x55, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0x5d, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0x49, asm.Arg, asm.BitsA); break;
+            case DPAG: asm.GenerateDirectPage(0x45, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0x4d, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0x55, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0x5d, asm.Arg); break;
             case DPGY:
-            case ABSY: asm.GenerateAbsolute(0x59, asm.arg); break;
-            case INDX: asm.GenerateDirectPage(0x41, asm.arg); break;
-            case INDY: asm.GenerateDirectPage(0x51, asm.arg); break;
+            case ABSY: asm.GenerateAbsolute(0x59, asm.Arg); break;
+            case INDX: asm.GenerateDirectPage(0x41, asm.Arg); break;
+            case INDY: asm.GenerateDirectPage(0x51, asm.Arg); break;
             case INDI:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0x52, asm.arg);
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x52, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0x4f, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x4f, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALGX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0x5f, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x5f, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0x47, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x47, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LINY:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0x57, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x57, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STAC:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0x43, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0x43, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STKI:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0x53, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0x53, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -1451,16 +1443,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the INC instruction.
     /// </summary>				
-    private readonly Opcode<As65> INC = new(Keyword, "INC", asm =>
+    private readonly Opcode INC = new(Keyword, "INC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case DPAG: asm.GenerateDirectPage(0xe6, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xee, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0xf6, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0xfe, asm.arg); break;
+            case DPAG: asm.GenerateDirectPage(0xe6, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xee, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0xf6, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0xfe, asm.Arg); break;
             case ACCM:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
                     asm.GenerateImplied(0x1a);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
@@ -1477,7 +1469,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the INX instruction.
     /// </summary>				
-    private readonly Opcode<As65> INX = new(Keyword, "INX", asm =>
+    private readonly Opcode INX = new(Keyword, "INX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1493,7 +1485,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the INY instruction.
     /// </summary>				
-    private readonly Opcode<As65> INY = new(Keyword, "INY", asm =>
+    private readonly Opcode INY = new(Keyword, "INY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1509,16 +1501,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JML instruction.
     /// </summary>				
-    private readonly Opcode<As65> JML = new(Keyword, "JML", asm =>
+    private readonly Opcode JML = new(Keyword, "JML", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(PBANK))
             {
                 case DPAG:
                 case ABSL:
-                case ALNG: asm.GenerateLong(0x5c, asm.arg); break;
-                case LIND: asm.GenerateIndirect(0xdc, asm.arg, true); break;
+                case ALNG: asm.GenerateLong(0x5c, asm.Arg); break;
+                case LIND: asm.GenerateIndirect(0xdc, asm.Arg, true); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -1534,28 +1526,28 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JMP instruction.
     /// </summary>				
-    private readonly Opcode<As65> JMP = new(Keyword, "JMP", asm =>
+    private readonly Opcode JMP = new(Keyword, "JMP", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
             case DPAG:
-            case ABSL: asm.GenerateAbsolute(0x4c, asm.arg); break;
-            case INDI: asm.GenerateIndirect(0x6c, asm.arg, true); break;
+            case ABSL: asm.GenerateAbsolute(0x4c, asm.Arg); break;
+            case INDI: asm.GenerateIndirect(0x6c, asm.Arg, true); break;
             case INDX:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    asm.GenerateAbsolute(0x7c, asm.arg);
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    asm.GenerateAbsolute(0x7c, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0x5c, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x5c, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateIndirect(0xdc, asm.arg, true);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateIndirect(0xdc, asm.Arg, true);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -1571,15 +1563,15 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JSL instruction.
     /// </summary>				
-    private readonly Opcode<As65> JSL = new(Keyword, "JSL", asm =>
+    private readonly Opcode JSL = new(Keyword, "JSL", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(PBANK))
             {
                 case DPAG:
                 case ABSL:
-                case ALNG: asm.GenerateLong(0x22, asm.arg); break;
+                case ALNG: asm.GenerateLong(0x22, asm.Arg); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -1595,17 +1587,17 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JSR instruction.
     /// </summary>				
-    private readonly Opcode<As65> JSR = new(Keyword, "JSR", asm =>
+    private readonly Opcode JSR = new(Keyword, "JSR", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
             case DPAG:
             case ABSL:
-            case ALNG: asm.GenerateAbsolute(0x20, asm.arg); break;
+            case ALNG: asm.GenerateAbsolute(0x20, asm.Arg); break;
 
             case INDX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateAbsolute(0xfc, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateAbsolute(0xfc, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -1621,64 +1613,64 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LDA instruction.
     /// </summary>				
-    private readonly Opcode<As65> LDA = new(Keyword, "LDA", asm =>
+    private readonly Opcode LDA = new(Keyword, "LDA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0xa9, asm.arg, asm.bitsA); break;
-            case DPAG: asm.GenerateDirectPage(0xa5, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xad, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0xb5, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0xbd, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0xa9, asm.Arg, asm.BitsA); break;
+            case DPAG: asm.GenerateDirectPage(0xa5, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xad, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0xb5, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0xbd, asm.Arg); break;
             case DPGY:
-            case ABSY: asm.GenerateAbsolute(0xb9, asm.arg); break;
-            case INDX: asm.GenerateDirectPage(0xa1, asm.arg); break;
-            case INDY: asm.GenerateDirectPage(0xb1, asm.arg); break;
+            case ABSY: asm.GenerateAbsolute(0xb9, asm.Arg); break;
+            case INDX: asm.GenerateDirectPage(0xa1, asm.Arg); break;
+            case INDY: asm.GenerateDirectPage(0xb1, asm.Arg); break;
             case INDI:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0xb2, asm.arg);
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0xb2, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0xaf, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0xaf, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALGX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0xbf, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0xbf, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0xa7, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0xa7, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LINY:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0xb7, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0xb7, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STAC:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0xa3, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0xa3, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STKI:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0xb3, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0xb3, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -1694,15 +1686,15 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LDX instruction.
     /// </summary>				
-    private readonly Opcode<As65> LDX = new(Keyword, "LDX", asm =>
+    private readonly Opcode LDX = new(Keyword, "LDX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0xa2, asm.arg, asm.bitsI); break;
-            case DPAG: asm.GenerateDirectPage(0xa6, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xae, asm.arg); break;
-            case DPGY: asm.GenerateDirectPage(0xb6, asm.arg); break;
-            case ABSY: asm.GenerateAbsolute(0xbe, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0xa2, asm.Arg, asm.BitsI); break;
+            case DPAG: asm.GenerateDirectPage(0xa6, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xae, asm.Arg); break;
+            case DPGY: asm.GenerateDirectPage(0xb6, asm.Arg); break;
+            case ABSY: asm.GenerateAbsolute(0xbe, asm.Arg); break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
                 break;
@@ -1714,15 +1706,15 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LDY instruction.
     /// </summary>				
-    private readonly Opcode<As65> LDY = new(Keyword, "LDY", asm =>
+    private readonly Opcode LDY = new(Keyword, "LDY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0xa0, asm.arg, asm.bitsI); break;
-            case DPAG: asm.GenerateDirectPage(0xa4, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0xac, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0xb4, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0xbc, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0xa0, asm.Arg, asm.BitsI); break;
+            case DPAG: asm.GenerateDirectPage(0xa4, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0xac, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0xb4, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0xbc, asm.Arg); break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
                 break;
@@ -1734,16 +1726,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LSR instruction.
     /// </summary>				
-    private readonly Opcode<As65> LSR = new(Keyword, "LSR", asm =>
+    private readonly Opcode LSR = new(Keyword, "LSR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
             case IMPL:
             case ACCM: asm.GenerateImplied(0x4a); break;
-            case DPAG: asm.GenerateDirectPage(0x46, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0x4e, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0x56, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0x5e, asm.arg); break;
+            case DPAG: asm.GenerateDirectPage(0x46, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0x4e, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0x56, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0x5e, asm.Arg); break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
                 break;
@@ -1755,16 +1747,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the MVN instruction.
     /// </summary>				
-    private readonly Opcode<As65> MVN = new(Keyword, "MVN", asm =>
+    private readonly Opcode MVN = new(Keyword, "MVN", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
             var dst = asm.ParseExpression();
 
-            if (asm.currentToken == Comma)
+            if (asm.CurrentToken == Comma)
             {
-                asm.currentToken = asm.NextRealToken();
+                asm.CurrentToken = asm.NextRealToken();
                 var src = asm.ParseExpression();
 
                 asm.AddByte(0x54);
@@ -1784,16 +1776,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the MVP instruction.
     /// </summary>				
-    private readonly Opcode<As65> MVP = new(Keyword, "MVP", asm =>
+    private readonly Opcode MVP = new(Keyword, "MVP", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
             var dst = asm.ParseExpression();
 
-            if (asm.currentToken == Comma)
+            if (asm.CurrentToken == Comma)
             {
-                asm.currentToken = asm.NextRealToken();
+                asm.CurrentToken = asm.NextRealToken();
                 var src = asm.ParseExpression();
 
                 asm.AddByte(0x44);
@@ -1813,7 +1805,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the NOP instruction.
     /// </summary>				
-    private readonly Opcode<As65> NOP = new(Keyword, "NOP", asm =>
+    private readonly Opcode NOP = new(Keyword, "NOP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1829,64 +1821,64 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the ORA instruction.
     /// </summary>				
-    private readonly Opcode<As65> ORA = new(Keyword, "ORA", asm =>
+    private readonly Opcode ORA = new(Keyword, "ORA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case IMMD: asm.GenerateImmediate(0x09, asm.arg, asm.bitsA); break;
-            case DPAG: asm.GenerateDirectPage(0x05, asm.arg); break;
-            case ABSL: asm.GenerateAbsolute(0x0f, asm.arg); break;
-            case DPGX: asm.GenerateDirectPage(0x15, asm.arg); break;
-            case ABSX: asm.GenerateAbsolute(0x1f, asm.arg); break;
+            case IMMD: asm.GenerateImmediate(0x09, asm.Arg, asm.BitsA); break;
+            case DPAG: asm.GenerateDirectPage(0x05, asm.Arg); break;
+            case ABSL: asm.GenerateAbsolute(0x0f, asm.Arg); break;
+            case DPGX: asm.GenerateDirectPage(0x15, asm.Arg); break;
+            case ABSX: asm.GenerateAbsolute(0x1f, asm.Arg); break;
             case DPGY:
-            case ABSY: asm.GenerateAbsolute(0x19, asm.arg); break;
-            case INDX: asm.GenerateDirectPage(0x01, asm.arg); break;
-            case INDY: asm.GenerateDirectPage(0x11, asm.arg); break;
+            case ABSY: asm.GenerateAbsolute(0x19, asm.Arg); break;
+            case INDX: asm.GenerateDirectPage(0x01, asm.Arg); break;
+            case INDY: asm.GenerateDirectPage(0x11, asm.Arg); break;
             case INDI:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0x12, asm.arg);
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x12, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0x0f, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x0f, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case ALGX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateLong(0x1f, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateLong(0x1f, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0x07, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x07, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case LINY:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateDirectPage(0x17, asm.arg);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateDirectPage(0x17, asm.Arg);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STAC:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0x03, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0x03, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
 
             case STKI:
-                if ((asm.processor & (M65816 | M65832)) != 0)
-                    asm.GenerateImmediate(0x13, asm.arg, 8);
+                if ((asm.Processor & (M65816 | M65832)) != 0)
+                    asm.GenerateImmediate(0x13, asm.Arg, 8);
                 else
                     asm.OnError(ERR_MODE_NOT_SUPPORTED);
                 break;
@@ -1902,15 +1894,15 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PEA instruction.
     /// </summary>				
-    private readonly Opcode<As65> PEA = new(Keyword, "PEA", asm =>
+    private readonly Opcode PEA = new(Keyword, "PEA", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
                 case DPAG:
                 case ABSL:
-                case IMMD: asm.GenerateImmediate(0xf4, asm.arg, 16); break;
+                case IMMD: asm.GenerateImmediate(0xf4, asm.Arg, 16); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -1926,13 +1918,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PEI instruction.
     /// </summary>				
-    private readonly Opcode<As65> PEI = new(Keyword, "PEI", asm =>
+    private readonly Opcode PEI = new(Keyword, "PEI", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
-                case INDI: asm.GenerateImmediate(0xd4, asm.arg, 8); break;
+                case INDI: asm.GenerateImmediate(0xd4, asm.Arg, 8); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -1948,16 +1940,16 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PER instruction.
     /// </summary>				
-    private readonly Opcode<As65> PER = new(Keyword, "PER", asm =>
+    private readonly Opcode PER = new(Keyword, "PER", asm =>
     {
         // put your code here
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(PBANK))
             {
                 case DPAG:
                 case ABSL:
-                    asm.GenerateRelative(0x62, asm.arg, true); break;
+                    asm.GenerateRelative(0x62, asm.Arg, true); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -1973,7 +1965,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHA instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHA = new(Keyword, "PHA", asm =>
+    private readonly Opcode PHA = new(Keyword, "PHA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1989,9 +1981,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHB instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHB = new(Keyword, "PHB", asm =>
+    private readonly Opcode PHB = new(Keyword, "PHB", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2011,9 +2003,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHD instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHD = new(Keyword, "PHD", asm =>
+    private readonly Opcode PHD = new(Keyword, "PHD", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2033,9 +2025,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHK instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHK = new(Keyword, "PHK", asm =>
+    private readonly Opcode PHK = new(Keyword, "PHK", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2055,7 +2047,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHP instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHP = new(Keyword, "PHP", asm =>
+    private readonly Opcode PHP = new(Keyword, "PHP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2073,9 +2065,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHX instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHX = new(Keyword, "PHX", asm =>
+    private readonly Opcode PHX = new(Keyword, "PHX", asm =>
     {
-        if ((asm.processor & (M6502 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M6502 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2100,9 +2092,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHY instruction.
     /// </summary>				
-    private readonly Opcode<As65> PHY = new(Keyword, "PHY", asm =>
+    private readonly Opcode PHY = new(Keyword, "PHY", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2126,7 +2118,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLA instruction.
     /// </summary>				
-    private readonly Opcode<As65> PLA = new(Keyword, "PLA", asm =>
+    private readonly Opcode PLA = new(Keyword, "PLA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2144,9 +2136,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLB instruction.
     /// </summary>				
-    private readonly Opcode<As65> PLB = new(Keyword, "PLB", asm =>
+    private readonly Opcode PLB = new(Keyword, "PLB", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2170,9 +2162,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLD instruction.
     /// </summary>				
-    private readonly Opcode<As65> PLD = new(Keyword, "PLD", asm =>
+    private readonly Opcode PLD = new(Keyword, "PLD", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2197,7 +2189,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLP instruction.
     /// </summary>				
-    private readonly Opcode<As65> PLP = new(Keyword, "PLP", asm =>
+    private readonly Opcode PLP = new(Keyword, "PLP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2218,9 +2210,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLX instruction.
     /// </summary>				
-    private readonly Opcode<As65> PLX = new(Keyword, "PLX", asm =>
+    private readonly Opcode PLX = new(Keyword, "PLX", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2245,9 +2237,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLY instruction.
     /// </summary>				
-    private readonly Opcode<As65> PLY = new(Keyword, "PLY", asm =>
+    private readonly Opcode PLY = new(Keyword, "PLY", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2272,14 +2264,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the REP instruction.
     /// </summary>				        
-    private readonly Opcode<As65> REP = new(Keyword, "REP", asm =>
+    private readonly Opcode REP = new(Keyword, "REP", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
                 case IMPL:
-                    asm.GenerateImmediate(0xc2, asm.arg, 8);
+                    asm.GenerateImmediate(0xc2, asm.Arg, 8);
                     break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2298,47 +2290,47 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB0 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB0 = new BitOperation(Keyword, "RMB0", 0x07);
+    private readonly Opcode RMB0 = new BitOperation(Keyword, "RMB0", 0x07);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB1 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB1 = new BitOperation(Keyword, "RMB1", 0x17);
+    private readonly Opcode RMB1 = new BitOperation(Keyword, "RMB1", 0x17);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB2 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB2 = new BitOperation(Keyword, "RMB2", 0x27);
+    private readonly Opcode RMB2 = new BitOperation(Keyword, "RMB2", 0x27);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB3 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB3 = new BitOperation(Keyword, "RMB3", 0x37);
+    private readonly Opcode RMB3 = new BitOperation(Keyword, "RMB3", 0x37);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB4 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB4 = new BitOperation(Keyword, "RMB4", 0x47);
+    private readonly Opcode RMB4 = new BitOperation(Keyword, "RMB4", 0x47);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB5 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB5 = new BitOperation(Keyword, "RMB5", 0x57);
+    private readonly Opcode RMB5 = new BitOperation(Keyword, "RMB5", 0x57);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB6 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB6 = new BitOperation(Keyword, "RMB6", 0x67);
+    private readonly Opcode RMB6 = new BitOperation(Keyword, "RMB6", 0x67);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB7 instruction.
     /// </summary>
-    private readonly Opcode<As65> RMB7 = new BitOperation(Keyword, "RMB7", 0x77);
+    private readonly Opcode RMB7 = new BitOperation(Keyword, "RMB7", 0x77);
 
     /// <summary>
     /// The <code>Opcode</code> to handle the ROL instruction.
     /// </summary>
-    private readonly Opcode<As65> ROL = new(Keyword, "ROL", asm =>
+    private readonly Opcode ROL = new(Keyword, "ROL", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2347,16 +2339,16 @@ public sealed class As65 : Assembler
                 asm.GenerateImplied(0x2a);
                 break;
             case DPAG:
-                asm.GenerateDirectPage(0x26, asm.arg);
+                asm.GenerateDirectPage(0x26, asm.Arg);
                 break;
             case ABSL:
-                asm.GenerateAbsolute(0x2e, asm.arg);
+                asm.GenerateAbsolute(0x2e, asm.Arg);
                 break;
             case DPGX:
-                asm.GenerateDirectPage(0x36, asm.arg);
+                asm.GenerateDirectPage(0x36, asm.Arg);
                 break;
             case ABSX:
-                asm.GenerateAbsolute(0x3e, asm.arg);
+                asm.GenerateAbsolute(0x3e, asm.Arg);
                 break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2370,7 +2362,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the ROR instruction.
     /// </summary>
-    private readonly Opcode<As65> ROR = new(Keyword, "ROR", asm =>
+    private readonly Opcode ROR = new(Keyword, "ROR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2379,16 +2371,16 @@ public sealed class As65 : Assembler
                 asm.GenerateImplied(0x6A);
                 break;
             case DPAG:
-                asm.GenerateDirectPage(0x66, asm.arg);
+                asm.GenerateDirectPage(0x66, asm.Arg);
                 break;
             case ABSL:
-                asm.GenerateAbsolute(0x6e, asm.arg);
+                asm.GenerateAbsolute(0x6e, asm.Arg);
                 break;
             case DPGX:
-                asm.GenerateDirectPage(0x76, asm.arg);
+                asm.GenerateDirectPage(0x76, asm.Arg);
                 break;
             case ABSX:
-                asm.GenerateAbsolute(0x7e, asm.arg);
+                asm.GenerateAbsolute(0x7e, asm.Arg);
                 break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2403,7 +2395,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTI instruction.
     /// </summary>
-    private readonly Opcode<As65> RTI = new(Keyword, "RTI", asm =>
+    private readonly Opcode RTI = new(Keyword, "RTI", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2423,8 +2415,8 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTL instruction.
     /// </summary>
-    private readonly Opcode<As65> RTL = new(Keyword, "RTL", asm => {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+    private readonly Opcode RTL = new(Keyword, "RTL", asm => {
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2447,7 +2439,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTS instruction.
     /// </summary>
-    private readonly Opcode<As65> RTS = new(Keyword, "RTS", asm =>
+    private readonly Opcode RTS = new(Keyword, "RTS", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2465,39 +2457,39 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SBC instruction.
     /// </summary>
-    private readonly Opcode<As65> SBC = new(Keyword, "SBC", asm =>
+    private readonly Opcode SBC = new(Keyword, "SBC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
             case IMMD:
-                asm.GenerateImmediate(0xe9, asm.arg, asm.bitsA);
+                asm.GenerateImmediate(0xe9, asm.Arg, asm.BitsA);
                 break;
             case DPAG:
-                asm.GenerateDirectPage(0xe5, asm.arg);
+                asm.GenerateDirectPage(0xe5, asm.Arg);
                 break;
             case ABSL:
-                asm.GenerateAbsolute(0xed, asm.arg);
+                asm.GenerateAbsolute(0xed, asm.Arg);
                 break;
             case DPGX:
-                asm.GenerateDirectPage(0xf5, asm.arg);
+                asm.GenerateDirectPage(0xf5, asm.Arg);
                 break;
             case ABSX:
-                asm.GenerateAbsolute(0xfd, asm.arg);
+                asm.GenerateAbsolute(0xfd, asm.Arg);
                 break;
             case DPGY:
             case ABSY:
-                asm.GenerateAbsolute(0xf8, asm.arg);
+                asm.GenerateAbsolute(0xf8, asm.Arg);
                 break;
             case INDX:
-                asm.GenerateDirectPage(0xe1, asm.arg);
+                asm.GenerateDirectPage(0xe1, asm.Arg);
                 break;
             case INDY:
-                asm.GenerateDirectPage(0xf1, asm.arg);
+                asm.GenerateDirectPage(0xf1, asm.Arg);
                 break;
             case INDI:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
                 {
-                    asm.GenerateDirectPage(0xf2, asm.arg);
+                    asm.GenerateDirectPage(0xf2, asm.Arg);
                 }
                 else
                 {
@@ -2506,9 +2498,9 @@ public sealed class As65 : Assembler
 
                 break;
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateLong(0xef, asm.arg);
+                    asm.GenerateLong(0xef, asm.Arg);
                 }
                 else
                 {
@@ -2519,9 +2511,9 @@ public sealed class As65 : Assembler
                 break;
 
             case ALGX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateLong(0xff, asm.arg);
+                    asm.GenerateLong(0xff, asm.Arg);
                 }
                 else
                 {
@@ -2532,9 +2524,9 @@ public sealed class As65 : Assembler
                 break;
 
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateDirectPage(0xe7, asm.arg);
+                    asm.GenerateDirectPage(0xe7, asm.Arg);
                 }
                 else
                 {
@@ -2543,9 +2535,9 @@ public sealed class As65 : Assembler
 
                 return true;
             case LINY:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateDirectPage(0xf7, asm.arg);
+                    asm.GenerateDirectPage(0xf7, asm.Arg);
                 }
                 else
                 {
@@ -2554,9 +2546,9 @@ public sealed class As65 : Assembler
 
                 return true;
             case STAC:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateImmediate(0xe3, asm.arg, 8);
+                    asm.GenerateImmediate(0xe3, asm.Arg, 8);
                 }
                 else
                 {
@@ -2566,9 +2558,9 @@ public sealed class As65 : Assembler
                 return true;
 
             case STKI:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateImmediate(0xf3, asm.arg, 8);
+                    asm.GenerateImmediate(0xf3, asm.Arg, 8);
                 }
                 else
                 {
@@ -2585,7 +2577,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SEC instruction.
     /// </summary>
-    private readonly Opcode<As65> SEC = new(Keyword, "SEC", asm =>
+    private readonly Opcode SEC = new(Keyword, "SEC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2603,7 +2595,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SED instruction.
     /// </summary>
-    private readonly Opcode<As65> SED = new(Keyword, "SED", asm =>
+    private readonly Opcode SED = new(Keyword, "SED", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2621,7 +2613,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SEI instruction.
     /// </summary>
-    private readonly Opcode<As65> SEI = new(Keyword, "SEI", asm =>
+    private readonly Opcode SEI = new(Keyword, "SEI", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2640,13 +2632,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SEP instruction.
     /// </summary>
-    private readonly Opcode<As65> SEP = new(Keyword, "SEP", asm =>
+    private readonly Opcode SEP = new(Keyword, "SEP", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
-                case IMMD: asm.GenerateImmediate(0xe2, asm.arg, 8);
+                case IMMD: asm.GenerateImmediate(0xe2, asm.Arg, 8);
                     break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2661,49 +2653,49 @@ public sealed class As65 : Assembler
         return true;
     });
 
-    private readonly Opcode<As65> SMB0 = new BitOperation(Keyword, "SMB0", 0x87);
-    private readonly Opcode<As65> SMB1 = new BitOperation(Keyword, "SMB1", 0X97);
-    private readonly Opcode<As65> SMB2 = new BitOperation(Keyword, "SMB2", 0xA7);
-    private readonly Opcode<As65> SMB3 = new BitOperation(Keyword, "SMB3", 0xB7);
-    private readonly Opcode<As65> SMB4 = new BitOperation(Keyword, "SMB4", 0xC7);
-    private readonly Opcode<As65> SMB5 = new BitOperation(Keyword, "SMB5", 0xD7);
-    private readonly Opcode<As65> SMB6 = new BitOperation(Keyword, "SMB6", 0xE7);
-    private readonly Opcode<As65> SMB7 = new BitOperation(Keyword, "SMB7", 0xF7);
+    private readonly Opcode SMB0 = new BitOperation(Keyword, "SMB0", 0x87);
+    private readonly Opcode SMB1 = new BitOperation(Keyword, "SMB1", 0X97);
+    private readonly Opcode SMB2 = new BitOperation(Keyword, "SMB2", 0xA7);
+    private readonly Opcode SMB3 = new BitOperation(Keyword, "SMB3", 0xB7);
+    private readonly Opcode SMB4 = new BitOperation(Keyword, "SMB4", 0xC7);
+    private readonly Opcode SMB5 = new BitOperation(Keyword, "SMB5", 0xD7);
+    private readonly Opcode SMB6 = new BitOperation(Keyword, "SMB6", 0xE7);
+    private readonly Opcode SMB7 = new BitOperation(Keyword, "SMB7", 0xF7);
 
     /// <summary>
     /// The <code>Opcode</code> to handle the STA instruction.
     /// </summary>
-    private readonly Opcode<As65> STA = new(Keyword, "STA", asm =>
+    private readonly Opcode STA = new(Keyword, "STA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case DPAG: asm.GenerateDirectPage(0x85, asm.arg);
+            case DPAG: asm.GenerateDirectPage(0x85, asm.Arg);
                 break;
 
             case ABSL:
-                asm.GenerateAbsolute(0x8d, asm.arg);
+                asm.GenerateAbsolute(0x8d, asm.Arg);
                 break;
 
             case DPGX:
-                asm.GenerateDirectPage(0x95, asm.arg);
+                asm.GenerateDirectPage(0x95, asm.Arg);
                 break;
 
             case ABSX:
-                asm.GenerateAbsolute(0x9d, asm.arg);
+                asm.GenerateAbsolute(0x9d, asm.Arg);
                 break;
 
             case DPGY:
             case ABSY:
-                asm.GenerateAbsolute(0x99, asm.arg);
+                asm.GenerateAbsolute(0x99, asm.Arg);
                 break;
             case INDX:
-                asm.GenerateDirectPage(0x81, asm.arg);
+                asm.GenerateDirectPage(0x81, asm.Arg);
                 break;
 
             case INDI:
-                if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
                 {
-                    asm.GenerateDirectPage(0x92, asm.arg);
+                    asm.GenerateDirectPage(0x92, asm.Arg);
                 }
                 else
                 {
@@ -2714,9 +2706,9 @@ public sealed class As65 : Assembler
                 break;
 
             case ALNG:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateLong(0x8f, asm.arg);
+                    asm.GenerateLong(0x8f, asm.Arg);
                 }
                 else
                 {
@@ -2725,9 +2717,9 @@ public sealed class As65 : Assembler
                 break;
 
             case ALGX:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateLong(0x9f, asm.arg);
+                    asm.GenerateLong(0x9f, asm.Arg);
                 }
                 else
                 {
@@ -2736,9 +2728,9 @@ public sealed class As65 : Assembler
                 break;
 
             case LIND:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateDirectPage(0x87, asm.arg);
+                    asm.GenerateDirectPage(0x87, asm.Arg);
                 }
                 else
                 {
@@ -2747,9 +2739,9 @@ public sealed class As65 : Assembler
                 break;
 
             case LINY:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateDirectPage(0x97, asm.arg);
+                    asm.GenerateDirectPage(0x97, asm.Arg);
                 }
                 else
                 {
@@ -2758,9 +2750,9 @@ public sealed class As65 : Assembler
                 break;
 
             case STAC:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateImmediate(0x83, asm.arg, 8);
+                    asm.GenerateImmediate(0x83, asm.Arg, 8);
                 }
                 else
                 {
@@ -2769,9 +2761,9 @@ public sealed class As65 : Assembler
                 break;
 
             case STKI:
-                if ((asm.processor & (M65816 | M65832)) != 0)
+                if ((asm.Processor & (M65816 | M65832)) != 0)
                 {
-                    asm.GenerateImmediate(0x93, asm.arg, 8);
+                    asm.GenerateImmediate(0x93, asm.Arg, 8);
                 }
                 else
                 {
@@ -2790,9 +2782,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STP instruction.
     /// </summary>
-    private readonly Opcode<As65> STP = new(Keyword, "STP", asm =>
+    private readonly Opcode STP = new(Keyword, "STP", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2814,18 +2806,18 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STX instruction.
     /// </summary>
-    private readonly Opcode<As65> STX = new(Keyword, "STX", asm =>
+    private readonly Opcode STX = new(Keyword, "STX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
-            case DPAG: asm.GenerateDirectPage(0x86, asm.arg);
+            case DPAG: asm.GenerateDirectPage(0x86, asm.Arg);
                 break;
 
-            case ABSL: asm.GenerateAbsolute(0x8e, asm.arg);
+            case ABSL: asm.GenerateAbsolute(0x8e, asm.Arg);
                 break;
 
             case DPGY:
-                asm.GenerateDirectPage(0x96, asm.arg);
+                asm.GenerateDirectPage(0x96, asm.Arg);
                 break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2838,20 +2830,20 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STY instruction.
     /// </summary>
-    private readonly Opcode<As65> STY = new(Keyword, "STY", asm =>
+    private readonly Opcode STY = new(Keyword, "STY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
             case DPAG:
-                asm.GenerateDirectPage(0x84, asm.arg);
+                asm.GenerateDirectPage(0x84, asm.Arg);
                 break;
 
             case ABSL:
-                asm.GenerateAbsolute(0x8c, asm.arg);
+                asm.GenerateAbsolute(0x8c, asm.Arg);
                 break;
 
             case DPGX:
-                asm.GenerateDirectPage(0x94, asm.arg);
+                asm.GenerateDirectPage(0x94, asm.Arg);
                 break;
             default:
                 asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2864,23 +2856,23 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STZ instruction.
     /// </summary>
-    private readonly Opcode<As65> STZ = new(Keyword, "STZ", asm =>
+    private readonly Opcode STZ = new(Keyword, "STZ", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
                 case DPAG:
-                    asm.GenerateDirectPage(0x64, asm.arg);
+                    asm.GenerateDirectPage(0x64, asm.Arg);
                     break;
                 case ABSL:
-                    asm.GenerateAbsolute(0x9c, asm.arg);
+                    asm.GenerateAbsolute(0x9c, asm.Arg);
                     break;
                 case DPGX:
-                    asm.GenerateDirectPage(0x74, asm.arg);
+                    asm.GenerateDirectPage(0x74, asm.Arg);
                     break;
                 case ABSX:
-                    asm.GenerateAbsolute(0X9e, asm.arg);
+                    asm.GenerateAbsolute(0X9e, asm.Arg);
                     break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
@@ -2898,7 +2890,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TAX instruction.
     /// </summary>
-    private readonly Opcode<As65> TAX = new(Keyword, "TAX", asm =>
+    private readonly Opcode TAX = new(Keyword, "TAX", asm =>
     {
         switch (asm.ParseMode((DBANK)))
         {
@@ -2916,7 +2908,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TAY instruction.
     /// </summary>
-    private readonly Opcode<As65> TAY = new(Keyword, "TAY", asm =>
+    private readonly Opcode TAY = new(Keyword, "TAY", asm =>
     {
         switch (asm.ParseMode((DBANK)))
         {
@@ -2933,9 +2925,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TCD instruction.
     /// </summary>
-    private readonly Opcode<As65> TCD = new(Keyword, "TCD", asm =>
+    private readonly Opcode TCD = new(Keyword, "TCD", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2954,9 +2946,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TCS instruction.
     /// </summary>
-    private readonly Opcode<As65> TCS = new(Keyword, "TCS", asm =>
+    private readonly Opcode TCS = new(Keyword, "TCS", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2975,9 +2967,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TDC instruction.
     /// </summary>
-    private readonly Opcode<As65> TDC = new(Keyword, "TDC", asm =>
+    private readonly Opcode TDC = new(Keyword, "TDC", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -2997,14 +2989,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TRB instruction.
     /// </summary>
-    private readonly Opcode<As65> TRB = new(Keyword, "TRB", asm =>
+    private readonly Opcode TRB = new(Keyword, "TRB", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
-                case DPAG: asm.GenerateDirectPage(0x14, asm.arg); break;
-                case ABSL: asm.GenerateAbsolute(0x1C, asm.arg); break;
+                case DPAG: asm.GenerateDirectPage(0x14, asm.Arg); break;
+                case ABSL: asm.GenerateAbsolute(0x1C, asm.Arg); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -3019,14 +3011,14 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TSB instruction.
     /// </summary>
-    private readonly Opcode<As65> TSB = new(Keyword, "TSB", asm =>
+    private readonly Opcode TSB = new(Keyword, "TSB", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
-                case DPAG: asm.GenerateDirectPage(0x04, asm.arg); break;
-                case ABSL: asm.GenerateAbsolute(0x0C, asm.arg); break;
+                case DPAG: asm.GenerateDirectPage(0x04, asm.Arg); break;
+                case ABSL: asm.GenerateAbsolute(0x0C, asm.Arg); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
                     break;
@@ -3041,9 +3033,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TSC instruction.
     /// </summary>
-    private readonly Opcode<As65> TSC = new(Keyword, "TSC", asm =>
+    private readonly Opcode TSC = new(Keyword, "TSC", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -3062,7 +3054,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TSX instruction.
     /// </summary>
-    private readonly Opcode<As65> TSX = new(Keyword, "TSX", asm =>
+    private readonly Opcode TSX = new(Keyword, "TSX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3077,7 +3069,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TXA instruction.
     /// </summary>
-    private readonly Opcode<As65> TXA = new(Keyword, "TXA", asm =>
+    private readonly Opcode TXA = new(Keyword, "TXA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3092,7 +3084,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TXS instruction.
     /// </summary>
-    private readonly Opcode<As65> TXS = new(Keyword, "TXS", asm =>
+    private readonly Opcode TXS = new(Keyword, "TXS", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3107,9 +3099,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TXY instruction.
     /// </summary>
-    private readonly Opcode<As65> TXY = new(Keyword, "TXY", asm =>
+    private readonly Opcode TXY = new(Keyword, "TXY", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -3129,7 +3121,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TYA instruction.
     /// </summary>
-    private readonly Opcode<As65> TYA = new(Keyword, "TYA", asm =>
+    private readonly Opcode TYA = new(Keyword, "TYA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3144,9 +3136,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TYX instruction.
     /// </summary>
-    private readonly Opcode<As65> TYX = new(Keyword, "TYX", asm =>
+    private readonly Opcode TYX = new(Keyword, "TYX", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -3165,9 +3157,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the WAI instruction.
     /// </summary>
-    private readonly Opcode<As65> WAI = new(Keyword, "WAI", asm =>
+    private readonly Opcode WAI = new(Keyword, "WAI", asm =>
     {
-        if ((asm.processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -3186,13 +3178,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the WDM instruction.
     /// </summary>
-    private readonly Opcode<As65> WDM = new(Keyword, "WDM", asm =>
+    private readonly Opcode WDM = new(Keyword, "WDM", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
-                case IMMD: asm.GenerateImmediate(0x42, asm.arg, 8); break;
+                case IMMD: asm.GenerateImmediate(0x42, asm.Arg, 8); break;
                 case IMPL: asm.GenerateImplied(0x42); break;
                 default:
                     asm.OnError(ERR_ILLEGAL_ADDR);
@@ -3209,9 +3201,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the XBA instruction.
     /// </summary>
-    private readonly Opcode<As65> XBA = new(Keyword, "XBA", asm =>
+    private readonly Opcode XBA = new(Keyword, "XBA", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -3230,9 +3222,9 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the XCE instruction.
     /// </summary>
-    private readonly Opcode<As65> XCE = new(Keyword, "XCE", asm =>
+    private readonly Opcode XCE = new(Keyword, "XCE", asm =>
     {
-        if ((asm.processor & (M65816 | M65832)) != 0)
+        if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
             {
@@ -3252,35 +3244,30 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the IF structured assembly command..
     /// </summary>				
-    private new readonly Opcode<As65> IF = new(Keyword, "IF", asm =>
+    private new readonly Opcode IF = new(Keyword, "IF", asm =>
     {
-        var index = asm.ifIndex++;
+        var index = asm.IfIndex++;
 
-        asm.ifs.Push(index);
+        asm.Ifs.Push(index);
 
-        if (asm.GetPass() == Pass.FIRST)
+        if (asm.Pass == Pass.FIRST)
         {
-            asm.elseAddr.Add(null);
-            asm.endifAddr.Add(null);
+            asm.ElseAddr.Add(null);
+            asm.EndIfAddr.Add(null);
         }
 
-        asm.currentToken = asm.NextRealToken();
+        asm.CurrentToken = asm.NextRealToken();
 
-        var target = asm.elseAddr.ElementAt(index);
+        var target = asm.ElseAddr.ElementAt(index) ?? (asm.EndIfAddr.ElementAt(index) ?? asm.Origin);
 
-        if (target == null)
-        {
-            target = asm.endifAddr.ElementAt(index) ?? asm.GetOrigin();
-        }
-
-        if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.NE, target);
-        else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.EQ, target);
-        else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.CS, target);
-        else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.CC, target);
-        else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.MI, target);
-        else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.PL, target);
-        else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.VS, target);
-        else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.VC, target);
+        if (asm.CurrentToken == EQ) asm.GenerateBranch(NE, target);
+        else if (asm.CurrentToken == NE) asm.GenerateBranch(EQ, target);
+        else if (asm.CurrentToken == CC) asm.GenerateBranch(CS, target);
+        else if (asm.CurrentToken == CS) asm.GenerateBranch(CC, target);
+        else if (asm.CurrentToken == PL) asm.GenerateBranch(MI, target);
+        else if (asm.CurrentToken == MI) asm.GenerateBranch(PL, target);
+        else if (asm.CurrentToken == VC) asm.GenerateBranch(VS, target);
+        else if (asm.CurrentToken == VS) asm.GenerateBranch(VC, target);
         else
             asm.OnError(ERR_INVALID_CONDITIONAL);
 
@@ -3291,16 +3278,16 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the ELSE structured assembly
     /// command.
     /// </summary>
-    private new readonly Opcode<As65> ELSE = new(Keyword, "ELSE", asm =>
+    private new readonly Opcode ELSE = new(Keyword, "ELSE", asm =>
     {
-        if (asm.ifs.Count > 0)
+        if (asm.Ifs.Count > 0)
         {
-            var index = asm.ifs.Peek();
+            var index = asm.Ifs.Peek();
 
-            var target = asm.endifAddr[index] ?? asm.GetOrigin();
+            var target = asm.EndIfAddr[index] ?? asm.Origin;
 
             asm.GenerateJump(target);
-            asm.elseAddr[index] = asm.section?.GetOrigin();
+            asm.ElseAddr[index] = asm.Section?.GetOrigin();
         }
         else
             asm.OnError(ERR_NO_ACTIVE_IF);
@@ -3312,13 +3299,13 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the ENDIF structured assembly
     /// command.
     /// </summary>
-    private new readonly Opcode<As65> ENDIF = new(Keyword, "ENDIF", asm =>
+    private new readonly Opcode ENDIF = new(Keyword, "ENDIF", asm =>
     {
-        if (asm.ifs.Count > 0)
+        if (asm.Ifs.Count > 0)
         {
-            var index = asm.ifs.Pop();
+            var index = asm.Ifs.Pop();
 
-            asm.endifAddr[index] = asm.section?.GetOrigin();
+            asm.EndIfAddr[index] = asm.Section?.GetOrigin();
         }
         else
             asm.OnError(ERR_NO_ACTIVE_IF);
@@ -3327,22 +3314,22 @@ public sealed class As65 : Assembler
     });
 
     /// <summary>
-    /// The <code>Opcode</code> to handle the REPEAT structured assemlby
+    /// The <code>Opcode</code> to handle the REPEAT structured assembly
     /// command.
     /// </summary>
-    private new readonly Opcode<As65> REPEAT = new(Keyword, "REPEAT", asm =>
+    private new readonly Opcode REPEAT = new(Keyword, "REPEAT", asm =>
     {
-        int index = asm.loopIndex++;
+        var index = asm.LoopIndex++;
 
-        asm.loops.Push(index);
+        asm.Loops.Push(index);
 
-        if (asm.GetPass() == Pass.FIRST)
+        if (asm.Pass == Pass.FIRST)
         {
-            asm.loopAddr.Add(asm.section?.GetOrigin());
-            asm.endAddr.Add(null);
+            asm.LoopAddr.Add(asm.Section?.GetOrigin());
+            asm.EndAddr.Add(null);
         }
         else
-            asm.loopAddr[index] = asm.section?.GetOrigin();
+            asm.LoopAddr[index] = asm.Section?.GetOrigin();
 
         return (true);
     });
@@ -3351,28 +3338,28 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the UNTIL structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode<As65> UNTIL = new(Keyword, "UNTIL", asm =>
+    private readonly Opcode UNTIL = new(Keyword, "UNTIL", asm =>
     {
-        if (asm.loops.Count > 0)
+        if (asm.Loops.Count > 0)
         {
-            var index = asm.loops.Pop();
+            var index = asm.Loops.Pop();
 
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
 
-            var target = asm.loopAddr[index] ?? asm.GetOrigin();
+            var target = asm.LoopAddr[index] ?? asm.Origin;
 
-            if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.NE, target);
-            else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.EQ, target);
-            else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.CS, target);
-            else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.CC, target);
-            else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.MI, target);
-            else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.PL, target);
-            else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.VS, target);
-            else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.VC, target);
+            if (asm.CurrentToken == EQ) asm.GenerateBranch(NE, target);
+            else if (asm.CurrentToken == NE) asm.GenerateBranch(EQ, target);
+            else if (asm.CurrentToken == CC) asm.GenerateBranch(CS, target);
+            else if (asm.CurrentToken == CS) asm.GenerateBranch(CC, target);
+            else if (asm.CurrentToken == PL) asm.GenerateBranch(MI, target);
+            else if (asm.CurrentToken == MI) asm.GenerateBranch(PL, target);
+            else if (asm.CurrentToken == VC) asm.GenerateBranch(VS, target);
+            else if (asm.CurrentToken == VS) asm.GenerateBranch(VC, target);
             else
                 asm.OnError(ERR_INVALID_CONDITIONAL);
 
-            asm.endAddr[index] = asm.section?.GetOrigin();
+            asm.EndAddr[index] = asm.Section?.GetOrigin();
         }
         else
             asm.OnError(ERR_NO_ACTIVE_REPEAT);
@@ -3381,21 +3368,20 @@ public sealed class As65 : Assembler
     });
 
     /// <summary>
-    /// The <code>Opcode</code> to handle the FOREVER structured assmbly
+    /// The <code>Opcode</code> to handle the FOREVER structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode<As65> FOREVER = new(Keyword, "FOREVER", asm =>
+    private readonly Opcode FOREVER = new(Keyword, "FOREVER", asm =>
     {
-        if (asm.loops.Count > 0)
+        if (asm.Loops.Count > 0)
         {
-            var index = asm.loops.Pop();
+            var index = asm.Loops.Pop();
 
-            var target = asm.loopAddr[index];
-            if (target == null) target = asm.GetOrigin();
+            var target = asm.LoopAddr[index] ?? asm.Origin;
 
             asm.GenerateJump(target);
 
-            asm.endAddr[index] = asm.section?.GetOrigin();
+            asm.EndAddr[index] = asm.Section?.GetOrigin();
         }
         else
             asm.OnError(ERR_NO_ACTIVE_REPEAT);
@@ -3407,35 +3393,33 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the WHILE structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode<As65> WHILE = new(Keyword, "WHILE", asm =>
+    private readonly Opcode WHILE = new(Keyword, "WHILE", asm =>
     {
-        var index = asm.loopIndex++;
+        var index = asm.LoopIndex++;
 
-        asm.loops.Push(index);
+        asm.Loops.Push(index);
 
-        if (asm.GetPass() == Pass.FIRST)
+        if (asm.Pass == Pass.FIRST)
         {
-            asm.loopAddr.Add(asm.section?.GetOrigin());
-            asm.endAddr.Add(null);
+            asm.LoopAddr.Add(asm.Section?.GetOrigin());
+            asm.EndAddr.Add(null);
         }
         else
-            asm.loopAddr[index] = asm.section?.GetOrigin();
+            asm.LoopAddr[index] = asm.Section?.GetOrigin();
 
-        asm.currentToken = asm.NextRealToken();
+        asm.CurrentToken = asm.NextRealToken();
 
-        var target = asm.endAddr[index];
-        if (target == null) target = asm.GetOrigin();
+        var target = asm.EndAddr[index] ?? asm.Origin;
 
-        if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.NE, target);
-        else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.EQ, target);
-        else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.CS, target);
-        else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.CC, target);
-        else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.MI, target);
-        else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.PL, target);
-        else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.VS, target);
-        else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.VC, target);
-        else
-            asm.OnError(ERR_INVALID_CONDITIONAL);
+        if (asm.CurrentToken == EQ) asm.GenerateBranch(NE, target);
+        else if (asm.CurrentToken == NE) asm.GenerateBranch(EQ, target);
+        else if (asm.CurrentToken == CC) asm.GenerateBranch(CS, target);
+        else if (asm.CurrentToken == CS) asm.GenerateBranch(CC, target);
+        else if (asm.CurrentToken == PL) asm.GenerateBranch(MI, target);
+        else if (asm.CurrentToken == MI) asm.GenerateBranch(PL, target);
+        else if (asm.CurrentToken == VC) asm.GenerateBranch(VS, target);
+        else if (asm.CurrentToken == VS) asm.GenerateBranch(VC, target);
+        else asm.OnError(ERR_INVALID_CONDITIONAL);
 
         return (true);
     });
@@ -3444,18 +3428,17 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the ENDW structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode<As65> ENDW = new(Keyword, "ENDW", asm =>
+    private readonly Opcode ENDW = new(Keyword, "ENDW", asm =>
     {
-        if (asm.loops.Count > 0)
+        if (asm.Loops.Count > 0)
         {
-            int index = asm.loops.Pop();
+            var index = asm.Loops.Pop();
 
-            var target = asm.loopAddr[index];
-            if (target == null) target = asm.section?.GetOrigin();
+            var target = asm.LoopAddr[index] ?? asm.Section?.GetOrigin();
 
             asm.GenerateJump(target);
 
-            asm.endAddr[index] = asm.section?.GetOrigin();
+            asm.EndAddr[index] = asm.Section?.GetOrigin();
         }
         else
             asm.OnError(ERR_NO_ACTIVE_WHILE);
@@ -3467,26 +3450,25 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the CONT structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode<As65> CONT = new(Keyword, "CONT", asm =>
+    private readonly Opcode CONT = new(Keyword, "CONT", asm =>
     {
-        if (asm.loops.Count > 0)
+        if (asm.Loops.Count > 0)
         {
-            int index = asm.loops.Peek();
+            var index = asm.Loops.Peek();
 
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
 
-            var target = asm.loopAddr[index];
-            if (target == null) target = asm.GetOrigin();
+            var target = asm.LoopAddr[index] ?? asm.Origin;
 
-            if (asm.currentToken == EOL) asm.GenerateJump(target);
-            else if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.currentToken, target);
+            if (asm.CurrentToken == EOL) asm.GenerateJump(target);
+            else if (asm.CurrentToken == EQ) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == NE) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == CC) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == CS) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == PL) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == MI) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == VC) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == VS) asm.GenerateBranch(asm.CurrentToken, target);
             else
                 asm.OnError(ERR_INVALID_CONDITIONAL);
         }
@@ -3500,26 +3482,25 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the BREAK structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode<As65> BREAK = new(Keyword, "BREAK", asm =>
+    private readonly Opcode BREAK = new(Keyword, "BREAK", asm =>
     {
-        if (asm.loops.Count > 0)
+        if (asm.Loops.Count > 0)
         {
-            var index = asm.loops.Peek();
+            var index = asm.Loops.Peek();
 
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
 
-            var target = asm.endAddr[index];
-            if (target == null) target = asm.GetOrigin();
+            var target = asm.EndAddr[index] ?? asm.Origin;
 
-            if (asm.currentToken == EOL) asm.GenerateJump(target);
-            else if (asm.currentToken == asm.EQ) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.NE) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.CC) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.CS) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.PL) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.MI) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.VC) asm.GenerateBranch(asm.currentToken, target);
-            else if (asm.currentToken == asm.VS) asm.GenerateBranch(asm.currentToken, target);
+            if (asm.CurrentToken == EOL) asm.GenerateJump(target);
+            else if (asm.CurrentToken == EQ) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == NE) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == CC) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == CS) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == PL) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == MI) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == VC) asm.GenerateBranch(asm.CurrentToken, target);
+            else if (asm.CurrentToken == VS) asm.GenerateBranch(asm.CurrentToken, target);
             else
                 asm.OnError(ERR_INVALID_CONDITIONAL);
         }
@@ -3532,18 +3513,18 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the A2STR instruction.
     /// </summary>
-    private readonly Opcode<As65> A2STR = new(Keyword, "A2STR", asm =>
+    private readonly Opcode A2STR = new(Keyword, "A2STR", asm =>
     {
         do {
-            asm.currentToken = asm.NextRealToken();
-            if (asm.currentToken?.Kind == String)
+            asm.CurrentToken = asm.NextRealToken();
+            if (asm.CurrentToken?.Kind == String)
             {
-                var value = asm.currentToken.Text;
+                var value = asm.CurrentToken.Text;
 
-                for (int index = 0; index < value.Length; ++index)
-                    asm.AddByte((byte)(value[index] | 0x80));
+                foreach (var b in value)
+                    asm.AddByte((byte)(b | 0x80));
 
-                asm.currentToken = asm.NextRealToken();
+                asm.CurrentToken = asm.NextRealToken();
             }
             else
             {
@@ -3554,9 +3535,9 @@ public sealed class As65 : Assembler
                 else
                     asm.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
             }
-        } while (asm.currentToken == Comma);
+        } while (asm.CurrentToken == Comma);
 
-        if (asm.currentToken != EOL) asm.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
+        if (asm.CurrentToken != EOL) asm.OnError(ErrorMessage.ERR_INVALID_EXPRESSION);
         return (true);
 
     });
@@ -3564,22 +3545,22 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the HSTR instruction.
     /// </summary>
-    private readonly Opcode<As65> HSTR = new(Keyword, "HSTR", asm =>
+    private readonly Opcode HSTR = new(Keyword, "HSTR", asm =>
     {
-        asm.currentToken = asm.NextRealToken();
+        asm.CurrentToken = asm.NextRealToken();
 
-        if (asm.currentToken?.Kind == String)
+        if (asm.CurrentToken?.Kind == String)
         {
-            var value = asm.currentToken.Text;
+            var value = asm.CurrentToken.Text;
 
-            for (int index = 0; index < value.Length;)
+            for (var index = 0; index < value.Length;)
             {
-                char ch = value[index++];
+                var ch = value[index++];
 
                 asm.AddByte((byte)(ch | ((index < value.Length) ? 0x00 : 0x80)));
             }
 
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
         }
         else
             asm.OnError(".HSTR must have a string argument");
@@ -3590,13 +3571,13 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the PSTR instruction.
     /// </summary>
-    private readonly Opcode<As65> PSTR = new(Keyword, "PSTR", asm =>
+    private readonly Opcode PSTR = new(Keyword, "PSTR", asm =>
     {
-        asm.currentToken = asm.NextRealToken();
+        asm.CurrentToken = asm.NextRealToken();
 
-        if (asm.currentToken?.Kind == String)
+        if (asm.CurrentToken?.Kind == String)
         {
-            String value = asm.currentToken.Text;
+            var value = asm.CurrentToken.Text;
 
             if (value.Length > 255)
             {
@@ -3605,10 +3586,10 @@ public sealed class As65 : Assembler
             }
 
             asm.AddByte((byte)(value.Length));
-            for (int index = 0; index < value.Length; ++index)
-                asm.AddByte((byte)value[index]);
+            foreach (var b in value)
+                asm.AddByte((byte)b);
 
-            asm.currentToken = asm.NextRealToken();
+            asm.CurrentToken = asm.NextRealToken();
         }
         else
             asm.OnError(".PSTR must have a string argument");
@@ -3616,15 +3597,15 @@ public sealed class As65 : Assembler
         return (true);
     });
 
-    private readonly Opcode<As65> JCC;
-    private readonly Opcode<As65> JCS;
-    private readonly Opcode<As65> JEQ;
-    private readonly Opcode<As65> JMI;
-    private readonly Opcode<As65> JNE;
-    private readonly Opcode<As65> JPL;
-    private readonly Opcode<As65> JVC;
-    private readonly Opcode<As65> JVS;
-    private readonly Opcode<As65> JPA;
+    private readonly Opcode JCC;
+    private readonly Opcode JCS;
+    private readonly Opcode JEQ;
+    private readonly Opcode JMI;
+    private readonly Opcode JNE;
+    private readonly Opcode JPL;
+    private readonly Opcode JVC;
+    private readonly Opcode JVS;
+    private readonly Opcode JPA;
 
     private As65() : base(new Module("65XX", false))
     {
@@ -3665,16 +3646,16 @@ public sealed class As65 : Assembler
         AddToken(DATA);
         AddToken(PAGE0);
         AddToken(ORG);
-        AddToken(base.ELSE);
+        AddToken(Assembler.ELSE);
         AddToken(End);
-        AddToken(base.ENDIF);
+        AddToken(Assembler.ENDIF);
         AddToken(ENDM);
         AddToken(ENDR);
         AddToken(Equ);
         AddToken(EXITM);
         AddToken(EXTERN);
         AddToken(GLOBAL);
-        AddToken(base.IF);
+        AddToken(Assembler.IF);
         AddToken(IFABS);
         AddToken(IFNABS);
         AddToken(IFREL);
@@ -3691,7 +3672,7 @@ public sealed class As65 : Assembler
         AddToken(MACRO);
         AddToken(ON);
         AddToken(Off);
-        AddToken(base.REPEAT);
+        AddToken(Assembler.REPEAT);
         AddToken(Set);
         AddToken(LIST);
         AddToken(NOLIST);
@@ -3708,7 +3689,7 @@ public sealed class As65 : Assembler
         AddToken(STRLEN);
         AddToken(HI);
         AddToken(LO);
-        AddToken(base.BANK);
+        AddToken(Assembler.BANK);
 
         // Opcodes & Registers
         AddToken(A);
@@ -3886,20 +3867,20 @@ public sealed class As65 : Assembler
 
     protected override string FormatListing()
     {
-        var byteCount = memory?.ByteCount;
+        var byteCount = Memory?.ByteCount;
 
         output.Clear();
 
-        switch (lineType)
+        switch (LineType)
         {
             case '=':
                 output.Append("         ");
-                if (addr == null)
+                if (Addr == null)
                     OnError("Addr is null");
-                output.Append(Hex.ToHex(addr?.Resolve() ?? 0, 8));
-                output.Append(addr?.IsAbsolute ?? false ? "  " : "' ");
+                output.Append(Hex.ToHex(Addr?.Resolve() ?? 0, 8));
+                output.Append(Addr?.IsAbsolute ?? false ? "  " : "' ");
                 output.Append("        ");
-                output.Append(lineType);
+                output.Append(LineType);
                 output.Append(' ');
                 break;
 
@@ -3908,24 +3889,24 @@ public sealed class As65 : Assembler
                 output.Append("        ");
                 output.Append("  ");
                 output.Append("        ");
-                output.Append(lineType);
+                output.Append(LineType);
                 output.Append(' ');
                 break;
 
             default:
-                if (IsActive && (addr != null) && ((label != null) || (lineType == ':') || (byteCount > 0)))
+                if (IsActive && (Addr != null) && ((Label != null) || (LineType == ':') || (byteCount > 0)))
                 {
-                    long value = addr.Resolve();
+                    var value = Addr.Resolve();
                     output.Append(Hex.ToHex(value >> 16, 2));
                     output.Append(":");
                     output.Append(Hex.ToHex(value, 4));
-                    output.Append(addr?.IsAbsolute == true ? "  " : "' ");
+                    output.Append(Addr?.IsAbsolute == true ? "  " : "' ");
 
-                    for (int index = 0; index < 8; ++index)
+                    for (var index = 0; index < 8; ++index)
                     {
                         if (index < byteCount)
                         {
-                            var code = memory?.GetByte(index) ?? 0;
+                            var code = Memory?.GetByte(index) ?? 0;
 
                             output.Append(code >= 0 ? Hex.ToHex(code, 2) : "??");
                         }
@@ -3933,13 +3914,13 @@ public sealed class As65 : Assembler
                             output.Append("  ");
                     }
                     output.Append((byteCount > 8) ? "> " : "  ");
-                    output.Append(lineType);
+                    output.Append(LineType);
                     output.Append(' ');
                 }
                 else
                 {
                     output.Append("                           ");
-                    output.Append(lineType);
+                    output.Append(LineType);
                     output.Append(' ');
                 }
                 break;
@@ -3954,27 +3935,27 @@ public sealed class As65 : Assembler
 
         P6502.Compile(this);
 
-        dataBank = 0;
-        directPage = 0;
-        bitsA = 0;
-        bitsI = 0;
+        DataBank = 0;
+        DirectPage = 0;
+        BitsA = 0;
+        BitsI = 0;
 
-        sections.Add(".page0", GetModule()?.FindSection(".page0"));
+        Sections.Add(".page0", Module?.FindSection(".page0"));
 
-        ifIndex = 0;
-        loopIndex = 0;
+        IfIndex = 0;
+        LoopIndex = 0;
 
-        title = "Portable 65xx Assembler [30.00]";
+        Title = "Portable 65xx Assembler [30.00]";
     }
 
     protected override void EndPass()
     {
-        if (ifs.Count > 0)
+        if (Ifs.Count > 0)
         {
             OnError(ERR_UNTERMINATED_IFS);
         }
 
-        if (loops.Count > 0)
+        if (Loops.Count > 0)
         {
             OnError(ERR_UNTERMINATED_LOOPS);
         }
@@ -3997,7 +3978,7 @@ public sealed class As65 : Assembler
     /// <returns>The next <code>Token</code></returns>
     private Token? ScanToken()
     {
-        int value = 0;
+        var value = 0;
 
         // handle tail comments
         if (PeekChar() == ';') return EOL;
@@ -4060,7 +4041,7 @@ public sealed class As65 : Assembler
 
             case '@':
                 {
-                    if (!IsOctal(PeekChar())) return Origin;
+                    if (!IsOctal(PeekChar())) return OriginToken;
 
                     buffer.Append('@');
                     do
@@ -4076,7 +4057,7 @@ public sealed class As65 : Assembler
 
             case '$':
                 {
-                    if (!IsHexadecimal(PeekChar())) return Origin;
+                    if (!IsHexadecimal(PeekChar())) return OriginToken;
 
                     buffer.Append('$');
                     do
@@ -4100,7 +4081,7 @@ public sealed class As65 : Assembler
                 {
                     if (IsAlphanumeric(PeekChar()))
                         break;
-                    return Origin;
+                    return OriginToken;
                 }
 
             case '~': return Complement;
@@ -4205,7 +4186,16 @@ public sealed class As65 : Assembler
 
             var symbol = buffer.ToString();
 
-            return tokens.TryGetValue(symbol.ToUpper(), out Token? opcode) ? opcode : new Token(Symbol, symbol);
+            if (tokenDictionary.ContainsKey(symbol.ToUpper()))
+            {
+                return tokenDictionary[symbol.ToUpper()];
+            }
+            else
+            {
+                return new Token(Symbol, symbol);
+            }
+
+            //return tokenDictionary.TryGetValue(symbol.ToUpper(), out var opcode) ? opcode : new Token(Symbol, symbol);
         }
 
         // Character Literals
@@ -4371,7 +4361,7 @@ public sealed class As65 : Assembler
     // Represents the direct page addressing mode
     private const int DPAG = 4;
 
-    // Represents the diret page indexed addressing mode
+    // Represents the direct page indexed addressing mode
     private const int DPGX = 5;
 
     // Represents the direct page indexed addressing mode
@@ -4455,113 +4445,110 @@ public sealed class As65 : Assembler
     /// <see cref="M65SC02"/>
     /// <see cref="M65816"/>
     /// </summary>
-    private int processor = 0;
+    //private int processor;
 
     // The current argument
-    private Expr? arg;
+    //private Expr? arg;
 
     // The current data bank (65816 only).
-    private int dataBank;
+    //private int dataBank;
 
     // The current direct page value (65816 only).
-    private int directPage;
+    //private int directPage;
 
     // A flag indicating the number of bits in the A register.
-    private int bitsA;
+    //private int bitsA;
 
     // A flag indicating the number of bits in the X and Y registers.
-    private int bitsI;
+    //private int bitsI;
 
     /// <summary>
     /// Determines the addressing mode used by the instruction.
     /// </summary>
     /// <param name="targetBank">The target bank value.</param>
     /// <returns>The address mode.</returns>
-    private int ParseMode(int targetBank)
+    public override int ParseMode(int targetBank)
     {
-        currentToken = NextRealToken();
+        CurrentToken = NextRealToken();
 
-        if (currentToken == EOL) return IMPL;
+        if (CurrentToken == EOL) return IMPL;
 
         // Handle Accumulator
-        if (currentToken == A)
+        if (CurrentToken == A)
         {
-            currentToken = NextRealToken();
-            arg = null;
+            CurrentToken = NextRealToken();
+            Arg = null;
             return ACCM;
         }
 
         // Handle Immediate
-        if (currentToken == HASH)
+        if (CurrentToken == HASH)
         {
-            currentToken = NextRealToken();
-            if (currentToken == Lt)
+            CurrentToken = NextRealToken();
+            if (CurrentToken == Lt)
             {
-                currentToken = NextRealToken();
-                arg = ParseImmediate();
+                CurrentToken = NextRealToken();
+                Arg = ParseImmediate();
             }
-            else if (currentToken == Gt)
+            else if (CurrentToken == Gt)
             {
-                currentToken = NextRealToken();
-                arg = Expr.Shr(ParseImmediate(), EIGHT);
+                CurrentToken = NextRealToken();
+                Arg = Expr.Shr(ParseImmediate(), EIGHT);
             }
-            else if (currentToken == BinaryXor)
+            else if (CurrentToken == BinaryXor)
             {
-                currentToken = NextRealToken();
-                arg = Expr.Shr(ParseImmediate(), SIXTEEN);
+                CurrentToken = NextRealToken();
+                Arg = Expr.Shr(ParseImmediate(), SIXTEEN);
             }
             else
-                arg = ParseImmediate();
+                Arg = ParseImmediate();
 
             return IMMD;
         }
 
         // Handle <.. <..,X <..,Y
-        if (currentToken == Lt)
+        if (CurrentToken == Lt)
         {
-            currentToken = NextRealToken();
-            arg = ParseExpression();
+            CurrentToken = NextRealToken();
+            Arg = ParseExpression();
 
-            if (arg == null)
+            if (Arg == null)
                 OnError(ERR_MISSING_EXPRESSION);
 
-            if (currentToken == Comma)
+            if (CurrentToken != Comma) return DPAG;
+            CurrentToken = NextRealToken();
+            if (CurrentToken == X)
             {
-                currentToken = NextRealToken();
-                if (currentToken == X)
-                {
-                    currentToken = NextRealToken();
-                    return DPGX;
-                }
-
-                if (currentToken == Y)
-                {
-                    currentToken = NextRealToken();
-                    return DPGY;
-                }
-
-                OnError(ERR_EXPECTED_X_OR_Y);
-                return UNKN;
+                CurrentToken = NextRealToken();
+                return DPGX;
             }
 
-            return DPAG;
+            if (CurrentToken == Y)
+            {
+                CurrentToken = NextRealToken();
+                return DPGY;
+            }
+
+            OnError(ERR_EXPECTED_X_OR_Y);
+            return UNKN;
+
         }
 
         // Handle >.. and >..,X
-        if (currentToken == Gt)
+        if (CurrentToken == Gt)
         {
-            currentToken = NextRealToken();
-            arg = ParseExpression();
+            CurrentToken = NextRealToken();
+            Arg = ParseExpression();
 
-            if (arg == null)
+            if (Arg == null)
                 OnError(ERR_MISSING_EXPRESSION);
 
-            if (currentToken == Comma)
+            if (CurrentToken == Comma)
             {
-                currentToken = NextRealToken();
-                if (currentToken == X)
+                CurrentToken = NextRealToken();
+                if (CurrentToken == X)
                 {
-                    currentToken = NextRealToken();
+                    CurrentToken = NextRealToken();
                     return ALGX;
                 }
 
@@ -4573,23 +4560,23 @@ public sealed class As65 : Assembler
         }
 
         // Handle [..] and [..],Y
-        if (currentToken == LBRACKET)
+        if (CurrentToken == LBRACKET)
         {
-            currentToken = NextRealToken();
-            arg = ParseExpression();
+            CurrentToken = NextRealToken();
+            Arg = ParseExpression();
 
-            if (arg == null)
+            if (Arg == null)
                 OnError(ERR_MISSING_EXPRESSION);
 
-            if (currentToken == RBRACKET)
+            if (CurrentToken == RBRACKET)
             {
-                currentToken = NextRealToken();
-                if (currentToken == Comma)
+                CurrentToken = NextRealToken();
+                if (CurrentToken == Comma)
                 {
-                    currentToken = NextRealToken();
-                    if (currentToken == Y)
+                    CurrentToken = NextRealToken();
+                    if (CurrentToken == Y)
                     {
-                        currentToken = NextRealToken();
+                        CurrentToken = NextRealToken();
                         return LINY;
                     }
 
@@ -4605,23 +4592,23 @@ public sealed class As65 : Assembler
         }
 
         // Handle (..,X) (..),Y, (..,S),Y and (..)
-        if (currentToken == LParen)
+        if (CurrentToken == LParen)
         {
-            currentToken = NextRealToken();
-            arg = ParseExpression();
+            CurrentToken = NextRealToken();
+            Arg = ParseExpression();
 
-            if (arg == null)
+            if (Arg == null)
                 OnError(ERR_MISSING_EXPRESSION);
 
-            if (currentToken == Comma)
+            if (CurrentToken == Comma)
             {
-                currentToken = NextRealToken();
-                if (currentToken == X)
+                CurrentToken = NextRealToken();
+                if (CurrentToken == X)
                 {
-                    currentToken = NextRealToken();
-                    if (currentToken == RParen)
+                    CurrentToken = NextRealToken();
+                    if (CurrentToken == RParen)
                     {
-                        currentToken = NextRealToken();
+                        CurrentToken = NextRealToken();
                         return INDX;
                     }
 
@@ -4629,18 +4616,18 @@ public sealed class As65 : Assembler
                     return UNKN;
                 }
 
-                if (currentToken == S)
+                if (CurrentToken == S)
                 {
-                    currentToken = NextRealToken();
-                    if (currentToken == RParen)
+                    CurrentToken = NextRealToken();
+                    if (CurrentToken == RParen)
                     {
-                        currentToken = NextRealToken();
-                        if (currentToken == Comma)
+                        CurrentToken = NextRealToken();
+                        if (CurrentToken == Comma)
                         {
-                            currentToken = NextRealToken();
-                            if (currentToken == Y)
+                            CurrentToken = NextRealToken();
+                            if (CurrentToken == Y)
                             {
-                                currentToken = NextRealToken();
+                                CurrentToken = NextRealToken();
                                 return STKI;
                             }
 
@@ -4660,86 +4647,76 @@ public sealed class As65 : Assembler
                 return UNKN;
             }
 
-            if (currentToken == RParen)
+            if (CurrentToken != RParen) return UNKN;
+            CurrentToken = NextRealToken();
+            if (CurrentToken != Comma) return INDI;
+            CurrentToken = NextRealToken();
+            if (CurrentToken == Y)
             {
-                currentToken = NextRealToken();
-                if (currentToken == Comma)
-                {
-                    currentToken = NextRealToken();
-                    if (currentToken == Y)
-                    {
-                        currentToken = NextRealToken();
-                        return INDY;
-                    }
-
-                    OnError(ERR_EXPECTED_Y);
-                    return UNKN;
-                }
-
-                return INDI;
+                CurrentToken = NextRealToken();
+                return INDY;
             }
 
+            OnError(ERR_EXPECTED_Y);
             return UNKN;
+
         }
 
         // Handle |.., |..,X and |..,Y or !.., !..,X and !..,Y
-        if (currentToken == BinaryOr || currentToken == LogicalNot)
+        if (CurrentToken == BinaryOr || CurrentToken == LogicalNot)
         {
-            currentToken = NextRealToken();
-            arg = ParseExpression();
+            CurrentToken = NextRealToken();
+            Arg = ParseExpression();
 
-            if (arg == null)
+            if (Arg == null)
                 OnError(ERR_MISSING_EXPRESSION);
 
-            if (currentToken == Comma)
+            if (CurrentToken != Comma) return ABSL;
+            CurrentToken = NextRealToken();
+            if (CurrentToken == X)
             {
-                currentToken = NextRealToken();
-                if (currentToken == X)
-                {
-                    currentToken = NextRealToken();
-                    return ABSX;
-                }
-
-                if (currentToken == Y)
-                {
-                    currentToken = NextRealToken();
-                    return ABSY;
-                }
-
-                OnError(ERR_EXPECTED_X_OR_Y);
-                return UNKN;
+                CurrentToken = NextRealToken();
+                return ABSX;
             }
 
-            return ABSL;
+            if (CurrentToken == Y)
+            {
+                CurrentToken = NextRealToken();
+                return ABSY;
+            }
+
+            OnError(ERR_EXPECTED_X_OR_Y);
+            return UNKN;
+
         }
 
         // Handle .. ..,X ..,Y and ..,S
-        arg = ParseExpression();
+        Arg = ParseExpression();
 
-        if (arg == null)
+        if (Arg == null)
         {
             OnError(ERR_MISSING_EXPRESSION);
             return ABSL;
         }
 
-        if (currentToken == Comma)
+        if (CurrentToken == Comma)
         {
-            currentToken = NextRealToken();
-            if (currentToken == X)
+            CurrentToken = NextRealToken();
+            if (CurrentToken == X)
             {
-                currentToken = NextRealToken();
-                return arg.IsAbsolute && IsByteAddress((int)arg.Resolve()) ? DPGX : ABSX;
+                CurrentToken = NextRealToken();
+                return Arg.IsAbsolute && IsByteAddress((int)Arg.Resolve()) ? DPGX : ABSX;
             }
 
-            if (currentToken == Y)
+            if (CurrentToken == Y)
             {
-                currentToken = NextRealToken();
-                return arg.IsAbsolute && IsByteAddress((int)arg.Resolve()) ? DPGY : ABSY;
+                CurrentToken = NextRealToken();
+                return Arg.IsAbsolute && IsByteAddress((int)Arg.Resolve()) ? DPGY : ABSY;
             }
 
-            if (currentToken == S)
+            if (CurrentToken == S)
             {
-                currentToken = NextRealToken();
+                CurrentToken = NextRealToken();
                 return STAC;
             }
 
@@ -4747,37 +4724,28 @@ public sealed class As65 : Assembler
             return UNKN;
         }
 
-        if (arg.IsAbsolute)
+        if (Arg.IsAbsolute)
         {
-            long address = arg.Resolve();
+            var address = Arg.Resolve();
 
-            if ((processor & (M65816 | M65832)) != 0)
+            if ((Processor & (M65816 | M65832)) == 0) return (address & 0xff00) == 0 ? DPAG : ABSL;
+            if ((address & 0xff0000) == 0)
             {
-                if ((address & 0xff0000) == 0)
-                {
-                    return IsByteAddress((int)address) ? DPAG : ABSL;
-                }
-                else
-                {
-                    if (targetBank == PBANK)
-                    {
-                        var origin = GetOrigin();
-
-                        if (origin?.IsAbsolute == true)
-                            return ((origin.Resolve() ^ address) & 0xff0000) == 0 ? ABSL : ALNG;
-                        return ALNG;
-                    }
-
-                    return ((address & 0xff0000) >> 16) == dataBank ? ABSL : ALNG;
-                }
+                return IsByteAddress((int)address) ? DPAG : ABSL;
             }
-            else
-                return (address & 0xff00) == 0 ? DPAG : ABSL;
+
+            if (targetBank != PBANK) return ((address & 0xff0000) >> 16) == DataBank ? ABSL : ALNG;
+            var origin = Origin;
+
+            if (origin?.IsAbsolute == true)
+                return ((origin.Resolve() ^ address) & 0xff0000) == 0 ? ABSL : ALNG;
+            return ALNG;
+
         }
-        else if (arg.IsExternal(GetOrigin()?.GetSection()))
-            return (processor & (M65816 | M65832)) != 0 ? ALNG : ABSL;
-        else
-            return ABSL;
+
+        if (Arg.IsExternal(Origin?.GetSection()))
+            return (Processor & (M65816 | M65832)) != 0 ? ALNG : ABSL;
+        return ABSL;
     }
 
     /// <summary>
@@ -4785,18 +4753,18 @@ public sealed class As65 : Assembler
     /// string literals as well as numbers.
     /// </summary>
     /// <returns>An expression containing the immediate value.</returns>
-    private Expr? ParseImmediate()
+    public override Expr? ParseImmediate()
     {
-        if (currentToken?.Kind == String)
+        if (CurrentToken?.Kind == String)
         {
-            var text = currentToken.Text;
+            var text = CurrentToken.Text;
 
             if (text.Length > 4)
                 OnError(ERR_TEXT_TOO_LONG_FOR_IMMD);
 
             var value = text.Aggregate(0, (current, t) => (current << 8) | t);
 
-            currentToken = NextRealToken();
+            CurrentToken = NextRealToken();
 
             return (new Value(null, value));
         }
@@ -4809,14 +4777,18 @@ public sealed class As65 : Assembler
         return (result);
     }
 
+    public override int DataBank { get; set; }
+
     /// <summary>
     /// Generate the code for an implied instruction
     /// </summary>
     /// <param name="opcode">The opcode byte</param>
-    private void GenerateImplied(int opcode)
+    public override void GenerateImplied(int opcode)
     {
         AddByte((byte)opcode);
     }
+
+    public override Expr? Arg { get; set; }
 
     /// <summary>
     /// Generate the code for an immediate instruction
@@ -4824,7 +4796,7 @@ public sealed class As65 : Assembler
     /// <param name="opcode">The opcode byte</param>
     /// <param name="expr">The immediate value</param>
     /// <param name="bits">Determines if an 8 or 16 bit value.</param>
-    private void GenerateImmediate(int opcode, Expr? expr, int bits)
+    public override void GenerateImmediate(int opcode, Expr? expr, int bits)
     {
         AddByte((byte)opcode);
         switch (bits)
@@ -4853,14 +4825,14 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="opcode">The opcode byte</param>
     /// <param name="expr">The address expression</param>
-    private void GenerateDirectPage(int opcode, Expr? expr)
+    public override void GenerateDirectPage(int opcode, Expr? expr)
     {
         AddByte((byte)opcode);
 
-        if ((directPage != 0) && (processor == M65816))
-            arg = Expr.Sub(expr, new Value(null, directPage));
+        if ((DirectPage != 0) && (Processor == M65816))
+            Arg = Expr.Sub(expr, new Value(null, DirectPage));
 
-        AddByte(arg);
+        AddByte(Arg);
     }
 
     /// <summary>
@@ -4868,7 +4840,7 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="opcode">The opcode byte.</param>
     /// <param name="expr">The address expression.</param>
-    private void GenerateAbsolute(int opcode, Expr? expr)
+    public override void GenerateAbsolute(int opcode, Expr? expr)
     {
         AddByte((byte)opcode);
         AddWord(expr);
@@ -4880,7 +4852,7 @@ public sealed class As65 : Assembler
     /// <param name="opcode">The opcode byte.</param>
     /// <param name="expr">The address expression.</param>
     /// <param name="isLong">Determines if an 8 or 16 bit value.</param>
-    private void GenerateIndirect(int opcode, Expr? expr, bool isLong)
+    public override void GenerateIndirect(int opcode, Expr? expr, bool isLong)
     {
         if (isLong)
             GenerateAbsolute(opcode, expr);
@@ -4894,9 +4866,9 @@ public sealed class As65 : Assembler
     /// <param name="opcode">The opcode byte.</param>
     /// <param name="expr">The address expression.</param>
     /// <param name="isLong">Determines if an 8 or 16 bit value.</param>
-    private void GenerateRelative(int opcode, Expr? expr, bool isLong)
+    public override void GenerateRelative(int opcode, Expr? expr, bool isLong)
     {
-        var origin = GetOrigin();
+        var origin = Origin;
 
         if (origin != null)
         {
@@ -4904,7 +4876,7 @@ public sealed class As65 : Assembler
             if (isLong)
             {
                 var dist = Expr.Sub(expr, Expr.Add(origin, THREE));
-                if (GetPass() == Pass.FINAL)
+                if (Pass == Pass.FINAL)
                 {
                     if (dist.IsAbsolute && ((dist.Resolve() < -32768) || (dist.Resolve() > 32767)))
                         OnError("Relative branch is out of range");
@@ -4915,7 +4887,7 @@ public sealed class As65 : Assembler
             else
             {
                 var dist = Expr.Sub(expr, Expr.Add(origin, TWO));
-                if (GetPass() == Pass.FINAL)
+                if (Pass == Pass.FINAL)
                 {
                     if (dist.IsAbsolute && ((dist.Resolve() < -128) || (dist.Resolve() > 127)))
                         OnError("Relative branch is out of range");
@@ -4933,7 +4905,7 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="opcode">The opcode byte.</param>
     /// <param name="expr">The address expression.</param>
-    private void GenerateLong(int opcode, Expr? expr)
+    public override void GenerateLong(int opcode, Expr? expr)
     {
         AddByte((byte)opcode);
         AddAddress(expr);
@@ -4945,7 +4917,7 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="condition">The condition causing the branch.</param>
     /// <param name="target">The target address.</param>
-    private void GenerateBranch(Token condition, Expr? target)
+    public override void GenerateBranch(Token condition, Expr? target)
     {
         if (IsShortDistance(target))
         {
@@ -4960,7 +4932,7 @@ public sealed class As65 : Assembler
         }
         else
         {
-            var skipOver = Expr.Add(GetOrigin(), FIVE);
+            var skipOver = Expr.Add(Origin, FIVE);
 
             if (condition == EQ) GenerateRelative(0xD0, skipOver, false);
             if (condition == NE) GenerateRelative(0xF0, skipOver, false);
@@ -4971,25 +4943,27 @@ public sealed class As65 : Assembler
             if (condition == VC) GenerateRelative(0x70, skipOver, false);
             if (condition == VS) GenerateRelative(0x50, skipOver, false);
 
-            if ((processor & (M65816 | M65832)) != 0)
+            if ((Processor & (M65816 | M65832)) != 0)
                 GenerateRelative(0x82, Expr.Sub(target, TWO), true);
             else
                 GenerateAbsolute(0x4C, target);
         }
     }
 
+    public override List<Value?> EndAddr { get; }
+
     /// <summary>
     /// Generates a jump to a target address using BRA if supported
     /// and within range.
     /// </summary>
     /// <param name="target">The target address.</param>
-    private void GenerateJump(Expr? target)
+    public override void GenerateJump(Expr? target)
     {
         if (HasShortBranch() && IsShortDistance(target))
             GenerateRelative(0x80, target, false);
         else
         {
-            if ((processor & (M65816 | M65832)) != 0)
+            if ((Processor & (M65816 | M65832)) != 0)
                 GenerateRelative(0x82, target, true);
             else
                 GenerateAbsolute(0x4C, target);
@@ -5002,9 +4976,9 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="target">The target address.</param>
     /// <returns>return <code>true</code> if the target address is near</returns>
-    private bool IsShortDistance(Expr? target)
+    public override bool IsShortDistance(Expr? target)
     {
-        var offset = Expr.Sub(target, Expr.Add(GetOrigin(), TWO));
+        var offset = Expr.Sub(target, Expr.Add(Origin, TWO));
 
         if (!offset.IsAbsolute) return (false);
         var distance = (int)offset.Resolve();
@@ -5016,20 +4990,33 @@ public sealed class As65 : Assembler
     /// Determines if the current processor supports the BRA opcode.
     /// </summary>
     /// <returns><code>true</code> if BRA is supported.</returns>
-    private bool HasShortBranch()
+    public override bool HasShortBranch()
     {
-        return ((processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0);
+        return ((Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0);
     }
+
+    //public override Source Source { get; set; }
+    //public override Token CurrentToken { get; set; }
+
+    public override int DirectPage { get; set; }
 
     /// <summary>
     /// Generate the series of bytes for a 24 bit address.
     /// </summary>
     /// <param name="expr">An expression representing the address.</param>
-    private void AddAddress(Expr? expr)
+    public override void AddAddress(Expr? expr)
     {
         AddWord(Expr.And(expr, OFFSET));
         AddByte(Expr.Shr(Expr.And(expr, BANK), SIXTEEN));
     }
+
+    public override int IfIndex { get; set; }
+    public override int LoopIndex { get; set; }
+    public override Stack<int> Ifs { get; } = new();
+    public override Stack<int> Loops { get; } = new();
+    public override List<Value?> ElseAddr { get; } = new();
+    public override List<Value?> EndIfAddr { get; } = new();
+    public override List<Value?> LoopAddr { get; } = new();
 
     /// <summary>
     /// The <code>Option</code> instance use to detect <code>-traditional</code>
@@ -5037,37 +5024,43 @@ public sealed class As65 : Assembler
     private readonly Option traditionalOption = new("-traditional", "Disables structured directives");
 
     // A Dictionary of keyword tokens to speed up classification
-    private readonly Dictionary<string, Token?> tokens = new();
+    private readonly Dictionary<string, Token?> tokenDictionary = new();
 
     /// <summary>
     /// A <code>StringBuffer</code> used to format output.
     /// </summary>
     private readonly StringBuilder output = new();
 
-    private int ifIndex;
+    //private int ifIndex;
 
-    private int loopIndex;
+    //private int loopIndex;
 
-    private readonly Stack<int> ifs = new();
+    //private readonly Stack<int> ifs = new();
 
-    private readonly Stack<int> loops = new();
+    //private readonly Stack<int> loops = new();
 
-    private readonly List<Value?> elseAddr = new();
+    //private readonly List<Value?> elseAddr = new();
 
-    private readonly List<Value?> endifAddr = new();
+    //private readonly List<Value?> endifAddr = new();
 
-    private List<Value?> loopAddr = new();
+    //private readonly List<Value?> loopAddr = new();
 
-    private List<Value?> endAddr = new();
+    //private readonly List<Value?> endAddr = new();
+
+    //public override int Processor { get; set; }
 
     /// <summary>
-    /// Adds a currentToken to the hash table indexed by its text in UPPER case.
+    /// Adds a CurrentToken to the hash table indexed by its text in UPPER case.
     /// </summary>
     /// <param name="token">The Token to add</param>
-    private void AddToken(Token token)
+    public override void AddToken(Token token)
     {
-        tokens.Add(token.Text.ToUpper(), token);
+        var key = token.Text.ToUpper();
+        tokenDictionary.SafeAdd(key, token);
     }
+
+    public override int BitsA { get; set; }
+    public override int BitsI { get; set; }
 
     /// <summary>
     /// Determines if an address can be represented by a byte.
@@ -5076,7 +5069,7 @@ public sealed class As65 : Assembler
     /// <returns>true if the value is a byte, false otherwise.</returns>
     private bool IsByteAddress(int value)
     {
-        return ((directPage <= value) && (value <= (directPage + 0xff)));
+        return ((DirectPage <= value) && (value <= (DirectPage + 0xff)));
     }
 
 }

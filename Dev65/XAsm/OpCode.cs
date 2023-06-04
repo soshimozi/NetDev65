@@ -5,7 +5,7 @@
 /// </summary>
 /// <author>Andrew Jacobs</author>
 /// <version>$Id$</version>
-public class Opcode<TAssembler> : Token, ICompilable<TAssembler> where TAssembler : IAssembler
+public class Opcode : Token, ICompilable
 {
     /// <summary>
     /// Constructs an <see cref="Opcode"/> instance.
@@ -14,7 +14,7 @@ public class Opcode<TAssembler> : Token, ICompilable<TAssembler> where TAssemble
     /// <param name="text"></param>
     /// <param name="compileAction"></param>
     /// <param name="alwaysActive">Marks an opcode that controls conditional compilation.</param>
-    public Opcode(TokenKind kind, string text, Func<TAssembler, bool>? compileAction = null, bool alwaysActive = false) 
+    public Opcode(TokenKind kind, string text, Func<IAssembler, bool>? compileAction = null, bool alwaysActive = false) 
         : base(kind, text)
     {
         _compileAction = compileAction;
@@ -31,7 +31,7 @@ public class Opcode<TAssembler> : Token, ICompilable<TAssembler> where TAssemble
     /// Performs the compilation effect of the <see cref="Opcode"/>.
     /// </summary>
     /// <returns><c>true</c> if the <see cref="Opcode"/> can have a label.</returns>
-    public virtual bool Compile(TAssembler assembler)
+    public virtual bool Compile(IAssembler assembler)
     {
         if(_compileAction != null)
             return _compileAction(assembler);
@@ -43,5 +43,5 @@ public class Opcode<TAssembler> : Token, ICompilable<TAssembler> where TAssemble
     /// </summary>
     private readonly bool alwaysActive;
 
-    private readonly Func<TAssembler, bool>? _compileAction;
+    private readonly Func<IAssembler, bool>? _compileAction;
 }
