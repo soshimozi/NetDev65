@@ -9,7 +9,7 @@
  */
 public abstract class UnaryExpr : Expr
 {
-    public Expr? Exp { get; }
+    private readonly Expr? _exp;
 
     /**
      * The <CODE>Not</CODE> class implements the logical NOT operation.
@@ -33,7 +33,7 @@ public abstract class UnaryExpr : Expr
          */
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Exp?.Resolve(sections, symbols) != 0 ? 0 : 1;
+            return _exp?.Resolve(sections, symbols) != 0 ? 0 : 1;
         }
 
         /**
@@ -41,7 +41,7 @@ public abstract class UnaryExpr : Expr
          */
         public override string ToString()
         {
-            return ($"<not>{Exp}</not>");
+            return ($"<not>{_exp}</not>");
         }
     }
 
@@ -67,7 +67,7 @@ public abstract class UnaryExpr : Expr
          */
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return ~(Exp?.Resolve(sections, symbols) ?? 0);
+            return ~(_exp?.Resolve(sections, symbols) ?? 0);
         }
 
         /**
@@ -75,7 +75,7 @@ public abstract class UnaryExpr : Expr
          */
         public override string ToString()
         {
-            return ($"<cpl>{Exp}</cpl>");
+            return ($"<cpl>{_exp}</cpl>");
         }
     }
 
@@ -102,7 +102,7 @@ public abstract class UnaryExpr : Expr
          */
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return -(Exp?.Resolve(sections, symbols) ?? 0);
+            return -(_exp?.Resolve(sections, symbols) ?? 0);
         }
 
         /**
@@ -110,22 +110,22 @@ public abstract class UnaryExpr : Expr
          */
         public override string ToString()
         {
-            return ($"<neg>{Exp}</neg>");
+            return ($"<neg>{_exp}</neg>");
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public sealed override bool IsAbsolute => Exp?.IsAbsolute == true;
+    public sealed override bool IsAbsolute => _exp?.IsAbsolute == true;
     
 
     /**
      * {@inheritDoc}
      */
-    public sealed override bool IsExternal(Section section)
+    public sealed override bool IsExternal(Section? section)
     {
-        return Exp?.IsExternal(section) == true;
+        return _exp?.IsExternal(section) == true;
     }
 
     /**
@@ -139,8 +139,23 @@ public abstract class UnaryExpr : Expr
      * 
      * @param exp			The underlying expression.
      */
-    protected UnaryExpr(Expr? exp)
+    private UnaryExpr(Expr? exp)
     {
-        Exp = exp;
+        _exp = exp;
     }
+}
+
+
+public static class UnaryFactory 
+{
+    public static Expr? Negate(Expr? expr)
+    {
+        return new UnaryExpr.Neg(expr);
+    }
+
+    public static Expr? Not(Expr? expr)
+    {
+        return new UnaryExpr.Not(expr);
+    }
+
 }

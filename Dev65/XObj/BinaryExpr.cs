@@ -1,4 +1,6 @@
-﻿namespace Dev65.XObj;
+﻿using System.Linq.Expressions;
+
+namespace Dev65.XObj;
 
 /// <summary>
 /// The <see cref="BinaryExpr"/> class is the common base of all mathematical and logical operators that take two arguments.
@@ -8,31 +10,31 @@ public abstract class BinaryExpr : Expr
     /// <summary>
     /// Get the left hand side sub-expression.
     /// </summary>
-    public Expr? Lhs { get; }
+    private readonly Expr? _lhs;
 
     /// <summary>
     /// Get the right hand side sub-expression.
     /// </summary>
-    public Expr? Rhs { get; }
+    private readonly Expr? _rhs;
 
     /// <summary>
     /// Constructs a <see cref="BinaryExpr"/> from its left and right sub-expressions.
     /// </summary>
     /// <param name="lhs">The left hand sub-expression.</param>
     /// <param name="rhs">The right hand sub-expression.</param>
-    protected BinaryExpr(Expr? lhs, Expr? rhs)
+    private BinaryExpr(Expr? lhs, Expr? rhs)
     {
-        Lhs = lhs;
-        Rhs = rhs;
+        _lhs = lhs;
+        _rhs = rhs;
     }
 
     /// <inheritdoc />
-    public override bool IsAbsolute => Lhs?.IsAbsolute == true && Rhs?.IsAbsolute == true;
+    public override bool IsAbsolute => _lhs?.IsAbsolute == true && _rhs?.IsAbsolute == true;
 
     /// <inheritdoc />
     public override bool IsExternal(Section? section)
     {
-        return Lhs?.IsExternal(section) == true || Rhs?.IsExternal(section) == true;
+        return _lhs?.IsExternal(section) == true || _rhs?.IsExternal(section) == true;
     }
 
     /// <inheritdoc />
@@ -56,13 +58,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) != 0 && Rhs?.Resolve(sections, symbols) != 0 ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) != 0 && _rhs?.Resolve(sections, symbols) != 0 ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<land>{Lhs}{Rhs}</land>";
+            return $"<land>{_lhs}{_rhs}</land>";
         }
     }
 
@@ -84,13 +86,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) != 0 || Rhs?.Resolve(sections, symbols) != 0 ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) != 0 || _rhs?.Resolve(sections, symbols) != 0 ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<lor>{Lhs}{Rhs}</lor>";
+            return $"<lor>{_lhs}{_rhs}</lor>";
         }
     }
 
@@ -112,13 +114,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) & Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) & _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<and>{Lhs}{Rhs}</and>";
+            return $"<and>{_lhs}{_rhs}</and>";
         }
     }
 
@@ -140,13 +142,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) | Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) | _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<or>{Lhs}{Rhs}</or>";
+            return $"<or>{_lhs}{_rhs}</or>";
         }
     }
 
@@ -168,13 +170,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) ^ Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) ^ _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<xor>{Lhs}{Rhs}</xor>";
+            return $"<xor>{_lhs}{_rhs}</xor>";
         }
     }
 
@@ -196,13 +198,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) + Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) + _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<add>{Lhs}{Rhs}</add>";
+            return $"<add>{_lhs}{_rhs}</add>";
         }
     }
 
@@ -224,14 +226,14 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) - Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) - _rhs?.Resolve(sections, symbols) ?? 0;
 
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<sub>{Lhs}{Rhs}</sub>";
+            return $"<sub>{_lhs}{_rhs}</sub>";
         }
     }
 
@@ -253,13 +255,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) * Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) * _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<mul>{Lhs}{Rhs}</mul>";
+            return $"<mul>{_lhs}{_rhs}</mul>";
         }
     }
 
@@ -281,13 +283,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) / Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) / _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<div>{Lhs}{Rhs}</div>";
+            return $"<div>{_lhs}{_rhs}</div>";
         }
     }
 
@@ -309,13 +311,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) % Rhs?.Resolve(sections, symbols) ?? 0;
+            return _lhs?.Resolve(sections, symbols) % _rhs?.Resolve(sections, symbols) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<mod>{Lhs}{Rhs}</mod>";
+            return $"<mod>{_lhs}{_rhs}</mod>";
         }
     }
 
@@ -337,13 +339,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) >> (int)(Rhs?.Resolve(sections, symbols) ?? 0) ?? 0;
+            return _lhs?.Resolve(sections, symbols) >> (int)(_rhs?.Resolve(sections, symbols) ?? 0) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<shr>{Lhs}{Rhs}</shr>";
+            return $"<shr>{_lhs}{_rhs}</shr>";
         }
     }
 
@@ -365,13 +367,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) << (int)(Rhs?.Resolve(sections, symbols) ?? 0) ?? 0;
+            return _lhs?.Resolve(sections, symbols) << (int)(_rhs?.Resolve(sections, symbols) ?? 0) ?? 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<shl>{Lhs}{Rhs}</shl>";
+            return $"<shl>{_lhs}{_rhs}</shl>";
         }
     }
 
@@ -393,13 +395,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) == Rhs?.Resolve(sections, symbols) ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) == _rhs?.Resolve(sections, symbols) ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<eq>{Lhs}{Rhs}</eq>";
+            return $"<eq>{_lhs}{_rhs}</eq>";
         }
     }
 
@@ -421,13 +423,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) != Rhs?.Resolve(sections, symbols) ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) != _rhs?.Resolve(sections, symbols) ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<ne>{Lhs}{Rhs}</ne>";
+            return $"<ne>{_lhs}{_rhs}</ne>";
         }
     }
 
@@ -449,13 +451,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) < Rhs?.Resolve(sections, symbols) ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) < _rhs?.Resolve(sections, symbols) ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<lt>{Lhs}{Rhs}</lt>";
+            return $"<lt>{_lhs}{_rhs}</lt>";
         }
     }
 
@@ -477,13 +479,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) <= Rhs?.Resolve(sections, symbols) ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) <= _rhs?.Resolve(sections, symbols) ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<le>{Lhs}{Rhs}</le>";
+            return $"<le>{_lhs}{_rhs}</le>";
         }
     }
 
@@ -505,13 +507,13 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) > Rhs?.Resolve(sections, symbols) ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) > _rhs?.Resolve(sections, symbols) ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<gt>{Lhs}{Rhs}</gt>";
+            return $"<gt>{_lhs}{_rhs}</gt>";
         }
     }
 
@@ -533,13 +535,41 @@ public abstract class BinaryExpr : Expr
         /// <inheritdoc />
         public override long Resolve(SectionMap? sections = null, SymbolMap? symbols = null)
         {
-            return Lhs?.Resolve(sections, symbols) >= Rhs?.Resolve(sections, symbols) ? 1 : 0;
+            return _lhs?.Resolve(sections, symbols) >= _rhs?.Resolve(sections, symbols) ? 1 : 0;
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"<ge>{Lhs}{Rhs}</ge>";
+            return $"<ge>{_lhs}{_rhs}</ge>";
         }
+    }
+}
+
+public static class BinaryExpressionFactory
+{
+    public static Expr? LogicalOr(Expr? lhs, Expr? rhs)
+    {
+        return new BinaryExpr.LOr(lhs, rhs);
+    }
+
+    public static Expr? LogicalAnd(Expr? lhs, Expr? rhs)
+    {
+        return new BinaryExpr.LAnd(lhs, rhs);
+    }
+
+    public static Expr? Mod(Expr? lhs, Expr? rhs)
+    {
+        return new BinaryExpr.Mod(lhs, rhs);
+    }
+
+    public static Expr? NotEqual(Expr? lhs, Expr? rhs)
+    {
+        return new BinaryExpr.Ne(lhs, rhs);
+    }
+
+    public static Expr? Subtract(Expr? lhs, Expr? rhs)
+    {
+        return new BinaryExpr.Sub(lhs, rhs);
     }
 }

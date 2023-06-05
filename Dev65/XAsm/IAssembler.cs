@@ -10,14 +10,12 @@ public interface IAssembler
     Token? NextRealToken();
     int Processor { get; set; }
 
-    void AddToken(Token token);
     void DoSet(string label, Expr? value);
     int BitsA { get; set; }
     int BitsI { get; set; }
 
     void SetSection(string section);
     Expr? ParseExpression();
-    Expr? ParseImmediate();
     int DataBank { get; set; }
     void OnError(string message);
     void OnWarning(string message);
@@ -41,8 +39,6 @@ public interface IAssembler
     void GenerateIndirect(int opcode, Expr? expr, bool isLong);
     void GenerateRelative(int opcode, Expr? expr, bool isLong);
     void GenerateLong(int opcode, Expr? expr);
-    bool IsShortDistance(Expr? target);
-    bool HasShortBranch();
 
     Value? Origin { get; set; }
     void AddByte(Expr? expr);
@@ -65,27 +61,22 @@ public interface IAssembler
     // The set of symbol which have been imported.
     HashSet<string> Externals { get; }
     void AddWord(Expr? expr);
-    void AddWord(long value);
     void AddLong(Expr? expr);
-    void AddLong(long value);
     bool IsActive { get; }
     Stack<bool> Status { get; }
-    string MacroName { get; set; }
+    string? MacroName { get; set; }
     TextSource? SavedLines { get; set; }
     Dictionary<string, TextSource> Macros { get; }
     Dictionary<string, Section?> Sections { get; }
     bool ThrowPage { get; set; }
 
     // The module being generated.
-    Module? Module { get; }
 
     // The current sections.
     Section? Section { get; set; }
 
     HashSet<string> Globals { get; }
-    string SectionName { get; set; }
+    string? SectionName { get; set; }
     bool Listing { get; set; }
-    string Title { get; set; }
-
-    Stack<Token> Tokens { get; }
+    string? Title { get; set; }
 }

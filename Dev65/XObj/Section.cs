@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Dev65.XObj;
 
@@ -12,12 +11,12 @@ namespace Dev65.XObj;
 /// <version>$Id$</version>
 public class Section
 {
-    private readonly Module module;
-    private readonly string name;
-    private bool relative;
-    private long start;
-    private int size;
-    private readonly List<Part> parts = new();
+    private readonly Module _module;
+    private readonly string _name;
+    private bool _relative;
+    private long _start;
+    private int _size;
+    private readonly List<Part> _parts = new();
 
     /// <summary>
     /// Constructs a <see cref="Section"/> instance with the given name.
@@ -26,9 +25,9 @@ public class Section
     /// <param name="name">The section name.</param>
     public Section(Module module, string name)
     {
-        this.module = module;
-        this.name = name;
-        relative = true;
+        _module = module;
+        _name = name;
+        _relative = true;
         Clear();
     }
 
@@ -40,10 +39,10 @@ public class Section
     /// <param name="start">The start address.</param>
     public Section(Module module, string name, long start)
     {
-        this.module = module;
-        this.name = name;
-        this.start = start;
-        relative = false;
+        _module = module;
+        _name = name;
+        _start = start;
+        _relative = false;
         Clear();
     }
 
@@ -53,7 +52,7 @@ public class Section
     /// <returns>The <see cref="Module"/> that contains this section.</returns>
     public Module GetModule()
     {
-        return module;
+        return _module;
     }
 
     /// <summary>
@@ -62,7 +61,7 @@ public class Section
     /// <returns>The section name.</returns>
     public string GetName()
     {
-        return name;
+        return _name;
     }
 
     /// <summary>
@@ -71,7 +70,7 @@ public class Section
     /// <returns><c>true</c> if the section is relative; otherwise, <c>false</c>.</returns>
     public bool IsRelative()
     {
-        return relative;
+        return _relative;
     }
 
     /// <summary>
@@ -80,7 +79,7 @@ public class Section
     /// <returns><c>true</c> if the section is absolute; otherwise, <c>false</c>.</returns>
     public bool IsAbsolute()
     {
-        return !relative;
+        return !_relative;
     }
 
     /// <summary>
@@ -89,7 +88,7 @@ public class Section
     /// <returns>The start address of an absolute section.</returns>
     public long GetStart()
     {
-        return start;
+        return _start;
     }
 
     /// <summary>
@@ -98,7 +97,7 @@ public class Section
     /// <returns>The size of the section.</returns>
     public int GetSize()
     {
-        return size;
+        return _size;
     }
 
     /// <summary>
@@ -108,7 +107,7 @@ public class Section
     /// <returns>The origin for the next byte.</returns>
     public Value GetOrigin()
     {
-        return new Value(relative ? this : null, start + size);
+        return new Value(_relative ? this : null, _start + _size);
     }
 
     /// <summary>
@@ -119,7 +118,7 @@ public class Section
     /// <returns>The section representing the target address.</returns>
     public Section? SetOrigin(long origin)
     {
-        return module.FindSection(name, origin);
+        return _module.FindSection(_name, origin);
     }
 
     /// <summary>
@@ -127,24 +126,24 @@ public class Section
     /// </summary>
     public void Clear()
     {
-        size = 0;
-        parts.Clear();
+        _size = 0;
+        _parts.Clear();
     }
 
     /// <summary>
     /// Adds a byte to the current section.
     /// </summary>
     /// <param name="expr">An expression yielding a byte value.</param>
-    public void AddByte(Expr expr)
+    public void AddByte(Expr? expr)
     {
-        if (expr.IsAbsolute)
+        if (expr?.IsAbsolute == true)
         {
-            AddByte(expr.Resolve(null, null));
+            AddByte(expr.Resolve());
         }
         else
         {
-            parts.Add(new ByteExpr(expr));
-            size++;
+            _parts.Add(new ByteExpr(expr));
+            _size++;
         }
     }
 
@@ -152,16 +151,16 @@ public class Section
     /// Adds a word to the current section.
     /// </summary>
     /// <param name="expr">An expression yielding a word value.</param>
-    public void AddWord(Expr expr)
+    public void AddWord(Expr? expr)
     {
-        if (expr.IsAbsolute)
+        if (expr?.IsAbsolute == true)
         {
             AddWord(expr.Resolve(null, null));
         }
         else
         {
-            parts.Add(new WordExpr(expr));
-            size += 2;
+            _parts.Add(new WordExpr(expr));
+            _size += 2;
         }
     }
 
@@ -169,16 +168,16 @@ public class Section
     /// Adds a long to the current section.
     /// </summary>
     /// <param name="expr">An expression yielding a long value.</param>
-    public void AddLong(Expr expr)
+    public void AddLong(Expr? expr)
     {
-        if (expr.IsAbsolute)
+        if (expr?.IsAbsolute == true)
         {
             AddLong(expr.Resolve(null, null));
         }
         else
         {
-            parts.Add(new LongExpr(expr));
-            size += 4;
+            _parts.Add(new LongExpr(expr));
+            _size += 4;
         }
     }
 
@@ -188,13 +187,13 @@ public class Section
     /// <param name="value">The byte value to add.</param>
     public void AddByte(long value)
     {
-        if (parts.Count == 0 || !(parts[^1] is Code))
+        if (_parts.Count == 0 || !(_parts[^1] is Code))
         {
-            parts.Add(new Code(module));
+            _parts.Add(new Code(_module));
         }
 
-        ((Code)parts[^1]).AddByte(value);
-        size++;
+        ((Code)_parts[^1]).AddByte(value);
+        _size++;
     }
 
     /// <summary>
@@ -203,26 +202,26 @@ public class Section
     /// <param name="value">The word value to add.</param>
     public void AddWord(long value)
     {
-        var byteSize = module.GetByteSize();
-        var byteMask = module.GetByteMask();
+        var byteSize = _module.GetByteSize();
+        var byteMask = _module.GetByteMask();
 
-        if (parts.Count == 0 || !(parts[^1] is Code))
+        if (_parts.Count == 0 || !(_parts[^1] is Code))
         {
-            parts.Add(new Code(module));
+            _parts.Add(new Code(_module));
         }
 
-        if (module.IsBigEndian())
+        if (_module.IsBigEndian())
         {
-            ((Code)parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
         }
         else
         {
-            ((Code)parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
         }
 
-        size += 2;
+        _size += 2;
     }
 
     /// <summary>
@@ -231,30 +230,30 @@ public class Section
     /// <param name="value">The long value to add.</param>
     public void AddLong(long value)
     {
-        var byteSize = module.GetByteSize();
-        var byteMask = module.GetByteMask();
+        var byteSize = _module.GetByteSize();
+        var byteMask = _module.GetByteMask();
 
-        if (parts.Count == 0 || !(parts[^1] is Code))
+        if (_parts.Count == 0 || !(_parts[^1] is Code))
         {
-            parts.Add(new Code(module));
+            _parts.Add(new Code(_module));
         }
 
-        if (module.IsBigEndian())
+        if (_module.IsBigEndian())
         {
-            ((Code)parts[^1]).AddByte((value >> (3 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (2 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (3 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (2 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
         }
         else
         {
-            ((Code)parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (2 * byteSize)) & byteMask);
-            ((Code)parts[^1]).AddByte((value >> (3 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (0 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (1 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (2 * byteSize)) & byteMask);
+            ((Code)_parts[^1]).AddByte((value >> (3 * byteSize)) & byteMask);
         }
 
-        size += 4;
+        _size += 4;
     }
 
     /// <summary>
@@ -263,16 +262,16 @@ public class Section
     /// <returns>The XML representation of this section.</returns>
     public override string ToString()
     {
-        if (parts.Count > 0)
+        if (_parts.Count > 0)
         {
             var buffer = new StringBuilder();
-            buffer.Append("<section name='").Append(name).Append("'");
-            if (!relative)
+            buffer.Append("<section name='").Append(_name).Append("'");
+            if (!_relative)
             {
-                buffer.Append(" addr='").Append(Hex.ToHex(start, 8)).Append("'");
+                buffer.Append(" addr='").Append(Hex.ToHex(_start, 8)).Append("'");
             }
-            buffer.Append(" size='").Append(size).Append("'>");
-            foreach (var part in parts)
+            buffer.Append(" size='").Append(_size).Append("'>");
+            foreach (var part in _parts)
             {
                 buffer.Append(part);
             }
@@ -288,7 +287,7 @@ public class Section
     /// <returns>A list of section parts.</returns>
     public List<Part> GetParts()
     {
-        return parts;
+        return _parts;
     }
 
     /// <summary>
@@ -297,8 +296,8 @@ public class Section
     /// <param name="start">The start address of the section.</param>
     protected internal void SetStart(int start)
     {
-        this.start = start;
-        relative = false;
+        _start = start;
+        _relative = false;
     }
 
     /// <summary>
@@ -307,6 +306,6 @@ public class Section
     /// <param name="size">The section size.</param>
     protected internal void SetSize(int size)
     {
-        this.size = size;
+        _size = size;
     }
 }

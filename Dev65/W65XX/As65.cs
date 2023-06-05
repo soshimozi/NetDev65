@@ -139,9 +139,6 @@ public sealed class As65 : Assembler
     });
 
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .65832 directives.
-    /// </summary>
     private readonly Opcode P65832 = new(Keyword, ".65832", as65 =>
     {
         as65.Processor = M65816;
@@ -158,18 +155,12 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .PAGE0 directives.
-    /// </summary>
     private readonly Opcode PAGE0 = new(Keyword, ".PAGE0", as65 =>
     {
         as65.SetSection(".page0");
         return false;
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .DBREG directives.
-    /// </summary>
     private readonly Opcode DBREG = new(Keyword, ".DBREG", as65 =>
     {
         if ((as65.Processor & (M65816 | M65832)) != 0)
@@ -188,9 +179,6 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .DPAGE directives.
-    /// </summary>
     private readonly Opcode DPAGE = new(Keyword, ".DPAGE", as65 =>
     {
         if ((as65.Processor & (M65816 | M65832)) != 0)
@@ -209,9 +197,6 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .LONGA directives.
-    /// </summary>
     private readonly Opcode LONGA = new(Keyword, ".LONGA", assembler =>
     {
         if ((assembler.Processor & (M65816 | M65832)) != 0)
@@ -237,9 +222,6 @@ public sealed class As65 : Assembler
 
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .LONGI directives.
-    /// </summary>
     private readonly Opcode LONGI = new(Keyword, ".LONGI", assembler =>
     {
         if ((assembler.Processor & (M65816 | M65832)) != 0)
@@ -265,9 +247,6 @@ public sealed class As65 : Assembler
 
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .WIDEA directives.
-    /// </summary>
     private readonly Opcode WIDEA = new(Keyword, ".WIDEA", assembler =>
     {
         if (assembler.Processor == M65832)
@@ -293,9 +272,6 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .WIDEI directives.
-    /// </summary>
     private readonly Opcode WIDEI = new(Keyword, ".WIDEI", assembler =>
     {
         if (assembler.Processor == M65832)
@@ -323,10 +299,6 @@ public sealed class As65 : Assembler
 
         return false;
     });
-
-    /// <summary>
-    /// An <see cref="Opcode&lt;As65&gt;"/> that handles .ADDR directives.
-    /// </summary>
     private readonly Opcode ADDR = new(Keyword, ".ADDR", as65 =>
     {
         do
@@ -347,92 +319,92 @@ public sealed class As65 : Assembler
     /// <summary>
     /// A <see cref="Token"/> representing the '?' character.
     /// </summary>
-    public static readonly Token QUESTION = new(Keyword, "?");
+    private static readonly Token QUESTION = new(Keyword, "?");
 
     /// <summary>
     /// A <see cref="Token"/> representing the '#' character.
     /// </summary>
-    public static readonly Token HASH = new(Keyword, "#");
+    private static readonly Token HASH = new(Keyword, "#");
 
     /// <summary>
     /// A <see cref="Token"/> representing the A register.
     /// </summary>
-    public static readonly Token A = new(Keyword, "A");
+    private static readonly Token A = new(Keyword, "A");
 
     /// <summary>
     /// A <see cref="Token"/> representing the S register.
     /// </summary>
-    public static readonly Token S = new(Keyword, "S");
+    private static readonly Token S = new(Keyword, "S");
 
     /// <summary>
     /// A <see cref="Token"/> representing the X register.
     /// </summary>
-    public static readonly Token X = new(Keyword, "X");
+    private static readonly Token X = new(Keyword, "X");
 
     /// <summary>
     /// A <see cref="Token"/> representing the Y register.
     /// </summary>
-    public static readonly Token Y = new(Keyword, "Y");
+    private static readonly Token Y = new(Keyword, "Y");
 
     /// <summary>
     /// A <see cref="Token"/> representing the ON keyword.
     /// </summary>
-    public static readonly Token ON = new(Keyword, "ON");
+    private static readonly Token ON = new(Keyword, "ON");
 
     /// <summary>
     /// A <see cref="Token"/> representing the OFF keyword.
     /// </summary>
-    public static readonly Token Off = new(Keyword, "OFF");
+    private static readonly Token Off = new(Keyword, "OFF");
 
     /// <summary>
     /// A <see cref="Token"/> representing the '[' character.
     /// </summary>
-    public static readonly Token LBRACKET = new(Keyword, "[");
+    private static readonly Token LBRACKET = new(Keyword, "[");
 
     /// <summary>
     /// A <see cref="Token"/> representing the ']' character.
     /// </summary>
-    public static readonly Token RBRACKET = new(Keyword, "]");
+    private static readonly Token RBRACKET = new(Keyword, "]");
 
     /// <summary>
     /// A <see cref="Token"/> representing the EQ keyword.
     /// </summary>
-    public static new readonly Token EQ = new(Keyword, "EQ");
+    private static readonly Token EQ = new(Keyword, "EQ");
 
     /// <summary>
     /// A <see cref="Token"/> representing the NE keyword.
     /// </summary>
-    public static new readonly Token NE = new(Keyword, "NE");
+    private static readonly Token NE = new(Keyword, "NE");
 
     /// <summary>
     /// A <see cref="Token"/> representing the CC keyword.
     /// </summary>
-    public static readonly Token CC = new(Keyword, "CC");
+    private static readonly Token CC = new(Keyword, "CC");
 
     /// <summary>
     /// A <see cref="Token"/> representing the CS keyword.
     /// </summary>
-    public static readonly Token CS = new(Keyword, "CS");
+    private static readonly Token CS = new(Keyword, "CS");
 
     /// <summary>
     /// A <see cref="Token"/> representing the PL keyword.
     /// </summary>
-    public static readonly Token PL = new(Keyword, "PL");
+    private static readonly Token PL = new(Keyword, "PL");
 
     /// <summary>
     /// A <see cref="Token"/> representing the MI keyword.
     /// </summary>
-    public static readonly Token MI = new(Keyword, "MI");
+    private static readonly Token MI = new(Keyword, "MI");
 
     /// <summary>
     /// A <see cref="Token"/> representing the VC keyword.
     /// </summary>
-    public static readonly Token VC = new(Keyword, "VC");
+    private static readonly Token VC = new(Keyword, "VC");
 
     /// <summary>
     /// A <see cref="Token"/> representing the VS keyword.
     /// </summary>
-    public static readonly Token VS = new(Keyword, "VS");
+    private static readonly Token VS = new(Keyword, "VS");
 
     private sealed class Jump : Opcode
     {
@@ -4438,31 +4410,6 @@ public sealed class As65 : Assembler
     private static readonly Value OFFSET = new(null, 0x0000ffff);
 
     /// <summary>
-    /// The current processor mask.
-    /// <see cref="M6501"/>
-    /// <see cref="M6502"/>
-    /// <see cref="M65C02"/>
-    /// <see cref="M65SC02"/>
-    /// <see cref="M65816"/>
-    /// </summary>
-    //private int processor;
-
-    // The current argument
-    //private Expr? arg;
-
-    // The current data bank (65816 only).
-    //private int dataBank;
-
-    // The current direct page value (65816 only).
-    //private int directPage;
-
-    // A flag indicating the number of bits in the A register.
-    //private int bitsA;
-
-    // A flag indicating the number of bits in the X and Y registers.
-    //private int bitsI;
-
-    /// <summary>
     /// Determines the addressing mode used by the instruction.
     /// </summary>
     /// <param name="targetBank">The target bank value.</param>
@@ -4753,7 +4700,7 @@ public sealed class As65 : Assembler
     /// string literals as well as numbers.
     /// </summary>
     /// <returns>An expression containing the immediate value.</returns>
-    public override Expr? ParseImmediate()
+    public Expr? ParseImmediate()
     {
         if (CurrentToken?.Kind == String)
         {
@@ -4950,7 +4897,7 @@ public sealed class As65 : Assembler
         }
     }
 
-    public override List<Value?> EndAddr { get; }
+    public override List<Value?> EndAddr { get; } = new();
 
     /// <summary>
     /// Generates a jump to a target address using BRA if supported
@@ -4976,7 +4923,7 @@ public sealed class As65 : Assembler
     /// </summary>
     /// <param name="target">The target address.</param>
     /// <returns>return <code>true</code> if the target address is near</returns>
-    public override bool IsShortDistance(Expr? target)
+    public bool IsShortDistance(Expr? target)
     {
         var offset = Expr.Sub(target, Expr.Add(Origin, TWO));
 
@@ -4990,7 +4937,7 @@ public sealed class As65 : Assembler
     /// Determines if the current processor supports the BRA opcode.
     /// </summary>
     /// <returns><code>true</code> if BRA is supported.</returns>
-    public override bool HasShortBranch()
+    public bool HasShortBranch()
     {
         return ((Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0);
     }
@@ -5053,7 +5000,7 @@ public sealed class As65 : Assembler
     /// Adds a CurrentToken to the hash table indexed by its text in UPPER case.
     /// </summary>
     /// <param name="token">The Token to add</param>
-    public override void AddToken(Token token)
+    public void AddToken(Token token)
     {
         var key = token.Text.ToUpper();
         tokenDictionary.SafeAdd(key, token);

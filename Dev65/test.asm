@@ -1,5 +1,4 @@
 ﻿	.EXTERN	ExtLab
-	.GLOBAL GblLab
 	.GLOBAL Somewhere
 
 	.6502
@@ -12,19 +11,7 @@
 	
 LABD .EQU (LABA-LABB)*2+LABC/3
 
-
-	LDY #$23
 	JMP $100
-
-;==============================================================================
-; Test size of address generated for global/external references
-;------------------------------------------------------------------------------
-
-GblLab:
-
-	.6502
-	
-	JMP GblLab
 
 ;==============================================================================
 ; Data
