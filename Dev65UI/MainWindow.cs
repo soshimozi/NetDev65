@@ -13,13 +13,11 @@ public class MainWindow : Window
     private readonly StatusItem _lenStatusItem;
     private readonly ListView _errorList;
     private readonly ListView _warningList;
+    private readonly TextView _outputView;
     private readonly List<string> warnings = new();
     private readonly List<string> errors = new();
     public MainWindow()
     {
-        //Width = Dim.Percent(80);
-        //Height = Dim.Percent(80);
-
         var menu = new MenuBar(new MenuBarItem[] {
             new MenuBarItem ("_File", new MenuItem [] {
                 new MenuItem ("_New", "", New),
@@ -89,8 +87,19 @@ public class MainWindow : Window
             ColorScheme = new ColorScheme()
         };
 
+        _outputView = new TextView()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill(),
+            Height = Dim.Fill(),
+            ColorScheme = new ColorScheme(),
+            ReadOnly = true
+        };
 
-        outputTabs.AddTab(new TabView.Tab("Errors", _errorList), true);
+
+        outputTabs.AddTab(new TabView.Tab("Output", _outputView), true);
+        outputTabs.AddTab(new TabView.Tab("Errors", _errorList), false);
         outputTabs.AddTab(new TabView.Tab("Warnings", _warningList), false);
 
         _errorList.RowRender += ErrorListOnRowRender;
@@ -125,15 +134,6 @@ public class MainWindow : Window
         {
             obj.RowAttribute = new Attribute(Color.Black, Color.White);
         }
-
-        //if (obj.Row % 2 == 0)
-        //{
-        //    obj.RowAttribute = new Attribute(Color.BrightGreen, Color.Magenta);
-        //}
-        //else
-        //{
-        //    obj.RowAttribute = new Attribute(Color.BrightMagenta, Color.Green);
-        //}
     }
 
     private void BuildAll()
@@ -172,11 +172,15 @@ public class MainWindow : Window
                 errors.Add(args.Message);
             };
 
+            _outputView.Text = string.Empty;
             errors.Clear();
             warnings.Clear();
-            assembler.Run(new[] { fileName });
-        }
 
+            _outputView.Text = $"Compiling {Path.GetFileName(fileName)}";
+            assembler.Run(new[] { fileName });
+
+            if(assembler.Warings)
+        }
     }
 
     private void Quit()

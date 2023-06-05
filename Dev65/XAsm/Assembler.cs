@@ -1813,6 +1813,7 @@ public abstract class Assembler : Application, IAssembler
         Module?.Clear();
 
         _errors = 0;
+        _warnings = 0;
         _lastLabel = null;
 
         _savedLines = null;
@@ -1884,6 +1885,16 @@ public abstract class Assembler : Application, IAssembler
         _errors++;
     }
 
+    public int ErrorCount
+    {
+        get => _errors;
+    }
+
+    public int WarnCount
+    {
+        get => _warnings;
+    }
+
     /// <summary>
     /// Print a warning message.
     /// </summary>
@@ -1896,6 +1907,8 @@ public abstract class Assembler : Application, IAssembler
         OnAssemblerWarning(new AssemblerWarningEventArgs(msg));
         if (Pass == Pass.FINAL)
             Paginate(msg);
+
+        _warnings++;
     }
 
     public abstract int DirectPage { get; set; }
@@ -2213,6 +2226,8 @@ public abstract class Assembler : Application, IAssembler
 
     // The number of errors seen during the current pass.
     private int _errors;
+
+    private int _warnings;
 
     // The number of warnings seen during the current pass.
 
