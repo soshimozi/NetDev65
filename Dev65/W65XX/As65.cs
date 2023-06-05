@@ -13,9 +13,14 @@ namespace Dev65.W65XX;
 /// </summary>
 public sealed class As65 : Assembler
 {
-    public static void AssemblerMain(string[] args)
+    //public static void AssemblerMain(string[] args)
+    //{
+    //    new As65().Run(args);
+    //}
+
+    public static Assembler CreateAssembler()
     {
-        new As65().Run(args);
+        return new As65();
     }
 
     // Bit mask for 6501 processor.
@@ -51,7 +56,7 @@ public sealed class As65 : Assembler
     private const int PBANK = 2;
 
 
-    private readonly Opcode P6501 = new(Keyword, ".6501",
+    private static readonly Opcode P6501 = new(Keyword, ".6501",
         assembler =>
         {
             assembler.Processor = M6501;
@@ -69,7 +74,7 @@ public sealed class As65 : Assembler
             return false;
         });
 
-    private readonly Opcode P6502 = new(Keyword, ".6502", as65 =>
+    private static readonly Opcode P6502 = new(Keyword, ".6502", as65 =>
     {
         as65.Processor = M6502;
 
@@ -87,7 +92,7 @@ public sealed class As65 : Assembler
     });
 
 
-    private readonly Opcode P65C02 = new(Keyword, ".65C02", as65 =>
+    private static readonly Opcode P65C02 = new(Keyword, ".65C02", as65 =>
     {
         as65.Processor = M65C02;
 
@@ -104,7 +109,7 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    private readonly Opcode P65SC02 = new(Keyword, ".65SC02", as65 =>
+    private static readonly Opcode P65SC02 = new(Keyword, ".65SC02", as65 =>
     {
         as65.Processor = M65SC02;
 
@@ -122,7 +127,7 @@ public sealed class As65 : Assembler
 
     });
 
-    private readonly Opcode P65816 = new(Keyword, ".65816", as65 =>
+    private static readonly Opcode P65816 = new(Keyword, ".65816", as65 =>
     {
         as65.Processor = M65816;
         as65.DoSet("__6501__", False);
@@ -139,7 +144,7 @@ public sealed class As65 : Assembler
     });
 
 
-    private readonly Opcode P65832 = new(Keyword, ".65832", as65 =>
+    private static readonly Opcode P65832 = new(Keyword, ".65832", as65 =>
     {
         as65.Processor = M65816;
         as65.DoSet("__6501__", False);
@@ -155,13 +160,13 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    private readonly Opcode PAGE0 = new(Keyword, ".PAGE0", as65 =>
+    private static readonly Opcode PAGE0 = new(Keyword, ".PAGE0", as65 =>
     {
         as65.SetSection(".page0");
         return false;
     });
 
-    private readonly Opcode DBREG = new(Keyword, ".DBREG", as65 =>
+    private static readonly Opcode DBREG = new(Keyword, ".DBREG", as65 =>
     {
         if ((as65.Processor & (M65816 | M65832)) != 0)
         {
@@ -179,7 +184,7 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    private readonly Opcode DPAGE = new(Keyword, ".DPAGE", as65 =>
+    private static readonly Opcode DPAGE = new(Keyword, ".DPAGE", as65 =>
     {
         if ((as65.Processor & (M65816 | M65832)) != 0)
         {
@@ -197,7 +202,7 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    private readonly Opcode LONGA = new(Keyword, ".LONGA", assembler =>
+    private static readonly Opcode LONGA = new(Keyword, ".LONGA", assembler =>
     {
         if ((assembler.Processor & (M65816 | M65832)) != 0)
         {
@@ -222,7 +227,7 @@ public sealed class As65 : Assembler
 
     });
 
-    private readonly Opcode LONGI = new(Keyword, ".LONGI", assembler =>
+    private static readonly Opcode LONGI = new(Keyword, ".LONGI", assembler =>
     {
         if ((assembler.Processor & (M65816 | M65832)) != 0)
         {
@@ -247,7 +252,7 @@ public sealed class As65 : Assembler
 
     });
 
-    private readonly Opcode WIDEA = new(Keyword, ".WIDEA", assembler =>
+    private static readonly Opcode WIDEA = new(Keyword, ".WIDEA", assembler =>
     {
         if (assembler.Processor == M65832)
         {
@@ -272,7 +277,7 @@ public sealed class As65 : Assembler
         return (false);
     });
 
-    private readonly Opcode WIDEI = new(Keyword, ".WIDEI", assembler =>
+    private static readonly Opcode WIDEI = new(Keyword, ".WIDEI", assembler =>
     {
         if (assembler.Processor == M65832)
         {
@@ -299,7 +304,7 @@ public sealed class As65 : Assembler
 
         return false;
     });
-    private readonly Opcode ADDR = new(Keyword, ".ADDR", as65 =>
+    private static readonly Opcode ADDR = new(Keyword, ".ADDR", as65 =>
     {
         do
         {
@@ -525,7 +530,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the ADC instruction.
     /// </summary>
-    private readonly Opcode ADC = new(Keyword, "ADC", as65 =>
+    private static readonly Opcode ADC = new(Keyword, "ADC", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
@@ -614,7 +619,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the AND instruction.
     /// </summary>
-    private readonly Opcode AND = new(Keyword, "AND", as65 =>
+    private static readonly Opcode AND = new(Keyword, "AND", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
@@ -703,7 +708,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the ASL instruction.
     /// </summary>
-    private readonly Opcode ASL = new(Keyword, "ASL", as65 =>
+    private static readonly Opcode ASL = new(Keyword, "ASL", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
@@ -735,88 +740,88 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR0 instruction.
     /// </summary>
-    private readonly Opcode BBR0 = new BitBranch(Keyword, "BBR0", 0x0f);
+    private static readonly Opcode BBR0 = new BitBranch(Keyword, "BBR0", 0x0f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR1 instruction.
     /// </summary>
-    private readonly Opcode BBR1 = new BitBranch(Keyword, "BBR1", 0x1f);
+    private static readonly Opcode BBR1 = new BitBranch(Keyword, "BBR1", 0x1f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR2 instruction.
     /// </summary>
-    private readonly Opcode BBR2 = new BitBranch(Keyword, "BBR2", 0x2f);
+    private static readonly Opcode BBR2 = new BitBranch(Keyword, "BBR2", 0x2f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR3 instruction.
     /// </summary>
-    private readonly Opcode BBR3 = new BitBranch(Keyword, "BBR3", 0x3f);
+    private static readonly Opcode BBR3 = new BitBranch(Keyword, "BBR3", 0x3f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR4 instruction.
     /// </summary>
-    private readonly Opcode BBR4 = new BitBranch(Keyword, "BBR4", 0x4f);
+    private static readonly Opcode BBR4 = new BitBranch(Keyword, "BBR4", 0x4f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR5 instruction.
     /// </summary>
-    private readonly Opcode BBR5 = new BitBranch(Keyword, "BBR5", 0x5f);
+    private static readonly Opcode BBR5 = new BitBranch(Keyword, "BBR5", 0x5f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR6 instruction.
     /// </summary>
-    private readonly Opcode BBR6 = new BitBranch(Keyword, "BBR6", 0x6f);
+    private static readonly Opcode BBR6 = new BitBranch(Keyword, "BBR6", 0x6f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBR7 instruction.
     /// </summary>
-    private readonly Opcode BBR7 = new BitBranch(Keyword, "BBR7", 0x7f);
+    private static readonly Opcode BBR7 = new BitBranch(Keyword, "BBR7", 0x7f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS0 instruction.
     /// </summary>
-    private readonly Opcode BBS0 = new BitBranch(Keyword, "BBS0", 0x8f);
+    private static readonly Opcode BBS0 = new BitBranch(Keyword, "BBS0", 0x8f);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS1 instruction.
     /// </summary>
-    private readonly Opcode BBS1 = new BitBranch(Keyword, "BBS1", 0x9F);
+    private static readonly Opcode BBS1 = new BitBranch(Keyword, "BBS1", 0x9F);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS2 instruction.
     /// </summary>
-    private readonly Opcode BBS2 = new BitBranch(Keyword, "BBS2", 0xAF);
+    private static readonly Opcode BBS2 = new BitBranch(Keyword, "BBS2", 0xAF);
 
     /// <summary>
     /// An<code> Opcode</code> that handles the BBS4 instruction. 
     /// </summary>
-    private readonly Opcode BBS3 = new BitBranch(Keyword, "BBS3", 0xBF);
+    private static readonly Opcode BBS3 = new BitBranch(Keyword, "BBS3", 0xBF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS4 instruction.
     /// </summary>
-    private readonly Opcode BBS4 = new BitBranch(Keyword, "BBS4", 0xCF);
+    private static readonly Opcode BBS4 = new BitBranch(Keyword, "BBS4", 0xCF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS5 instruction.
     /// </summary>
-    private readonly Opcode BBS5 = new BitBranch(Keyword, "BBS5", 0xDF);
+    private static readonly Opcode BBS5 = new BitBranch(Keyword, "BBS5", 0xDF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS6 instruction.
     /// </summary>
-    private readonly Opcode BBS6 = new BitBranch(Keyword, "BBS6", 0xEF);
+    private static readonly Opcode BBS6 = new BitBranch(Keyword, "BBS6", 0xEF);
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BBS7 instruction.
     /// </summary>
-    private readonly Opcode BBS7 = new BitBranch(Keyword, "BBS7", 0xFF);
+    private static readonly Opcode BBS7 = new BitBranch(Keyword, "BBS7", 0xFF);
 
 
     /// <summary>
     /// An <code>Opcode</code> that handles the BCC instruction.
     /// </summary>
-    private readonly Opcode BCC = new(Keyword, "BCC", as65 =>
+    private static readonly Opcode BCC = new(Keyword, "BCC", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
@@ -836,7 +841,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BCS instruction.
     /// </summary>
-    private readonly Opcode BCS = new(Keyword, "BCS", as65 =>
+    private static readonly Opcode BCS = new(Keyword, "BCS", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
@@ -856,7 +861,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BEQ instruction.
     /// </summary>
-    private readonly Opcode BEQ = new(Keyword, "BEQ", as65 =>
+    private static readonly Opcode BEQ = new(Keyword, "BEQ", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
@@ -876,7 +881,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BIT instruction.
     /// </summary>
-    private readonly Opcode BIT = new(Keyword, "BIT", as65 =>
+    private static readonly Opcode BIT = new(Keyword, "BIT", as65 =>
     {
         switch (as65.ParseMode(DBANK))
         {
@@ -918,7 +923,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BMI instruction.
     /// </summary>
-    private readonly Opcode BMI = new(Keyword, "BMI", as65 =>
+    private static readonly Opcode BMI = new(Keyword, "BMI", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
@@ -938,7 +943,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BNE instruction.
     /// </summary>
-    private readonly Opcode BNE = new(Keyword, "BNE", as65 =>
+    private static readonly Opcode BNE = new(Keyword, "BNE", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
@@ -957,7 +962,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BPL instruction.
     /// </summary>
-    private readonly Opcode BPL = new(Keyword, "BPL", as65 =>
+    private static readonly Opcode BPL = new(Keyword, "BPL", as65 =>
     {
         switch (as65.ParseMode(PBANK))
         {
@@ -976,7 +981,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BRA instruction.
     /// </summary>
-    private readonly Opcode BRA = new(Keyword, "BRA", as65 =>
+    private static readonly Opcode BRA = new(Keyword, "BRA", as65 =>
     {
         if ((as65.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -1002,7 +1007,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BRK instruction.
     /// </summary>
-    private readonly Opcode BRK = new(Keyword, "BRK", asm =>
+    private static readonly Opcode BRK = new(Keyword, "BRK", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1019,7 +1024,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BRL instruction.
     /// </summary>
-    private readonly Opcode BRL = new(Keyword, "BRL", asm =>
+    private static readonly Opcode BRL = new(Keyword, "BRL", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1045,7 +1050,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BVC instruction.
     /// </summary>				
-    private readonly Opcode BVC = new(Keyword, "BVC", asm =>
+    private static readonly Opcode BVC = new(Keyword, "BVC", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
@@ -1067,7 +1072,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the BVS instruction.
     /// </summary>				
-    private readonly Opcode BVS = new(Keyword, "BVS", asm =>
+    private static readonly Opcode BVS = new(Keyword, "BVS", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
@@ -1088,7 +1093,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLC instruction.
     /// </summary>				
-    private readonly Opcode CLC = new(Keyword, "CLC", asm =>
+    private static readonly Opcode CLC = new(Keyword, "CLC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1104,7 +1109,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLD instruction.
     /// </summary>				
-    private readonly Opcode CLD = new(Keyword, "CLD", asm =>
+    private static readonly Opcode CLD = new(Keyword, "CLD", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1120,7 +1125,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLI instruction.
     /// </summary>				
-    private readonly Opcode CLI = new(Keyword, "CLI", asm =>
+    private static readonly Opcode CLI = new(Keyword, "CLI", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1137,7 +1142,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CLV instruction.
     /// </summary>				
-    private readonly Opcode CLV = new(Keyword, "CLV", asm =>
+    private static readonly Opcode CLV = new(Keyword, "CLV", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1152,7 +1157,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CMP instruction.
     /// </summary>				
-    private readonly Opcode CMP = new(Keyword, "CMP", asm =>
+    private static readonly Opcode CMP = new(Keyword, "CMP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1226,7 +1231,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the COP instruction.
     /// </summary>				
-    private readonly Opcode COP = new(Keyword, "COP", asm =>
+    private static readonly Opcode COP = new(Keyword, "COP", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1248,7 +1253,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CPX instruction.
     /// </summary>				
-    private readonly Opcode CPX = new(Keyword, "CPX", asm =>
+    private static readonly Opcode CPX = new(Keyword, "CPX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1265,7 +1270,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the CPY instruction.
     /// </summary>				
-    private readonly Opcode CPY = new(Keyword, "CPY", asm =>
+    private static readonly Opcode CPY = new(Keyword, "CPY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1282,7 +1287,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the DEC instruction.
     /// </summary>				
-    private readonly Opcode DEC = new(Keyword, "DEC", asm =>
+    private static readonly Opcode DEC = new(Keyword, "DEC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1307,7 +1312,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the DEX instruction.
     /// </summary>				
-    private readonly Opcode DEX = new(Keyword, "DEX", asm =>
+    private static readonly Opcode DEX = new(Keyword, "DEX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1323,7 +1328,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the DEY instruction.
     /// </summary>				
-    private readonly Opcode DEY = new(Keyword, "DEY", asm =>
+    private static readonly Opcode DEY = new(Keyword, "DEY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1340,7 +1345,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the EOR instruction.
     /// </summary>				
-    private readonly Opcode EOR = new(Keyword, "EOR", asm =>
+    private static readonly Opcode EOR = new(Keyword, "EOR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1415,7 +1420,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the INC instruction.
     /// </summary>				
-    private readonly Opcode INC = new(Keyword, "INC", asm =>
+    private static readonly Opcode INC = new(Keyword, "INC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1441,7 +1446,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the INX instruction.
     /// </summary>				
-    private readonly Opcode INX = new(Keyword, "INX", asm =>
+    private static readonly Opcode INX = new(Keyword, "INX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1457,7 +1462,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the INY instruction.
     /// </summary>				
-    private readonly Opcode INY = new(Keyword, "INY", asm =>
+    private static readonly Opcode INY = new(Keyword, "INY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1473,7 +1478,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JML instruction.
     /// </summary>				
-    private readonly Opcode JML = new(Keyword, "JML", asm =>
+    private static readonly Opcode JML = new(Keyword, "JML", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1498,7 +1503,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JMP instruction.
     /// </summary>				
-    private readonly Opcode JMP = new(Keyword, "JMP", asm =>
+    private static readonly Opcode JMP = new(Keyword, "JMP", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
@@ -1535,7 +1540,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JSL instruction.
     /// </summary>				
-    private readonly Opcode JSL = new(Keyword, "JSL", asm =>
+    private static readonly Opcode JSL = new(Keyword, "JSL", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1559,7 +1564,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the JSR instruction.
     /// </summary>				
-    private readonly Opcode JSR = new(Keyword, "JSR", asm =>
+    private static readonly Opcode JSR = new(Keyword, "JSR", asm =>
     {
         switch (asm.ParseMode(PBANK))
         {
@@ -1585,7 +1590,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LDA instruction.
     /// </summary>				
-    private readonly Opcode LDA = new(Keyword, "LDA", asm =>
+    private static readonly Opcode LDA = new(Keyword, "LDA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1658,7 +1663,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LDX instruction.
     /// </summary>				
-    private readonly Opcode LDX = new(Keyword, "LDX", asm =>
+    private static readonly Opcode LDX = new(Keyword, "LDX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1678,7 +1683,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LDY instruction.
     /// </summary>				
-    private readonly Opcode LDY = new(Keyword, "LDY", asm =>
+    private static readonly Opcode LDY = new(Keyword, "LDY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1698,7 +1703,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the LSR instruction.
     /// </summary>				
-    private readonly Opcode LSR = new(Keyword, "LSR", asm =>
+    private static readonly Opcode LSR = new(Keyword, "LSR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1719,7 +1724,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the MVN instruction.
     /// </summary>				
-    private readonly Opcode MVN = new(Keyword, "MVN", asm =>
+    private static readonly Opcode MVN = new(Keyword, "MVN", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1748,7 +1753,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the MVP instruction.
     /// </summary>				
-    private readonly Opcode MVP = new(Keyword, "MVP", asm =>
+    private static readonly Opcode MVP = new(Keyword, "MVP", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1777,7 +1782,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the NOP instruction.
     /// </summary>				
-    private readonly Opcode NOP = new(Keyword, "NOP", asm =>
+    private static readonly Opcode NOP = new(Keyword, "NOP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1793,7 +1798,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the ORA instruction.
     /// </summary>				
-    private readonly Opcode ORA = new(Keyword, "ORA", asm =>
+    private static readonly Opcode ORA = new(Keyword, "ORA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1866,7 +1871,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PEA instruction.
     /// </summary>				
-    private readonly Opcode PEA = new(Keyword, "PEA", asm =>
+    private static readonly Opcode PEA = new(Keyword, "PEA", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1890,7 +1895,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PEI instruction.
     /// </summary>				
-    private readonly Opcode PEI = new(Keyword, "PEI", asm =>
+    private static readonly Opcode PEI = new(Keyword, "PEI", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1912,7 +1917,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PER instruction.
     /// </summary>				
-    private readonly Opcode PER = new(Keyword, "PER", asm =>
+    private static readonly Opcode PER = new(Keyword, "PER", asm =>
     {
         // put your code here
         if ((asm.Processor & (M65816 | M65832)) != 0)
@@ -1937,7 +1942,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHA instruction.
     /// </summary>				
-    private readonly Opcode PHA = new(Keyword, "PHA", asm =>
+    private static readonly Opcode PHA = new(Keyword, "PHA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -1953,7 +1958,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHB instruction.
     /// </summary>				
-    private readonly Opcode PHB = new(Keyword, "PHB", asm =>
+    private static readonly Opcode PHB = new(Keyword, "PHB", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1975,7 +1980,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHD instruction.
     /// </summary>				
-    private readonly Opcode PHD = new(Keyword, "PHD", asm =>
+    private static readonly Opcode PHD = new(Keyword, "PHD", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -1997,7 +2002,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHK instruction.
     /// </summary>				
-    private readonly Opcode PHK = new(Keyword, "PHK", asm =>
+    private static readonly Opcode PHK = new(Keyword, "PHK", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2019,7 +2024,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHP instruction.
     /// </summary>				
-    private readonly Opcode PHP = new(Keyword, "PHP", asm =>
+    private static readonly Opcode PHP = new(Keyword, "PHP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2037,7 +2042,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHX instruction.
     /// </summary>				
-    private readonly Opcode PHX = new(Keyword, "PHX", asm =>
+    private static readonly Opcode PHX = new(Keyword, "PHX", asm =>
     {
         if ((asm.Processor & (M6502 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2064,7 +2069,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PHY instruction.
     /// </summary>				
-    private readonly Opcode PHY = new(Keyword, "PHY", asm =>
+    private static readonly Opcode PHY = new(Keyword, "PHY", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2090,7 +2095,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLA instruction.
     /// </summary>				
-    private readonly Opcode PLA = new(Keyword, "PLA", asm =>
+    private static readonly Opcode PLA = new(Keyword, "PLA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2108,7 +2113,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLB instruction.
     /// </summary>				
-    private readonly Opcode PLB = new(Keyword, "PLB", asm =>
+    private static readonly Opcode PLB = new(Keyword, "PLB", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2134,7 +2139,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLD instruction.
     /// </summary>				
-    private readonly Opcode PLD = new(Keyword, "PLD", asm =>
+    private static readonly Opcode PLD = new(Keyword, "PLD", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2161,7 +2166,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLP instruction.
     /// </summary>				
-    private readonly Opcode PLP = new(Keyword, "PLP", asm =>
+    private static readonly Opcode PLP = new(Keyword, "PLP", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2182,7 +2187,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLX instruction.
     /// </summary>				
-    private readonly Opcode PLX = new(Keyword, "PLX", asm =>
+    private static readonly Opcode PLX = new(Keyword, "PLX", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2209,7 +2214,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the PLY instruction.
     /// </summary>				
-    private readonly Opcode PLY = new(Keyword, "PLY", asm =>
+    private static readonly Opcode PLY = new(Keyword, "PLY", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2236,7 +2241,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the REP instruction.
     /// </summary>				        
-    private readonly Opcode REP = new(Keyword, "REP", asm =>
+    private static readonly Opcode REP = new(Keyword, "REP", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2262,47 +2267,47 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB0 instruction.
     /// </summary>
-    private readonly Opcode RMB0 = new BitOperation(Keyword, "RMB0", 0x07);
+    private static readonly Opcode RMB0 = new BitOperation(Keyword, "RMB0", 0x07);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB1 instruction.
     /// </summary>
-    private readonly Opcode RMB1 = new BitOperation(Keyword, "RMB1", 0x17);
+    private static readonly Opcode RMB1 = new BitOperation(Keyword, "RMB1", 0x17);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB2 instruction.
     /// </summary>
-    private readonly Opcode RMB2 = new BitOperation(Keyword, "RMB2", 0x27);
+    private static readonly Opcode RMB2 = new BitOperation(Keyword, "RMB2", 0x27);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB3 instruction.
     /// </summary>
-    private readonly Opcode RMB3 = new BitOperation(Keyword, "RMB3", 0x37);
+    private static readonly Opcode RMB3 = new BitOperation(Keyword, "RMB3", 0x37);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB4 instruction.
     /// </summary>
-    private readonly Opcode RMB4 = new BitOperation(Keyword, "RMB4", 0x47);
+    private static readonly Opcode RMB4 = new BitOperation(Keyword, "RMB4", 0x47);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB5 instruction.
     /// </summary>
-    private readonly Opcode RMB5 = new BitOperation(Keyword, "RMB5", 0x57);
+    private static readonly Opcode RMB5 = new BitOperation(Keyword, "RMB5", 0x57);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB6 instruction.
     /// </summary>
-    private readonly Opcode RMB6 = new BitOperation(Keyword, "RMB6", 0x67);
+    private static readonly Opcode RMB6 = new BitOperation(Keyword, "RMB6", 0x67);
 
     /// <summary>
     /// An <CODE>Opcode</CODE> that handles the RMB7 instruction.
     /// </summary>
-    private readonly Opcode RMB7 = new BitOperation(Keyword, "RMB7", 0x77);
+    private static readonly Opcode RMB7 = new BitOperation(Keyword, "RMB7", 0x77);
 
     /// <summary>
     /// The <code>Opcode</code> to handle the ROL instruction.
     /// </summary>
-    private readonly Opcode ROL = new(Keyword, "ROL", asm =>
+    private static readonly Opcode ROL = new(Keyword, "ROL", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2334,7 +2339,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the ROR instruction.
     /// </summary>
-    private readonly Opcode ROR = new(Keyword, "ROR", asm =>
+    private static readonly Opcode ROR = new(Keyword, "ROR", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2367,7 +2372,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTI instruction.
     /// </summary>
-    private readonly Opcode RTI = new(Keyword, "RTI", asm =>
+    private static readonly Opcode RTI = new(Keyword, "RTI", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2387,7 +2392,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTL instruction.
     /// </summary>
-    private readonly Opcode RTL = new(Keyword, "RTL", asm => {
+    private static readonly Opcode RTL = new(Keyword, "RTL", asm => {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
             switch (asm.ParseMode(DBANK))
@@ -2411,7 +2416,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the RTS instruction.
     /// </summary>
-    private readonly Opcode RTS = new(Keyword, "RTS", asm =>
+    private static readonly Opcode RTS = new(Keyword, "RTS", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2429,7 +2434,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SBC instruction.
     /// </summary>
-    private readonly Opcode SBC = new(Keyword, "SBC", asm =>
+    private static readonly Opcode SBC = new(Keyword, "SBC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2549,7 +2554,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SEC instruction.
     /// </summary>
-    private readonly Opcode SEC = new(Keyword, "SEC", asm =>
+    private static readonly Opcode SEC = new(Keyword, "SEC", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2567,7 +2572,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SED instruction.
     /// </summary>
-    private readonly Opcode SED = new(Keyword, "SED", asm =>
+    private static readonly Opcode SED = new(Keyword, "SED", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2585,7 +2590,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SEI instruction.
     /// </summary>
-    private readonly Opcode SEI = new(Keyword, "SEI", asm =>
+    private static readonly Opcode SEI = new(Keyword, "SEI", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2604,7 +2609,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the SEP instruction.
     /// </summary>
-    private readonly Opcode SEP = new(Keyword, "SEP", asm =>
+    private static readonly Opcode SEP = new(Keyword, "SEP", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2625,19 +2630,19 @@ public sealed class As65 : Assembler
         return true;
     });
 
-    private readonly Opcode SMB0 = new BitOperation(Keyword, "SMB0", 0x87);
-    private readonly Opcode SMB1 = new BitOperation(Keyword, "SMB1", 0X97);
-    private readonly Opcode SMB2 = new BitOperation(Keyword, "SMB2", 0xA7);
-    private readonly Opcode SMB3 = new BitOperation(Keyword, "SMB3", 0xB7);
-    private readonly Opcode SMB4 = new BitOperation(Keyword, "SMB4", 0xC7);
-    private readonly Opcode SMB5 = new BitOperation(Keyword, "SMB5", 0xD7);
-    private readonly Opcode SMB6 = new BitOperation(Keyword, "SMB6", 0xE7);
-    private readonly Opcode SMB7 = new BitOperation(Keyword, "SMB7", 0xF7);
+    private static readonly Opcode SMB0 = new BitOperation(Keyword, "SMB0", 0x87);
+    private static readonly Opcode SMB1 = new BitOperation(Keyword, "SMB1", 0X97);
+    private static readonly Opcode SMB2 = new BitOperation(Keyword, "SMB2", 0xA7);
+    private static readonly Opcode SMB3 = new BitOperation(Keyword, "SMB3", 0xB7);
+    private static readonly Opcode SMB4 = new BitOperation(Keyword, "SMB4", 0xC7);
+    private static readonly Opcode SMB5 = new BitOperation(Keyword, "SMB5", 0xD7);
+    private static readonly Opcode SMB6 = new BitOperation(Keyword, "SMB6", 0xE7);
+    private static readonly Opcode SMB7 = new BitOperation(Keyword, "SMB7", 0xF7);
 
     /// <summary>
     /// The <code>Opcode</code> to handle the STA instruction.
     /// </summary>
-    private readonly Opcode STA = new(Keyword, "STA", asm =>
+    private static readonly Opcode STA = new(Keyword, "STA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2754,7 +2759,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STP instruction.
     /// </summary>
-    private readonly Opcode STP = new(Keyword, "STP", asm =>
+    private static readonly Opcode STP = new(Keyword, "STP", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2778,7 +2783,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STX instruction.
     /// </summary>
-    private readonly Opcode STX = new(Keyword, "STX", asm =>
+    private static readonly Opcode STX = new(Keyword, "STX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2802,7 +2807,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STY instruction.
     /// </summary>
-    private readonly Opcode STY = new(Keyword, "STY", asm =>
+    private static readonly Opcode STY = new(Keyword, "STY", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -2828,7 +2833,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the STZ instruction.
     /// </summary>
-    private readonly Opcode STZ = new(Keyword, "STZ", asm =>
+    private static readonly Opcode STZ = new(Keyword, "STZ", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2862,7 +2867,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TAX instruction.
     /// </summary>
-    private readonly Opcode TAX = new(Keyword, "TAX", asm =>
+    private static readonly Opcode TAX = new(Keyword, "TAX", asm =>
     {
         switch (asm.ParseMode((DBANK)))
         {
@@ -2880,7 +2885,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TAY instruction.
     /// </summary>
-    private readonly Opcode TAY = new(Keyword, "TAY", asm =>
+    private static readonly Opcode TAY = new(Keyword, "TAY", asm =>
     {
         switch (asm.ParseMode((DBANK)))
         {
@@ -2897,7 +2902,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TCD instruction.
     /// </summary>
-    private readonly Opcode TCD = new(Keyword, "TCD", asm =>
+    private static readonly Opcode TCD = new(Keyword, "TCD", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2918,7 +2923,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TCS instruction.
     /// </summary>
-    private readonly Opcode TCS = new(Keyword, "TCS", asm =>
+    private static readonly Opcode TCS = new(Keyword, "TCS", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2939,7 +2944,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TDC instruction.
     /// </summary>
-    private readonly Opcode TDC = new(Keyword, "TDC", asm =>
+    private static readonly Opcode TDC = new(Keyword, "TDC", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -2961,7 +2966,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TRB instruction.
     /// </summary>
-    private readonly Opcode TRB = new(Keyword, "TRB", asm =>
+    private static readonly Opcode TRB = new(Keyword, "TRB", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -2983,7 +2988,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TSB instruction.
     /// </summary>
-    private readonly Opcode TSB = new(Keyword, "TSB", asm =>
+    private static readonly Opcode TSB = new(Keyword, "TSB", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -3005,7 +3010,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TSC instruction.
     /// </summary>
-    private readonly Opcode TSC = new(Keyword, "TSC", asm =>
+    private static readonly Opcode TSC = new(Keyword, "TSC", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -3026,7 +3031,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TSX instruction.
     /// </summary>
-    private readonly Opcode TSX = new(Keyword, "TSX", asm =>
+    private static readonly Opcode TSX = new(Keyword, "TSX", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3041,7 +3046,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TXA instruction.
     /// </summary>
-    private readonly Opcode TXA = new(Keyword, "TXA", asm =>
+    private static readonly Opcode TXA = new(Keyword, "TXA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3056,7 +3061,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TXS instruction.
     /// </summary>
-    private readonly Opcode TXS = new(Keyword, "TXS", asm =>
+    private static readonly Opcode TXS = new(Keyword, "TXS", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3071,7 +3076,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TXY instruction.
     /// </summary>
-    private readonly Opcode TXY = new(Keyword, "TXY", asm =>
+    private static readonly Opcode TXY = new(Keyword, "TXY", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -3093,7 +3098,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TYA instruction.
     /// </summary>
-    private readonly Opcode TYA = new(Keyword, "TYA", asm =>
+    private static readonly Opcode TYA = new(Keyword, "TYA", asm =>
     {
         switch (asm.ParseMode(DBANK))
         {
@@ -3108,7 +3113,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the TYX instruction.
     /// </summary>
-    private readonly Opcode TYX = new(Keyword, "TYX", asm =>
+    private static readonly Opcode TYX = new(Keyword, "TYX", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -3129,7 +3134,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the WAI instruction.
     /// </summary>
-    private readonly Opcode WAI = new(Keyword, "WAI", asm =>
+    private static readonly Opcode WAI = new(Keyword, "WAI", asm =>
     {
         if ((asm.Processor & (M65C02 | M65SC02 | M65816 | M65832)) != 0)
         {
@@ -3150,7 +3155,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the WDM instruction.
     /// </summary>
-    private readonly Opcode WDM = new(Keyword, "WDM", asm =>
+    private static readonly Opcode WDM = new(Keyword, "WDM", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -3173,7 +3178,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the XBA instruction.
     /// </summary>
-    private readonly Opcode XBA = new(Keyword, "XBA", asm =>
+    private static readonly Opcode XBA = new(Keyword, "XBA", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -3194,7 +3199,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the XCE instruction.
     /// </summary>
-    private readonly Opcode XCE = new(Keyword, "XCE", asm =>
+    private static readonly Opcode XCE = new(Keyword, "XCE", asm =>
     {
         if ((asm.Processor & (M65816 | M65832)) != 0)
         {
@@ -3216,7 +3221,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// An <code>Opcode</code> that handles the IF structured assembly command..
     /// </summary>				
-    private new readonly Opcode IF = new(Keyword, "IF", asm =>
+    private new static readonly Opcode IF = new(Keyword, "IF", asm =>
     {
         var index = asm.IfIndex++;
 
@@ -3250,7 +3255,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the ELSE structured assembly
     /// command.
     /// </summary>
-    private new readonly Opcode ELSE = new(Keyword, "ELSE", asm =>
+    private new static readonly Opcode ELSE = new(Keyword, "ELSE", asm =>
     {
         if (asm.Ifs.Count > 0)
         {
@@ -3271,7 +3276,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the ENDIF structured assembly
     /// command.
     /// </summary>
-    private new readonly Opcode ENDIF = new(Keyword, "ENDIF", asm =>
+    private new static readonly Opcode ENDIF = new(Keyword, "ENDIF", asm =>
     {
         if (asm.Ifs.Count > 0)
         {
@@ -3289,7 +3294,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the REPEAT structured assembly
     /// command.
     /// </summary>
-    private new readonly Opcode REPEAT = new(Keyword, "REPEAT", asm =>
+    private new static readonly Opcode REPEAT = new(Keyword, "REPEAT", asm =>
     {
         var index = asm.LoopIndex++;
 
@@ -3310,7 +3315,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the UNTIL structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode UNTIL = new(Keyword, "UNTIL", asm =>
+    private static readonly Opcode UNTIL = new(Keyword, "UNTIL", asm =>
     {
         if (asm.Loops.Count > 0)
         {
@@ -3343,7 +3348,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the FOREVER structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode FOREVER = new(Keyword, "FOREVER", asm =>
+    private static readonly Opcode FOREVER = new(Keyword, "FOREVER", asm =>
     {
         if (asm.Loops.Count > 0)
         {
@@ -3365,7 +3370,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the WHILE structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode WHILE = new(Keyword, "WHILE", asm =>
+    private static readonly Opcode WHILE = new(Keyword, "WHILE", asm =>
     {
         var index = asm.LoopIndex++;
 
@@ -3400,7 +3405,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the ENDW structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode ENDW = new(Keyword, "ENDW", asm =>
+    private static readonly Opcode ENDW = new(Keyword, "ENDW", asm =>
     {
         if (asm.Loops.Count > 0)
         {
@@ -3422,7 +3427,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the CONT structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode CONT = new(Keyword, "CONT", asm =>
+    private static readonly Opcode CONT = new(Keyword, "CONT", asm =>
     {
         if (asm.Loops.Count > 0)
         {
@@ -3454,7 +3459,7 @@ public sealed class As65 : Assembler
     /// The <code>Opcode</code> to handle the BREAK structured assembly
     /// command.
     /// </summary>
-    private readonly Opcode BREAK = new(Keyword, "BREAK", asm =>
+    private static readonly Opcode BREAK = new(Keyword, "BREAK", asm =>
     {
         if (asm.Loops.Count > 0)
         {
@@ -3485,7 +3490,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the A2STR instruction.
     /// </summary>
-    private readonly Opcode A2STR = new(Keyword, "A2STR", asm =>
+    private static readonly Opcode A2STR = new(Keyword, "A2STR", asm =>
     {
         do {
             asm.CurrentToken = asm.NextRealToken();
@@ -3517,7 +3522,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the HSTR instruction.
     /// </summary>
-    private readonly Opcode HSTR = new(Keyword, "HSTR", asm =>
+    private static readonly Opcode HSTR = new(Keyword, "HSTR", asm =>
     {
         asm.CurrentToken = asm.NextRealToken();
 
@@ -3543,7 +3548,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Opcode</code> to handle the PSTR instruction.
     /// </summary>
-    private readonly Opcode PSTR = new(Keyword, "PSTR", asm =>
+    private static readonly Opcode PSTR = new(Keyword, "PSTR", asm =>
     {
         asm.CurrentToken = asm.NextRealToken();
 
@@ -3569,20 +3574,24 @@ public sealed class As65 : Assembler
         return (true);
     });
 
-    private readonly Opcode JCC;
-    private readonly Opcode JCS;
-    private readonly Opcode JEQ;
-    private readonly Opcode JMI;
-    private readonly Opcode JNE;
-    private readonly Opcode JPL;
-    private readonly Opcode JVC;
-    private readonly Opcode JVS;
-    private readonly Opcode JPA;
+    private static readonly Opcode JCC;
+    private static readonly Opcode JCS;
+    private static readonly Opcode JEQ;
+    private static readonly Opcode JMI;
+    private static readonly Opcode JNE;
+    private static readonly Opcode JPL;
+    private static readonly Opcode JVC;
+    private static readonly Opcode JVS;
+    private static readonly Opcode JPA;
 
     private As65() : base(new Module("65XX", false))
     {
         SetMemoryModel(new MemoryModelByte());
 
+    }
+
+    static As65()
+    {
         JCC = new Jump("JCC", CC);
         JCS = new Jump("JCS", CS);
         JEQ = new Jump("JEQ", EQ);
@@ -3938,6 +3947,641 @@ public sealed class As65 : Assembler
         return (ScanToken());
     }
 
+    public class TokenScanner
+    {
+        public void Init()
+        {
+            AddToken(P6501);
+            AddToken(P6502);
+            AddToken(P65C02);
+            AddToken(P65SC02);
+            AddToken(P65816);
+            AddToken(P65832);
+            AddToken(DBREG);
+            AddToken(DPAGE);
+            AddToken(ADDR);
+            AddToken(BSS);
+            AddToken(Byte);
+            AddToken(DByte);
+            AddToken(Word);
+            AddToken(LONG);
+            AddToken(Space);
+            AddToken(Align);
+            AddToken(Dcb);
+            AddToken(CODE);
+            AddToken(DATA);
+            AddToken(PAGE0);
+            AddToken(ORG);
+            AddToken(Assembler.ELSE);
+            AddToken(End);
+            AddToken(Assembler.ENDIF);
+            AddToken(ENDM);
+            AddToken(ENDR);
+            AddToken(Equ);
+            AddToken(EXITM);
+            AddToken(EXTERN);
+            AddToken(GLOBAL);
+            AddToken(Assembler.IF);
+            AddToken(IFABS);
+            AddToken(IFNABS);
+            AddToken(IFREL);
+            AddToken(IFNREL);
+            AddToken(IFDEF);
+            AddToken(IFNDEF);
+            AddToken(INCLUDE);
+            AddToken(APPEND);
+            AddToken(INSERT);
+            AddToken(LONGA);
+            AddToken(LONGI);
+            AddToken(WIDEA);
+            AddToken(WIDEI);
+            AddToken(MACRO);
+            AddToken(ON);
+            AddToken(Off);
+            AddToken(Assembler.REPEAT);
+            AddToken(Set);
+            AddToken(LIST);
+            AddToken(NOLIST);
+            AddToken(PAGE);
+            AddToken(TITLE);
+            AddToken(ERROR);
+            AddToken(WARN);
+
+            AddToken(A2STR);
+            AddToken(HSTR);
+            AddToken(PSTR);
+
+            // Functions
+            AddToken(STRLEN);
+            AddToken(HI);
+            AddToken(LO);
+            AddToken(Assembler.BANK);
+
+            // Opcodes & Registers
+            AddToken(A);
+            AddToken(ADC);
+            AddToken(AND);
+            AddToken(ASL);
+            AddToken(BBR0);
+            AddToken(BBR1);
+            AddToken(BBR2);
+            AddToken(BBR3);
+            AddToken(BBR4);
+            AddToken(BBR5);
+            AddToken(BBR6);
+            AddToken(BBR7);
+            AddToken(BBS0);
+            AddToken(BBS1);
+            AddToken(BBS2);
+            AddToken(BBS3);
+            AddToken(BBS4);
+            AddToken(BBS5);
+            AddToken(BBS6);
+            AddToken(BBS7);
+            AddToken(BCC);
+            AddToken(BCS);
+            AddToken(BEQ);
+            AddToken(BIT);
+            AddToken(BMI);
+            AddToken(BNE);
+            AddToken(BPL);
+            AddToken(BRA);
+            AddToken(BRK);
+            AddToken(BRL);
+            AddToken(BVC);
+            AddToken(BVS);
+            AddToken(CLC);
+            AddToken(CLD);
+            AddToken(CLI);
+            AddToken(CLV);
+            AddToken(CMP);
+            AddToken(COP);
+            AddToken(CPX);
+            AddToken(CPY);
+            AddToken(DEC);
+            AddToken(DEX);
+            AddToken(DEY);
+            AddToken(EOR);
+            AddToken(HI);
+            AddToken(INC);
+            AddToken(INX);
+            AddToken(INY);
+            AddToken(JML);
+            AddToken(JMP);
+            AddToken(JSL);
+            AddToken(JSR);
+            AddToken(LO);
+            AddToken(LDA);
+            AddToken(LDX);
+            AddToken(LDY);
+            AddToken(LSR);
+            AddToken(MVN);
+            AddToken(MVP);
+            AddToken(NOP);
+            AddToken(ORA);
+            AddToken(PEA);
+            AddToken(PEI);
+            AddToken(PER);
+            AddToken(PHA);
+            AddToken(PHB);
+            AddToken(PHD);
+            AddToken(PHK);
+            AddToken(PHP);
+            AddToken(PHX);
+            AddToken(PHY);
+            AddToken(PLA);
+            AddToken(PLB);
+            AddToken(PLD);
+            AddToken(PLP);
+            AddToken(PLX);
+            AddToken(PLY);
+            AddToken(REP);
+            AddToken(RMB0);
+            AddToken(RMB1);
+            AddToken(RMB2);
+            AddToken(RMB3);
+            AddToken(RMB4);
+            AddToken(RMB5);
+            AddToken(RMB6);
+            AddToken(RMB7);
+            AddToken(ROL);
+            AddToken(ROR);
+            AddToken(RTI);
+            AddToken(RTL);
+            AddToken(RTS);
+            AddToken(S);
+            AddToken(SBC);
+            AddToken(SEC);
+            AddToken(SED);
+            AddToken(SEI);
+            AddToken(SEP);
+            AddToken(SMB0);
+            AddToken(SMB1);
+            AddToken(SMB2);
+            AddToken(SMB3);
+            AddToken(SMB4);
+            AddToken(SMB5);
+            AddToken(SMB6);
+            AddToken(SMB7);
+            AddToken(STA);
+            AddToken(STP);
+            AddToken(STX);
+            AddToken(STY);
+            AddToken(STZ);
+            AddToken(TAX);
+            AddToken(TAY);
+            AddToken(TCD);
+            AddToken(TCS);
+            AddToken(TDC);
+            AddToken(TRB);
+            AddToken(TSB);
+            AddToken(TSC);
+            AddToken(TSX);
+            AddToken(TXA);
+            AddToken(TXS);
+            AddToken(TXY);
+            AddToken(TYA);
+            AddToken(TYX);
+            AddToken(WAI);
+            AddToken(WDM);
+            AddToken(XBA);
+            AddToken(XCE);
+            AddToken(X);
+            AddToken(Y);
+
+            // Structured Assembly
+            if (!traditionalOption.IsPresent)
+            {
+                AddToken(IF);
+                AddToken(ELSE);
+                AddToken(ENDIF);
+                AddToken(REPEAT);
+                AddToken(UNTIL);
+                AddToken(FOREVER);
+                AddToken(WHILE);
+                AddToken(ENDW);
+                AddToken(CONT);
+                AddToken(BREAK);
+                AddToken(EQ);
+                AddToken(NE);
+                AddToken(CC);
+                AddToken(CS);
+                AddToken(PL);
+                AddToken(MI);
+                AddToken(VC);
+                AddToken(VS);
+
+                // Expanding jumps
+                AddToken(JCC);
+                AddToken(JCS);
+                AddToken(JEQ);
+                AddToken(JMI);
+                AddToken(JNE);
+                AddToken(JPL);
+                AddToken(JVC);
+                AddToken(JVS);
+                AddToken(JPA);
+            }
+
+        }
+
+        public void AddToken(Token token)
+        {
+            var key = token.Text.ToUpper();
+            tokenDictionary.SafeAdd(key, token);
+        }
+
+        /// <summary>
+        /// A <code>StringBuffer</code> used to build up new tokens.a
+        /// </summary>
+        private readonly StringBuilder buffer = new();
+
+        // The characters comprising the _line being assembled.
+        private char[]? _text;
+
+        // The offset of the next character in the current _line.
+        private int _offset;
+
+        private Stack<Token> Tokens { get; } = new();
+
+        public Token? CurrentToken { get; set; }
+
+        private readonly Dictionary<string, Token?> tokenDictionary = new();
+
+        public void Tokenize(string nextLine)
+        {
+            _offset = 0;
+            _text = nextLine.ToCharArray();
+
+            if ((CurrentToken = NextToken()) == EOL) return;
+        }
+
+        /// <summary>
+        /// Fetches the next <see cref="Token"/> consuming any that have been
+        /// pushed back first
+        /// </summary>
+        /// <returns>The next <see cref="Token"/> to be processed.</returns>
+        private Token? NextToken()
+        {
+            return Tokens.Count != 0 ? Tokens.Pop() : ScanToken();
+        }
+
+        /**
+         * Gets and consumes the next character on the source _line.
+         * 
+         * @return	The next character on the _line.
+         */
+        private char NextChar()
+        {
+            var ch = PeekChar();
+
+            if (ch != '\0') ++_offset;
+            return (ch);
+        }
+
+        private char PeekChar()
+        {
+            return ((_offset < _text?.Length) ? _text[_offset] : '\0');
+        }
+
+        /// <summary>
+        /// Extracts the next <code>Token</code> from the source line and
+        /// classifies it.
+        /// </summary>
+        /// <returns>The next <code>Token</code></returns>
+        private Token? ScanToken()
+        {
+            var value = 0;
+
+            // handle tail comments
+            if (PeekChar() == ';') return EOL;
+
+            buffer.Clear();
+            var ch = NextChar();
+
+            if (ch == '\0') return EOL;
+
+            if (IsSpace(ch))
+            {
+                while (IsSpace(PeekChar()))
+                    NextChar();
+
+                return WhiteSpace;
+            }
+
+            // Handle characters
+            switch (ch)
+            {
+                case '?': return QUESTION;
+                case '#': return HASH;
+                case '^': return BinaryXor;
+                case '-': return Minus;
+                case '+': return Plus;
+                case '*':
+                    {
+                        if (PeekChar() != '=') return Times;
+
+                        NextChar();
+                        return ORG;
+
+                    }
+                case '/': return Divide;
+                case ';':
+                    {
+                        // Consume comments
+                        while (NextChar() != '\0')
+                        {
+                        }
+
+                        return EOL;
+                    }
+
+                case '%':
+                    {
+                        if (!IsBinary(PeekChar())) return Modulo;
+
+                        buffer.Append('%');
+                        do
+                        {
+                            ch = NextChar();
+                            buffer.Append(ch);
+                            value = (value << 1) + (ch - '0');
+
+                        } while (IsBinary(PeekChar()));
+
+                        return new Token(Number, buffer.ToString(), value);
+                    }
+
+                case '@':
+                    {
+                        if (!IsOctal(PeekChar())) return OriginToken;
+
+                        buffer.Append('@');
+                        do
+                        {
+                            ch = NextChar();
+                            buffer.Append(ch);
+                            value = (value << 3) + (ch - '0');
+
+                        } while (IsOctal(PeekChar()));
+
+                        return new Token(Number, buffer.ToString(), value);
+                    }
+
+                case '$':
+                    {
+                        if (!IsHexadecimal(PeekChar())) return OriginToken;
+
+                        buffer.Append('$');
+                        do
+                        {
+                            ch = NextChar();
+                            buffer.Append(ch);
+                            value <<= 4;
+                            if (char.ToLower(ch) >= 'a' && char.ToLower(ch) < 'f')
+                                value += char.ToLower(ch) - 'a' + 10;
+                            else
+                                value += ch - '0';
+
+
+                        } while (IsHexadecimal(PeekChar()));
+
+                        return new Token(Number, buffer.ToString(), value);
+
+                    }
+
+                case '.':
+                    {
+                        if (IsAlphanumeric(PeekChar()))
+                            break;
+                        return OriginToken;
+                    }
+
+                case '~': return Complement;
+                case '=': return EQ;
+
+                case '(': return LParen;
+                case ')': return RParen;
+                case '[': return LBRACKET;
+                case ']': return RBRACKET;
+                case ',': return Comma;
+                case ':': return Colon;
+
+                case '!':
+                    {
+                        if (PeekChar() == '=')
+                        {
+                            NextChar();
+                            return NE;
+                        }
+
+                        return LogicalNot;
+                    }
+
+                case '&':
+                    {
+                        if (PeekChar() == '&')
+                        {
+                            NextChar();
+                            return LogicalAnd;
+                        }
+
+                        return BinaryAnd;
+                    }
+
+                case '|':
+                    {
+                        if (PeekChar() == '|')
+                        {
+                            NextChar();
+                            return LogicalOr;
+                        }
+
+                        return BinaryOr;
+                    }
+
+                case '<':
+                    {
+                        switch (PeekChar())
+                        {
+                            case '=':
+                                NextChar();
+                                return Le;
+                            case '<':
+                                NextChar();
+                                return LShift;
+                        }
+
+                        return Lt;
+                    }
+
+                case '>':
+                    {
+                        switch (PeekChar())
+                        {
+                            case '=':
+                                NextChar();
+                                return Ge;
+                            case '>':
+                                NextChar();
+                                return RShift;
+                        }
+
+                        return Gt;
+                    }
+            }
+
+            // Handle numbers
+            if (IsDecimal(ch))
+            {
+                value = ch - '0';
+                while (IsDecimal(PeekChar()))
+                {
+                    ch = NextChar();
+                    buffer.Append(ch);
+                    value = value * 10 + (ch - '0');
+                }
+
+                return new Token(Number, buffer.ToString(), value);
+            }
+
+
+            // Handle Symbols
+            if (ch == '.' || (ch == '_') || IsAlpha(ch))
+            {
+                buffer.Append(ch);
+                ch = PeekChar();
+                while (ch == '_' || IsAlphanumeric(ch))
+                {
+                    buffer.Append(NextChar());
+                    ch = PeekChar();
+                }
+
+                var symbol = buffer.ToString();
+
+                return tokenDictionary.ContainsKey(symbol.ToUpper()) ? tokenDictionary[symbol.ToUpper()] : new Token(Symbol, symbol);
+            }
+
+            // Character Literals
+            if (ch == '\'')
+            {
+                ch = NextChar();
+                while ((ch != '\0') && (ch != '\''))
+                {
+                    value <<= 8;
+                    if (ch == '\\')
+                    {
+                        switch (PeekChar())
+                        {
+                            case '\t':
+                                value |= '\t';
+                                NextChar();
+                                break;
+
+                            case '\b':
+                                value |= '\b';
+                                NextChar();
+                                break;
+
+                            case '\r':
+                                value |= '\r';
+                                NextChar();
+                                break;
+
+                            case '\n':
+                                value |= '\n';
+                                NextChar();
+                                break;
+
+                            case '\\':
+                                value |= '\\';
+                                NextChar();
+                                break;
+
+                            case '\'':
+                                value |= '\'';
+                                NextChar();
+                                break;
+
+                            case '\"':
+                                value |= '\"';
+                                NextChar();
+                                break;
+
+                            default:
+                                value |= ch;
+                                break;
+                        }
+                    }
+                    else
+                        value |= ch;
+
+                    ch = NextChar();
+                }
+
+                if (ch != '\'') return new Token(Error, ERR_STRING_TERM);
+
+                return new Token(Number, "#CHAR", value);
+            }
+
+            if (ch == '\"')
+            {
+                while (((ch = NextChar()) != '\0') && (ch != '\"'))
+                {
+                    if (ch == '\\')
+                    {
+                        switch (PeekChar())
+                        {
+                            case 't':
+                                buffer.Append('\t');
+                                NextChar();
+                                continue;
+
+                            case 'b':
+                                buffer.Append('\b');
+                                NextChar();
+                                continue;
+                            case 'r':
+                                buffer.Append('\r');
+                                NextChar();
+                                continue;
+                            case 'n':
+                                buffer.Append('\n');
+                                NextChar();
+                                continue;
+                            case '\'':
+                                buffer.Append('\'');
+                                NextChar();
+                                continue;
+                            case '"':
+                                buffer.Append('"');
+                                NextChar();
+                                continue;
+
+                            case '\\':
+                                buffer.Append("\\");
+                                NextChar();
+                                continue;
+                        }
+
+                        buffer.Append(ch);
+                    }
+                    else
+                    {
+                        buffer.Append(ch);
+                    }
+                }
+
+                if (ch != '\"') return new Token(Error, ERR_STRING_TERM);
+                return new Token(String, buffer.ToString());
+            }
+
+            buffer.Append(ch);
+            return new Token(Unknown, buffer.ToString());
+        }
+
+    }
+
     /// <summary>
     /// A <code>StringBuffer</code> used to build up new tokens.
     /// </summary>
@@ -4158,16 +4802,7 @@ public sealed class As65 : Assembler
 
             var symbol = buffer.ToString();
 
-            if (tokenDictionary.ContainsKey(symbol.ToUpper()))
-            {
-                return tokenDictionary[symbol.ToUpper()];
-            }
-            else
-            {
-                return new Token(Symbol, symbol);
-            }
-
-            //return tokenDictionary.TryGetValue(symbol.ToUpper(), out var opcode) ? opcode : new Token(Symbol, symbol);
+            return tokenDictionary.ContainsKey(symbol.ToUpper()) ? tokenDictionary[symbol.ToUpper()] : new Token(Symbol, symbol);
         }
 
         // Character Literals
@@ -4968,7 +5603,7 @@ public sealed class As65 : Assembler
     /// <summary>
     /// The <code>Option</code> instance use to detect <code>-traditional</code>
     /// </summary>
-    private readonly Option traditionalOption = new("-traditional", "Disables structured directives");
+    private static readonly Option traditionalOption = new("-traditional", "Disables structured directives");
 
     // A Dictionary of keyword tokens to speed up classification
     private readonly Dictionary<string, Token?> tokenDictionary = new();

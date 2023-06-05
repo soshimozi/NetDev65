@@ -4,29 +4,29 @@ using static System.Int32;
 
 namespace Dev65.XObj;
 
-public class Parser
+public static class Parser
 {
-    private readonly Stack<string> _tags = new();
+    private static readonly Stack<string> Tags = new();
 
-    private Module? _module;
+    private static Module? _module;
 
-    private Section? _section;
+    private static Section? _section;
 
-    private string? _sect = string.Empty;
+    private static string? _sect = string.Empty;
 
-    private string _chars = string.Empty;
+    private static string _chars = string.Empty;
 
-    private StringBuilder _bytes = new();
-    private readonly Stack<object?> _stack = new();
+    private static StringBuilder _bytes = new();
+    private static readonly Stack<object?> Stack = new();
 
-    public object? Parse(string fileName)
+    public static object? Parse(string fileName)
     {
         //var stack = new Stack<object?>();
 
         (Expr? lhs, Expr? rhs) PopTwo()
         {
-            var rhs = _stack.Pop() as Expr;
-            var lhs = _stack.Pop() as Expr;
+            var rhs = Stack.Pop() as Expr;
+            var lhs = Stack.Pop() as Expr;
             return (lhs, rhs);
         }
 
@@ -41,12 +41,12 @@ public class Parser
                     {
                         var localName = reader.LocalName;
 
-                        _tags.Push(localName);
+                        Tags.Push(localName);
 
                         switch (localName)
                         {
                             case "library":
-                                _stack.Push(new Library());
+                                Stack.Push(new Library());
                                 break;
 
                             case "module":
@@ -63,7 +63,7 @@ public class Parser
                                 if (reader.GetAttribute("name") != null)
                                     _module.Name = reader.GetAttribute("name");
 
-                                _stack.Push(_module);
+                                Stack.Push(_module);
                                 break;
 
                             case "section":
@@ -86,7 +86,7 @@ public class Parser
 
                             case "gbl":
                                 var symbol = reader.GetAttribute("symbol");
-                                var expression = _stack.Pop() as Expr;
+                                var expression = Stack.Pop() as Expr;
                                 _module?.AddGlobal(symbol ?? string.Empty, expression);
                                 break;
                         }
@@ -99,7 +99,7 @@ public class Parser
 
                         _chars = new string(text);
 
-                        switch (_tags.Peek())
+                        switch (Tags.Peek())
                         {
                             case "section":
                             {
@@ -116,7 +116,7 @@ public class Parser
                                 break;
                             }
                             case "gbl":
-                                _stack.Push(text);
+                                Stack.Push(text);
                                 break;
                         }
 
@@ -125,7 +125,7 @@ public class Parser
                     case XmlNodeType.EndElement:
                     {
                         var localName = reader.LocalName;
-                        _tags.Pop();
+                        Tags.Pop();
 
                         Expr? lhs, rhs, expr;
 
@@ -133,84 +133,84 @@ public class Parser
                         {
                             case "add":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.Add(lhs, rhs));
+                                Stack.Push(new BinaryExpr.Add(lhs, rhs));
                                 break;
 
                             case "and":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.And(lhs, rhs));
+                                Stack.Push(new BinaryExpr.And(lhs, rhs));
                                 break;
 
                             case "byte":
-                                expr = _stack.Pop() as Expr;
+                                expr = Stack.Pop() as Expr;
                                 _section?.AddByte(expr);
                                 break;
 
                             case "cpl":
-                                expr = _stack.Pop() as Expr;
-                                _stack.Push(new UnaryExpr.Cpl(expr));
+                                expr = Stack.Pop() as Expr;
+                                Stack.Push(new UnaryExpr.Cpl(expr));
                                 break;
 
                             case "eq":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.Eq(lhs, rhs));
+                                Stack.Push(new BinaryExpr.Eq(lhs, rhs));
                                 break;
 
                             case "ext":
-                                _stack.Push(new Extern(_chars));
+                                Stack.Push(new Extern(_chars));
                                 break;
 
                             case "ge":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.Ge(lhs, rhs));
+                                Stack.Push(new BinaryExpr.Ge(lhs, rhs));
                                 break;
 
                             case "gt":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.Gt(lhs, rhs));
+                                Stack.Push(new BinaryExpr.Gt(lhs, rhs));
                                 break;
 
                             case "gbl":
-                                expr = _stack.Pop() as Expr;
-                                var sym = _stack.Pop() as string ?? string.Empty;
+                                expr = Stack.Pop() as Expr;
+                                var sym = Stack.Pop() as string ?? string.Empty;
                                 _module?.AddGlobal(sym, expr);
                                 break;
 
                             case "le":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.Le(lhs, rhs));
+                                Stack.Push(new BinaryExpr.Le(lhs, rhs));
                                 break;
 
                             case "lt":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(new BinaryExpr.Lt(lhs, rhs));
+                                Stack.Push(new BinaryExpr.Lt(lhs, rhs));
                                 break;
 
                             case "land":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(BinaryExpressionFactory.LogicalAnd(lhs, rhs));
+                                Stack.Push(BinaryExpressionFactory.LogicalAnd(lhs, rhs));
                                 break;
 
                             case "lor":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(BinaryExpressionFactory.LogicalOr(lhs, rhs));
+                                Stack.Push(BinaryExpressionFactory.LogicalOr(lhs, rhs));
                                 break;
 
                             case "long":
-                                expr = _stack.Pop() as Expr;
+                                expr = Stack.Pop() as Expr;
                                 _section?.AddLong(expr);
                                 break;
 
                             case "library":
                                 var modules = new Stack<Module?>();
 
-                                while (_stack.Peek() as Module is { } module)
+                                while (Stack.Peek() as Module is { } module)
                                 {
-                                    _stack.Pop();
+                                    Stack.Pop();
                                     modules.Push(module);
                                 }
 
-                                var library = _stack.Peek() as Library;
+                                var library = Stack.Peek() as Library;
                                 while (modules.Count > 0)
                                 {
                                     library?.AddModule(modules.Pop());
@@ -219,31 +219,31 @@ public class Parser
 
                             case "mod":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(BinaryExpressionFactory.Mod(lhs, rhs));
+                                Stack.Push(BinaryExpressionFactory.Mod(lhs, rhs));
                                 break;
 
                             case "ne":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(BinaryExpressionFactory.NotEqual(lhs, rhs));
+                                Stack.Push(BinaryExpressionFactory.NotEqual(lhs, rhs));
                                 break;
 
                             case "neg":
-                                _stack.Push(UnaryFactory.Negate(_stack.Pop() as Expr));
+                                Stack.Push(UnaryFactory.Negate(Stack.Pop() as Expr));
                                 break;
 
                             case "not":
-                                _stack.Push(UnaryFactory.Not(_stack.Pop() as Expr));
+                                Stack.Push(UnaryFactory.Not(Stack.Pop() as Expr));
                                 break;
 
                             case "or":
                                 (lhs, rhs) = PopTwo();
-                                _stack.Push(BinaryExpressionFactory.Subtract(lhs, rhs));
+                                Stack.Push(BinaryExpressionFactory.Subtract(lhs, rhs));
                                 break;
 
 
                             case "val":
                                 _ = TryParse(_chars, out var value);
-                                _stack.Push(_sect != null
+                                Stack.Push(_sect != null
                                     ? new Value(_module?.FindSection(_sect), value)
                                     : new Value(null, value));
 
@@ -258,6 +258,6 @@ public class Parser
                 }
             }
 
-            return _stack.Pop();
+            return Stack.Pop();
     }
 }

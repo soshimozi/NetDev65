@@ -1,14 +1,42 @@
-﻿using Dev65.XApp;
+﻿using System.Diagnostics;
+using Dev65.XApp;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using Dev65.XObj;
 using System.Xml.Linq;
 
 namespace Dev65.XLnk;
 
+public class LinkerErrorEventArgs : EventArgs
+{
+    public string Message { get; }
+
+    public Exception? Exception { get; }
+
+    public LinkerErrorEventArgs(string message, Exception? ex)
+    {
+        Message = message;
+        Exception = ex;
+    }
+}
+
+public class LinkerWarningEventArgs : EventArgs
+{
+    public string Message { get; }
+
+    public LinkerWarningEventArgs(string message)
+    {
+        Message = message;
+    }
+}
+
 public abstract class Linker : Application
 {
     private readonly int _byteSize;
     private readonly long _byteMask;
+
+    public event EventHandler<LinkerErrorEventArgs> LinkerError;
+    public event EventHandler<LinkerWarningEventArgs> LinkerWarning; 
 
     // the .CODE, .DATA, and .BSS areas
     private Dictionary<string, Area> areas = new();
@@ -38,7 +66,9 @@ public abstract class Linker : Application
     /**
 	 * The set of modules to be linked.
 	 */
-    private List<Module> modules = new();
+    private List<Module?> modules = new();
+
+    private List<Library?> libraries = new();
 
     protected Linker(int byteSize)
     {
@@ -60,25 +90,22 @@ public abstract class Linker : Application
         if (dmp.IsPresent) ++count;
         if (cdo.IsPresent) ++count;
 
-        if (count == 0)
+        switch (count)
         {
-            OnError("No output format selected (-bin, -hex, -ihx, -dmp, -c, or -wdc");
-            IsFinished = true;
-            return;
-        }
-
-        if (count > 1)
-        {
-            OnError("Only one output format can be selected at a time.");
-            IsFinished = true;
-            return;
+            case 0:
+                OnError("No output format selected (-bin, -hex, -ihx, -dmp, -c, or -wdc");
+                IsFinished = true;
+                return;
+            case > 1:
+                OnError("Only one output format can be selected at a time.");
+                IsFinished = true;
+                return;
         }
 
         var hi = 0x00000000L;
         var lo = 0xffffffffL;
 
-        Area? area;
-        if (areas.TryGetValue(".code", out area))
+        if (areas.TryGetValue(".code", out var area))
         {
             if (area.GetHiAddr() > hi) hi = area.GetHiAddr();
             if (area.GetLoAddr() < lo) lo = area.GetLoAddr();
@@ -109,11 +136,86 @@ public abstract class Linker : Application
 
         if (GetArguments()?.Length != 0) return;
 
-        Console.Error.WriteLine("Error: No object or library files specified");
+        OnError("Error: No object or library files specified");
         IsFinished = true;
     }
 
     protected override void Execute()
+    {
+        var arguments = GetArguments();
+
+        if (arguments == null) return;
+
+        // Stage I - load all the modules and libraries
+        foreach (var arg in arguments)
+        {
+            if (arg?.EndsWith(".obj") == true)
+            {
+                var obj = Parser.Parse(arg);
+                if (obj != null && obj is Module module)
+                {
+                    if (!modules.Contains(module))
+                    {
+                        modules.Add(module);
+                    }
+                    else
+                    {
+                        OnWarning($"Module '{arg}' specified more than once.");
+                    }
+                }
+                else
+                {
+                    OnError($"Invalid object file '{arg}'");
+                    IsFinished = true;
+                }
+            } else if (arg?.EndsWith(".lib") == true)
+            {
+                var obj = Parser.Parse(arg) as Library;
+                if (obj == null)
+                {
+                    OnError($"Invalid library file '{arg}'");
+                    IsFinished = true;
+                }
+                else
+                {
+                    if (!libraries.Contains(obj))
+                    {
+                        libraries.Add(obj);
+                    }
+                    else
+                    {
+                        OnWarning($"Library '{arg}' specified more than once");
+                    }
+                }
+
+            }
+            else
+            {
+                OnError($"Unrecognized file type for '{arg}'");
+                IsFinished = true;
+            }
+        }
+
+        if (IsFinished) return;
+
+        // Stage II - process all the modules that must be linked
+        foreach (var module in modules)
+        {
+            ProcessModule(module);
+        }
+
+        // Stage III - process libraries for any required modules
+
+        // Stage IV - Sort sections by type and size
+
+        // Stage V - Fit sections into available memory
+
+        // Stage VI - Calculate all the global symbol addresses
+        
+        // Stage VII - Copy code to target fixing cross references
+    }
+
+    private void ProcessModule(Module? module)
     {
         throw new NotImplementedException();
     }
@@ -128,14 +230,14 @@ public abstract class Linker : Application
         return " <object/library file> ...";
     }
 
-    protected virtual void OnError(string message)
+    protected virtual void OnError(string message, Exception? ex = null)
     {
-
+        OnLinkerError(new LinkerErrorEventArgs(message, ex));
     }
 
     protected virtual void OnWarning(string message)
     {
-
+        OnLinkerWarning(new LinkerWarningEventArgs(message));
     }
 
     protected virtual void CreateAreas()
@@ -162,10 +264,19 @@ public abstract class Linker : Application
             areas.Add(".data", areas[".code"]);
     }
 
-    protected void AddArea(string name, string location)
+    private void AddArea(string name, string location)
     {
         var area = new Area(location);
-
         areas.SafeAdd(name, area);
+    }
+
+    private void OnLinkerError(LinkerErrorEventArgs e)
+    {
+        LinkerError?.Invoke(this, e);
+    }
+
+    private void OnLinkerWarning(LinkerWarningEventArgs e)
+    {
+        LinkerWarning?.Invoke(this, e); 
     }
 }

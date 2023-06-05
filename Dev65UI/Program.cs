@@ -5,15 +5,19 @@ using Dev65.XObj;
 using Dev65UI;
 using Terminal.Gui;
 
-As65.AssemblerMain(new[] { "test.asm" });
+//As65.AssemblerMain(new[] { "test.asm" });
 
-var parser = new Parser();
+//var parser = new Parser();
 
-//var stream = new FileStream("test.asm", FileMode.Create);
-parser.Parse("test.obj");
+////var stream = new FileStream("test.asm", FileMode.Create);
+//Parser.Parse("test.obj");
 
 
 Application.Init();
+//Application.Top.ColorScheme = Colors.Base;
+//Application.Top.Add(new MainWindow());
+
+//Application.Run(Application.Top);
 
 var Win = new Window($"CTRL-Q to Close - Dev65 IDE")
 {
@@ -24,215 +28,51 @@ var Win = new Window($"CTRL-Q to Close - Dev65 IDE")
     ColorScheme = Colors.Base,
 };
 
-Setup();
+//Setup();
 
-Application.Top.Add(Win);
+//Application.Top.Add(Win);
+//Application.Run(Application.Top);
 
+Application.Top.Add(new MainWindow());
 Application.Run(Application.Top);
 
-void Quit()
-{
-    Application.RequestStop();
-}
+// Before the application exits, reset Terminal.Gui for clean shutdown
+Application.Shutdown();
 
-void Setup()
-{
-    var fileMenu = new MenuBarItem("_File", new MenuItem[]
-    {
-        new("Open _Project", "Open an existing project", () => { }),
-        new("New _Project", "Create a new project", () => { }),
-        new( "_Close Project", "Close the current project", () => { }),
-        new("_Quit", "", Quit)
-    });
+//void Quit()
+//{
+//    Application.RequestStop();
+//}
 
-    var settingsMenu = new MenuBarItem("_Settings", new MenuItem[] { });
+//void Setup()
+//{
+//    var fileMenu = new MenuBarItem("_File", new MenuItem[]
+//    {
+//        new("Open _Project", "Open an existing project", () => { }),
+//        new("New _Project", "Create a new project", () => { }),
+//        new( "_Close Project", "Close the current project", () => { }),
+//        new("_Quit", "", Quit)
+//    });
 
-    var menu = new MenuBar(new [] {
-                fileMenu,
-                settingsMenu
-            });
-    Application.Top.Add(menu);
+//    var settingsMenu = new MenuBarItem("_Settings", new MenuItem[] { });
 
-    //var statusBar = new StatusBar(new StatusItem[] {
-    //            new (Key.CtrlMask | Key.Q, "~^Q~ Quit", Quit),
-    //        });
-
-    //Application.Top.Add(statusBar);
-
-    ////Top.LayoutStyle = LayoutStyle.Computed;
-    //// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
-    //// BUGBUG: Dim.Fill returns too big a value sometimes.
-    //const string rule = "|123456789";
-    //var horizontalRuler = new Label("")
-    //{
-    //    X = 0,
-    //    Y = 0,
-    //    Width = Dim.Fill(),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
-    //    ColorScheme = Colors.Error
-    //};
-
-    //Win.Add(horizontalRuler);
-
-    //// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
-    //// TODO: Either build a custom control for this or implement linewrap in Label #352
-    //const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
-
-    //var verticalRuler = new Label("")
-    //{
-    //    X = 0,
-    //    Y = 0,
-    //    Width = 1,
-    //    Height = Dim.Fill(),
-    //    ColorScheme = Colors.Error
-    //};
-
-    //Win.LayoutComplete += (a) => {
-    //    horizontalRuler.Text = rule.Repeat((int)Math.Ceiling((double)(horizontalRuler.Bounds.Width) / (double)rule.Length))[0..(horizontalRuler.Bounds.Width)];
-    //    verticalRuler.Text = vrule.Repeat((int)Math.Ceiling((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length))[0..(verticalRuler.Bounds.Height * 2)];
-    //};
-
-    //Win.Add(verticalRuler);
-
-    //// Demonstrate At - Absolute Layout using Pos
-    //var absoluteButton = new Button("Absolute At(2,1)")
-    //{
-    //    X = Pos.At(2),
-    //    Y = Pos.At(1)
-    //};
-    //Win.Add(absoluteButton);
-
-    //// Demonstrate using Dim to create a window that fills the parent with a margin
-    //int margin = 10;
-    //var subWin = new Window($"Centered Sub Window with {margin} character margin")
-    //{
-    //    X = Pos.Center(),
-    //    Y = 2,
-    //    Width = Dim.Fill(margin),
-    //    Height = 7
-    //};
-    //Win.Add(subWin);
-
-    //int i = 1;
-    //string txt = "Resize the terminal to see computed layout in action.";
-    //var labelList = new List<View> { new Label($"The lines below show different TextAlignments") };
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-
-    //subWin.Add(labelList.ToArray());
-
-    // #522 repro?
-    //var frameView = new FrameView($"Directory View")
-    //{
-    //    X = 0,
-    //    Y = 0,
-    //    Width = Dim.Percent(10),
-    //    Height = Dim.Fill()
-    //};
-    //Win.Add(frameView);
-    //i = 1;
-    //labelList = new List<View>();
-    //labelList.Add(new Label($"The lines below show different TextAlignments"));
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //labelList.Add(new Label($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.Dialog });
-    //frameView.Add(labelList.ToArray());
-
-    // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
-    var textView = new TextView()
-    {
-        X = 0 + 2,
-        Y = 0,
-        Width = Dim.Fill(),
-        Height = Dim.Fill(),
-        ColorScheme = Colors.TopLevel,
-    };
-    textView.Text = File.ReadAllText("test.asm");
-    Win.Add(textView);
-
-    //// Demonstrate AnchorEnd - Button is anchored to bottom/right
-    //var anchorButton = new Button("Anchor End")
-    //{
-    //    Y = Pos.AnchorEnd() - 1,
-    //};
-    //// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-    //anchorButton.X = Pos.AnchorEnd() - (Pos.Right(anchorButton) - Pos.Left(anchorButton));
-    //anchorButton.Clicked += () => {
-    //    // Ths demonstrates how to have a dynamically sized button
-    //    // Each time the button is clicked the button's text gets longer
-    //    // The call to Win.LayoutSubviews causes the Computed layout to
-    //    // get updated. 
-    //    anchorButton.Text += "!";
-    //    Win.LayoutSubviews();
-    //};
-    //Win.Add(anchorButton);
+//    var menu = new MenuBar(new [] {
+//                fileMenu,
+//                settingsMenu
+//            });
+//    Application.Top.Add(menu);
 
 
-    //// Centering multiple controls horizontally. 
-    //// This is intentionally convoluted to illustrate potential bugs.
-    //var bottomLabel = new Label("This should be the 2nd to last line (Bug #xxx).")
-    //{
-    //    TextAlignment = Terminal.Gui.TextAlignment.Centered,
-    //    ColorScheme = Colors.Menu,
-    //    Width = Dim.Fill(),
-    //    X = Pos.Center(),
-    //    Y = Pos.AnchorEnd() - 2 // FIXED: -2 should be two lines above border; but it has to be -4
-    //};
-    //Win.Add(bottomLabel);
+//    // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
+//    var textView = new TextView()
+//    {
+//        X = 0 + 2,
+//        Y = 0,
+//        Width = Dim.Fill(),
+//        Height = Dim.Fill(),
+//        ColorScheme = Colors.TopLevel,
+//    };
+//    textView.Text = File.ReadAllText("test.asm");
+//    Win.Add(textView);
+//}
 
-    //// Show positioning vertically using Pos.Bottom 
-    //// BUGBUG: -1 should be just above border; but it has to be -3
-    //var leftButton = new Button("Left")
-    //{
-    //    Y = Pos.AnchorEnd() - 1
-    //};
-    //leftButton.Clicked += () => {
-    //    // Ths demonstrates how to have a dynamically sized button
-    //    // Each time the button is clicked the button's text gets longer
-    //    // The call to Win.LayoutSubviews causes the Computed layout to
-    //    // get updated. 
-    //    leftButton.Text += "!";
-    //    Win.LayoutSubviews();
-    //};
-
-
-    //// show positioning vertically using Pos.AnchorEnd
-    //var centerButton = new Button("Center")
-    //{
-    //    X = Pos.Center(),
-    //    Y = Pos.AnchorEnd() - 1
-    //};
-    //centerButton.Clicked += () => {
-    //    // Ths demonstrates how to have a dynamically sized button
-    //    // Each time the button is clicked the button's text gets longer
-    //    // The call to Win.LayoutSubviews causes the Computed layout to
-    //    // get updated. 
-    //    centerButton.Text += "!";
-    //    Win.LayoutSubviews();
-    //};
-
-    //// show positioning vertically using another window and Pos.Bottom
-    //var rightButton = new Button("Right")
-    //{
-    //    Y = Pos.Y(centerButton)
-    //};
-    //rightButton.Clicked += () => {
-    //    // Ths demonstrates how to have a dynamically sized button
-    //    // Each time the button is clicked the button's text gets longer
-    //    // The call to Win.LayoutSubviews causes the Computed layout to
-    //    // get updated. 
-    //    rightButton.Text += "!";
-    //    Win.LayoutSubviews();
-    //};
-
-    //// Center three buttons with 5 spaces between them
-    //// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-    //leftButton.X = Pos.Left(centerButton) - (Pos.Right(leftButton) - Pos.Left(leftButton)) - 5;
-    //rightButton.X = Pos.Right(centerButton) + 5;
-
-    //Win.Add(leftButton);
-    //Win.Add(centerButton);
-    //Win.Add(rightButton);
-}

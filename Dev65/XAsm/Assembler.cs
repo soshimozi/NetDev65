@@ -1,18 +1,53 @@
-﻿using System.Text;
+﻿using System.Dynamic;
+using System.Text;
 using Dev65.XApp;
 using Dev65.XObj;
 
 namespace Dev65.XAsm;
 
+public class AssemblerErrorEventArgs : EventArgs
+{
+    public string Message
+    {
+        get;
+    }
+
+
+    public Exception? Exception
+    {
+        get;
+    }
+
+
+    public AssemblerErrorEventArgs(string message, Exception? exception = null)
+    {
+        Message = message;
+        Exception = exception;
+    }
+}
+
+public class AssemblerWarningEventArgs : EventArgs
+{
+    public string Message { get; }
+
+    public AssemblerWarningEventArgs(string message)
+    {
+        Message = message;
+    }
+}
 
 public abstract class Assembler : Application, IAssembler
 {
+    public event EventHandler<AssemblerErrorEventArgs> AssemblerError;
+    public event EventHandler<AssemblerWarningEventArgs> AssemblerWarning;
+
     private static readonly TokenKind Operator = new("OPERATOR");
     protected static readonly TokenKind Symbol = new("SYMBOL");
     protected static readonly TokenKind Keyword = new("KEYWORD");
     protected static readonly TokenKind Number = new("NUMBER");
     protected static readonly TokenKind String = new("STRING");
     protected static readonly TokenKind Unknown = new("UNKNOWN");
+    protected static readonly TokenKind Error = new("ERROR");
 
     //protected Dictionary<string, Expr?> symbols = new();
 
@@ -722,25 +757,25 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode CODE = new(Keyword, ".CODE", assembler =>
+    protected static readonly Opcode CODE = new(Keyword, ".CODE", assembler =>
     {
         assembler.SetSection(".code");
         return (false);
     });
 
-    protected readonly Opcode DATA = new (Keyword, ".DATA", assembler =>
+    protected static readonly Opcode DATA = new (Keyword, ".DATA", assembler =>
     {
         assembler.SetSection(".data");
         return (false);
     });
 
-    protected readonly Opcode BSS = new (Keyword, ".BSS", assembler =>
+    protected static readonly Opcode BSS = new (Keyword, ".BSS", assembler =>
     {
         assembler.SetSection(".bss");
         return (false);
     });
 
-    protected readonly Opcode ORG = new (Keyword, ".ORG", assembler =>
+    public static readonly Opcode ORG = new (Keyword, ".ORG", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
@@ -754,7 +789,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    protected readonly Opcode EXTERN = new (Keyword, ".EXTERN", assembler =>
+    protected static readonly Opcode EXTERN = new (Keyword, ".EXTERN", assembler =>
     {
         if (assembler.Pass== Pass.FIRST)
         {
@@ -778,7 +813,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode GLOBAL = new(Keyword, ".GLOBAL", assembler =>
+    protected static readonly Opcode GLOBAL = new(Keyword, ".GLOBAL", assembler =>
     {
         if (assembler.Pass == Pass.FIRST)
         {
@@ -801,25 +836,25 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode LIST = new(Keyword, ".LIST", assembler =>
+    protected static readonly Opcode LIST = new(Keyword, ".LIST", assembler =>
     {
         assembler.Listing = true;
         return (false);
     });
 
-    protected readonly Opcode NOLIST = new(Keyword, ".NOLIST", assembler => 
+    protected static readonly Opcode NOLIST = new(Keyword, ".NOLIST", assembler => 
     {
             assembler.Listing = false;
             return (false);
     });
 
-    protected readonly Opcode PAGE = new(Keyword, ".PAGE", assembler => 
+    protected static readonly Opcode PAGE = new(Keyword, ".PAGE", assembler => 
     {
             assembler.ThrowPage = true;
             return (false);
     });
 
-    protected readonly Opcode TITLE = new(Keyword, ".TITLE", assembler => 
+    protected static readonly Opcode TITLE = new(Keyword, ".TITLE", assembler => 
     {
             assembler.CurrentToken = assembler.NextRealToken();
 
@@ -1298,7 +1333,7 @@ public abstract class Assembler : Application, IAssembler
 
     protected override void CleanUp()
     {
-        if (_errors > 0) Environment.Exit(-1);
+        //if (_errors > 0) Environment.Exit(-1);
     }
 
     /// <summary>
@@ -1839,7 +1874,10 @@ public abstract class Assembler : Application, IAssembler
     {
         var msg = $"Error: {_line?.FileName} ({_line?.LineNumber}) {message}";
 
-        Console.Error.WriteLine(msg);
+        //Console.Error.WriteLine(msg);
+
+        OnAssemblerError(new AssemblerErrorEventArgs(msg));
+
         if (Pass == Pass.FINAL)
             Paginate(msg);
 
@@ -1854,7 +1892,8 @@ public abstract class Assembler : Application, IAssembler
     {
         var msg = $"Warning: {_line?.FileName} ({_line?.LineNumber}) {message}";
 
-        Console.Error.WriteLine(msg);
+        //Console.Error.WriteLine(msg);
+        OnAssemblerWarning(new AssemblerWarningEventArgs(msg));
         if (Pass == Pass.FINAL)
             Paginate(msg);
     }
@@ -2239,4 +2278,13 @@ public abstract class Assembler : Application, IAssembler
     public HashSet<string> Externals { get; } = new();
     private Stack<Token> Tokens { get; } = new();
 
+    protected virtual void OnAssemblerError(AssemblerErrorEventArgs e)
+    {
+        AssemblerError?.Invoke(this, e);
+    }
+
+    protected virtual void OnAssemblerWarning(AssemblerWarningEventArgs e)
+    {
+        AssemblerWarning?.Invoke(this, e);
+    }
 }
