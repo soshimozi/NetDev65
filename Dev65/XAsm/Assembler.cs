@@ -7,7 +7,7 @@ namespace Dev65.XAsm;
 
 public abstract class Assembler : Application, IAssembler
 {
-    protected static readonly TokenKind Operator = new("OPERATOR");
+    private static readonly TokenKind Operator = new("OPERATOR");
     protected static readonly TokenKind Symbol = new("SYMBOL");
     protected static readonly TokenKind Keyword = new("KEYWORD");
     protected static readonly TokenKind Number = new("NUMBER");
@@ -16,111 +16,111 @@ public abstract class Assembler : Application, IAssembler
 
     //protected Dictionary<string, Expr?> symbols = new();
 
-    public static readonly Token WhiteSpace = new(Unknown, "#SPACE");
+    protected static readonly Token WhiteSpace = new(Unknown, "#SPACE");
 
-    public static readonly Opcode EOL = new(Unknown, "#EOL", _ => true);
+    protected static readonly Opcode EOL = new(Unknown, "#EOL", _ => true);
 
     /// <summary>
     /// A <see cref="Token"/> representing the origin (e.g. $ or @).
     /// </summary>
-    public static readonly Token OriginToken = new(Keyword, "ORIGIN");
+    protected static readonly Token OriginToken = new(Keyword, "ORIGIN");
 
     /// <summary>
     /// A <see cref="Token"/> representing a comma.
     /// </summary>
-    public static readonly Token Comma = new(Keyword, ",");
+    protected static readonly Token Comma = new(Keyword, ",");
 
     /// <summary>
     /// A <see cref="Token"/> representing a colon.
     /// </summary>
-    public static readonly Token Colon = new(Keyword, ":");
+    protected static readonly Token Colon = new(Keyword, ":");
 
     /// <summary>
     /// A <see cref="Token"/> representing addition.
     /// </summary>
-    public static readonly Token Plus = new(Keyword, "+");
+    protected static readonly Token Plus = new(Keyword, "+");
 
     /// <summary>
     /// A <see cref="Token"/> representing subtraction.
     /// </summary>
-    public static readonly Token Minus = new(Keyword, "-");
+    protected static readonly Token Minus = new(Keyword, "-");
 
     /// <summary>
     /// A <see cref="Token"/> representing multiply.
     /// </summary>
-    public static readonly Token Times = new(Keyword, "*");
+    protected static readonly Token Times = new(Keyword, "*");
 
     // Token representing divide.
-    public static readonly Token Divide = new(Operator, "/");
+    protected static readonly Token Divide = new(Operator, "/");
 
     // Token representing modulo.
-    public static readonly Token Modulo = new(Operator, "%");
+    protected static readonly Token Modulo = new(Operator, "%");
 
     // Token representing complement.
-    public static readonly Token Complement = new(Operator, "~");
+    protected static readonly Token Complement = new(Operator, "~");
 
     // Token representing binary and.
-    public static readonly Token BinaryAnd = new(Operator, "&");
+    protected static readonly Token BinaryAnd = new(Operator, "&");
 
     // Token representing binary or.
-    public static readonly Token BinaryOr = new(Operator, "|");
+    protected static readonly Token BinaryOr = new(Operator, "|");
 
     // Token representing binary xor.
-    public static readonly Token BinaryXor = new(Operator, "^");
+    protected static readonly Token BinaryXor = new(Operator, "^");
 
     // Token representing logical not.
-    public static readonly Token LogicalNot = new(Operator, "!");
+    protected static readonly Token LogicalNot = new(Operator, "!");
 
     // Token representing logical and.
-    public static readonly Token LogicalAnd = new(Operator, "&&");
+    protected static readonly Token LogicalAnd = new(Operator, "&&");
 
     // Token representing logical or.
-    public static readonly Token LogicalOr = new(Operator, "||");
+    protected static readonly Token LogicalOr = new(Operator, "||");
 
     // Token representing equal.
-    public static readonly Token EQ = new(Operator, "=");
+    private static readonly Token EQ = new(Operator, "=");
 
     // Token representing not equal.
-    public static readonly Token NE = new(Operator, "!=");
+    private static readonly Token NE = new(Operator, "!=");
 
     // Token representing less than.
-    public static readonly Token Lt = new(Operator, "<");
+    protected static readonly Token Lt = new(Operator, "<");
 
     // Token representing less than or equal.
-    public static readonly Token Le = new(Operator, "<=");
+    protected static readonly Token Le = new(Operator, "<=");
 
     // Token representing greater than.
-    public static readonly Token Gt = new(Operator, ">");
+    protected static readonly Token Gt = new(Operator, ">");
 
     // Token representing greater than or equal.
-    public static readonly Token Ge = new(Operator, ">=");
+    protected static readonly Token Ge = new(Operator, ">=");
 
     // Token representing a left shift.
-    public static readonly Token LShift = new(Operator, "<<");
+    protected static readonly Token LShift = new(Operator, "<<");
 
     // Token representing a right shift.
-    public static readonly Token RShift = new(Operator, ">>");
+    protected static readonly Token RShift = new(Operator, ">>");
 
     // Token representing an opening parenthesis.
-    public static readonly Token LParen = new(Operator, "(");
+    protected static readonly Token LParen = new(Operator, "(");
 
     // Token representing a closing parenthesis.
-    public static readonly Token RParen = new(Operator, ")");
+    protected static readonly Token RParen = new(Operator, ")");
 
     // Token representing the LO function.
-    public static readonly Token LO = new(Keyword, "LO");
+    protected static readonly Token LO = new(Keyword, "LO");
 
     // Token representing the HI function.
-    public static readonly Token HI = new(Keyword, "HI");
+    protected static readonly Token HI = new(Keyword, "HI");
 
     // Token representing the STRLEN function.
-    public static readonly Token STRLEN = new(Keyword, "STRLEN");
+    protected static readonly Token STRLEN = new(Keyword, "STRLEN");
 
     // Token representing the BANK function.
-    public static readonly Token BANK = new(Keyword, "BANK");
+    protected static readonly Token BANK = new(Keyword, "BANK");
 
     // Opcode that handles .INCLUDE directives.
-    public static readonly Token INCLUDE = new Opcode(Keyword, ".INCLUDE",
+    protected static readonly Token INCLUDE = new Opcode(Keyword, ".INCLUDE",
         assembler =>
         {
             assembler.CurrentToken = assembler.NextRealToken();
@@ -150,7 +150,7 @@ public abstract class Assembler : Application, IAssembler
     /**
 	 * An <CODE>Opcode</CODE> that handles .APPEND directives
 	 */
-    public static readonly Token APPEND = new Opcode(Keyword, ".APPEND", assembler => 
+    protected static readonly Token APPEND = new Opcode(Keyword, ".APPEND", assembler => 
     {
             if (assembler.CurrentToken?.Kind == String)
             {
@@ -171,7 +171,7 @@ public abstract class Assembler : Application, IAssembler
             return (false);
     });
 
-    public static readonly Token INSERT = new Opcode(Keyword, ".INSERT", assembler =>
+    protected static readonly Token INSERT = new Opcode(Keyword, ".INSERT", assembler =>
     {
         if (assembler.CurrentToken?.Kind == String)
         {
@@ -204,12 +204,12 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    public static readonly Opcode End = new(Keyword, ".END", assembler => {
+    protected static readonly Opcode End = new(Keyword, ".END", assembler => {
         assembler.Sources.Clear();
         return false;
     });
 
-    public static readonly Opcode Equ = new(Keyword, ".EQU", assembler =>
+    protected static readonly Opcode Equ = new(Keyword, ".EQU", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         assembler.Addr = assembler.ParseExpression();
@@ -241,7 +241,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    public static readonly Opcode Set = new(Keyword, ".SET", assembler =>
+    protected static readonly Opcode Set = new(Keyword, ".SET", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         assembler.Addr = assembler.ParseExpression();
@@ -270,7 +270,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    public static readonly Opcode Space = new(Keyword, ".SPACE", assembler =>
+    protected static readonly Opcode Space = new(Keyword, ".SPACE", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
@@ -293,7 +293,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode Align = new(Keyword, ".ALIGN", assembler =>
+    protected static readonly Opcode Align = new(Keyword, ".ALIGN", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
@@ -312,7 +312,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode Dcb = new(Keyword, ".DCB", assembler =>
+    protected static readonly Opcode Dcb = new(Keyword, ".DCB", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
@@ -346,7 +346,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode Byte = new(Keyword, ".BYTE", assembler =>
+    protected static readonly Opcode Byte = new(Keyword, ".BYTE", assembler =>
     {
         do
         {
@@ -375,7 +375,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode DByte = new(Keyword, ".DBYTE", assembler =>
+    protected static readonly Opcode DByte = new(Keyword, ".DBYTE", assembler =>
     {
         do
         {
@@ -395,7 +395,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode Word = new(Keyword, ".WORD", assembler =>
+    protected static readonly Opcode Word = new(Keyword, ".WORD", assembler =>
     {
         do
         {
@@ -412,7 +412,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode LONG = new(Keyword, ".LONG", assembler =>
+    protected static readonly Opcode LONG = new(Keyword, ".LONG", assembler =>
     {
         do
         {
@@ -429,7 +429,7 @@ public abstract class Assembler : Application, IAssembler
         return (true);
     });
 
-    public static readonly Opcode IF = new(Keyword, ".IF", assembler =>
+    protected static readonly Opcode IF = new(Keyword, ".IF", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -457,7 +457,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Opcode IFABS = new(Keyword, ".IFABS", assembler =>
+    protected static readonly Opcode IFABS = new(Keyword, ".IFABS", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -479,7 +479,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Opcode IFNABS = new(Keyword, ".IFNABS", assembler =>
+    protected static readonly Opcode IFNABS = new(Keyword, ".IFNABS", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -501,7 +501,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Opcode IFREL = new(Keyword, ".IFREL", assembler =>
+    protected static readonly Opcode IFREL = new(Keyword, ".IFREL", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -523,7 +523,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Opcode IFNREL = new(Keyword, ".IFNREL", assembler =>
+    protected static readonly Opcode IFNREL = new(Keyword, ".IFNREL", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -545,7 +545,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Opcode IFDEF = new (Keyword, ".IFDEF", assembler =>
+    protected static readonly Opcode IFDEF = new (Keyword, ".IFDEF", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -566,7 +566,7 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    public static readonly Opcode IFNDEF = new(Keyword, ".IFNDEF", assembler =>
+    protected static readonly Opcode IFNDEF = new(Keyword, ".IFNDEF", assembler =>
     {
         if (assembler.IsActive)
         {
@@ -587,12 +587,12 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    public static readonly Opcode ELSE = new(Keyword, ".ELSE", assembler =>
+    protected static readonly Opcode ELSE = new(Keyword, ".ELSE", assembler =>
     {
         if (assembler.Status.Count != 0)
         {
             var state = assembler.Status.Pop();
-            assembler.Status.Push((assembler.IsActive && !state) ? true : false);
+            assembler.Status.Push(assembler.IsActive && !state);
         }
         else
             assembler.OnError(ErrorMessage.ERR_NO_OPEN_IF);
@@ -600,7 +600,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Opcode ENDIF = new(Keyword, ".ENDIF", assembler =>
+    protected static readonly Opcode ENDIF = new(Keyword, ".ENDIF", assembler =>
     {
         if (assembler.Status.Count != 0)
             assembler.Status.Pop();
@@ -611,24 +611,19 @@ public abstract class Assembler : Application, IAssembler
     }, true);
 
 
-    public static readonly Opcode ERROR = new(Keyword, ".ERROR", assembler =>
+    protected static readonly Opcode ERROR = new(Keyword, ".ERROR", assembler =>
     {
-        if (assembler.IsActive)
-        {
-            assembler.CurrentToken = assembler.NextRealToken();
-            if (assembler.CurrentToken?.Kind == String)
-            {
-                assembler.OnError(assembler.CurrentToken.Text);
-            }
-            else
-                assembler.OnError(ErrorMessage.ERR_EXPECTED_QUOTED_MESSAGE);
-        }
+        if (!assembler.IsActive) return (false);
+        assembler.CurrentToken = assembler.NextRealToken();
+        assembler.OnError(assembler.CurrentToken?.Kind == String
+            ? assembler.CurrentToken.Text
+            : ErrorMessage.ERR_EXPECTED_QUOTED_MESSAGE);
 
         return (false);
     }, true);
 
 
-    public static readonly Opcode WARN = new(Keyword, ".WARN", assembler =>
+    protected static readonly Opcode WARN = new(Keyword, ".WARN", assembler =>
     {
         if (!assembler.IsActive) return (false);
 
@@ -643,7 +638,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     }, true);
 
-    public static readonly Token MACRO = new Opcode(Keyword, ".MACRO", assembler =>
+    protected static readonly Token MACRO = new Opcode(Keyword, ".MACRO", assembler =>
     {
         if ((assembler.Label != null) && ((assembler.MacroName = assembler.Label.Text) != null))
         {
@@ -678,11 +673,11 @@ public abstract class Assembler : Application, IAssembler
 
     });
 
-    public static readonly Token ENDM = new Opcode(Keyword, ".ENDM", assembler =>
+    protected static readonly Token ENDM = new Opcode(Keyword, ".ENDM", assembler =>
     {
         if (assembler.SavedLines != null)
         {
-            assembler.Macros.Add(assembler.MacroName, assembler.SavedLines);
+            assembler.Macros.Add(assembler.MacroName ?? string.Empty, assembler.SavedLines);
             assembler.SavedLines = null;
         }
         else
@@ -691,7 +686,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    public static readonly Token EXITM = new Opcode(Keyword, ".EXITM", assembler =>
+    protected static readonly Token EXITM = new Opcode(Keyword, ".EXITM", assembler =>
     {
         while (assembler.Sources.Peek() is MacroSource)
             assembler.Sources.Pop();
@@ -699,7 +694,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    public static readonly Token REPEAT = new Opcode(Keyword, ".REPEAT", assembler =>
+    protected static readonly Token REPEAT = new Opcode(Keyword, ".REPEAT", assembler =>
     {
         assembler.CurrentToken = assembler.NextRealToken();
         var expr = assembler.ParseExpression();
@@ -714,7 +709,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    public static readonly Token ENDR = new Opcode(Keyword, ".ENDR", assembler =>
+    protected static readonly Token ENDR = new Opcode(Keyword, ".ENDR", assembler =>
     {
         if (assembler.SavedLines != null)
         {
@@ -783,7 +778,7 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode GLOBAL = new Opcode(Keyword, ".GLOBAL", assembler =>
+    protected readonly Opcode GLOBAL = new(Keyword, ".GLOBAL", assembler =>
     {
         if (assembler.Pass == Pass.FIRST)
         {
@@ -806,29 +801,29 @@ public abstract class Assembler : Application, IAssembler
         return (false);
     });
 
-    protected readonly Opcode LIST = new Opcode(Keyword, ".LIST", assembler =>
+    protected readonly Opcode LIST = new(Keyword, ".LIST", assembler =>
     {
         assembler.Listing = true;
         return (false);
     });
 
-    protected readonly Opcode NOLIST = new Opcode(Keyword, ".NOLIST", assembler => 
+    protected readonly Opcode NOLIST = new(Keyword, ".NOLIST", assembler => 
     {
             assembler.Listing = false;
             return (false);
     });
 
-    protected readonly Opcode PAGE = new Opcode(Keyword, ".PAGE", assembler => 
+    protected readonly Opcode PAGE = new(Keyword, ".PAGE", assembler => 
     {
             assembler.ThrowPage = true;
             return (false);
     });
 
-    protected Opcode TITLE = new Opcode(Keyword, ".TITLE", assembler => 
+    protected readonly Opcode TITLE = new(Keyword, ".TITLE", assembler => 
     {
             assembler.CurrentToken = assembler.NextRealToken();
 
-            assembler.Title = assembler?.CurrentToken?.Text;
+            assembler.Title = assembler.CurrentToken?.Text;
             return (false);
     });
 
@@ -900,7 +895,7 @@ public abstract class Assembler : Application, IAssembler
     public Dictionary<string, TextSource> Macros { get; } = new();
     public Dictionary<string, Section?> Sections { get; } = new();
     public bool ThrowPage { get; set; }
-    public Module? Module { get; set; }
+    protected Module? Module { get; }
     public Section? Section { get; set; }
     public HashSet<string> Globals { get; } = new();
     public string? SectionName { get; set; }
@@ -1323,7 +1318,7 @@ public abstract class Assembler : Application, IAssembler
         Sections.Add(".bss", Module?.FindSection(".bss"));
     }
 
-    protected void Process()
+    private void Process()
     {
         while ((Sources.Count != 0))
         {
@@ -1352,30 +1347,33 @@ public abstract class Assembler : Application, IAssembler
     /// <returns>The string to add to the listing.</returns>
     protected abstract string FormatListing();
 
-    protected string ExpandText()
+    private string ExpandText()
     {
         Buffer.Clear();
+
+        var text = _text ?? Array.Empty<char>();
         for (var index = 0; index < _text?.Length; ++index)
         {
-            if (_text[index] == '\t')
+            if (text[index] == '\t')
             {
                 do
                 {
                     Buffer.Append(" ");
-                } while (Buffer.Length % ERR_TAB_SIZE != 0);
+                } while (Buffer.Length % TabSize != 0);
             }
-            else
-                Buffer.Append(_text[index]);
+            else Buffer.Append(text[index]);
         }
+
         return (Buffer.ToString());
+        
     }
 
     /// <summary>
-    /// Initialises the tokeniser to process the given nextLine. This method is
+    /// Initializes the tokenizer to process the given nextLine. This method is
     /// overloaded in derived classes.
     /// </summary>
     /// <param name="nextLine">The next <see cref="Line"/> to be processed.</param>
-    protected virtual void Process(Line nextLine)
+    private void Process(Line nextLine)
     {
         LineType = Sources.Peek() is TextSource ? '+' : ' ';
 
@@ -1638,7 +1636,6 @@ public abstract class Assembler : Application, IAssembler
     /// <summary>
     /// Determines if the <see cref="Assembler"/> supports the given pass.
     /// </summary>
-    /// <param name="pass">The assembler pass.</param>
     /// <returns>True if pass is supported, False otherwise</returns>
     protected abstract bool IsSupportedPass(Pass pass);
 
@@ -1647,13 +1644,13 @@ public abstract class Assembler : Application, IAssembler
     /// </summary>
     /// <param name="fileName">The name of the file to process.</param>
     /// <returns>True if the assembly succeeded with no errors</returns>
-    protected bool Assemble(string fileName)
+    private void Assemble(string fileName)
     {
-        if (!Assemble(Pass.FIRST, fileName)) return (false);
-        if (!Assemble(Pass.INTERMEDIATE, fileName)) return (false);
-        if (!Assemble(Pass.INTERMEDIATE, fileName)) return (false);
-        if (!Assemble(Pass.INTERMEDIATE, fileName)) return (false);
-        if (!Assemble(Pass.FINAL, fileName)) return (false);
+        if (!Assemble(Pass.FIRST, fileName)) return;
+        if (!Assemble(Pass.INTERMEDIATE, fileName)) return;
+        if (!Assemble(Pass.INTERMEDIATE, fileName)) return;
+        if (!Assemble(Pass.INTERMEDIATE, fileName)) return;
+        if (!Assemble(Pass.FINAL, fileName)) return;
 
         // Add globally define symbols to the object module. 
         foreach (var name in Globals)
@@ -1721,7 +1718,7 @@ public abstract class Assembler : Application, IAssembler
             string lhs;
             string rhs;
 
-            // Format name sice
+            // Format name slice
             var name = keys[index];
 
             var expr = Symbols.GetValueOrDefault(name);
@@ -1758,8 +1755,7 @@ public abstract class Assembler : Application, IAssembler
         }
 
         _listFile?.Close();
-
-        return (_errors == 0);
+        _listFile = null;
     }
 
     /**
@@ -1795,7 +1791,7 @@ public abstract class Assembler : Application, IAssembler
         {
             if (pass == Pass.FINAL)
             {
-                _listFile = new StreamWriter(File.OpenWrite(GetListingFile(fileName)), Encoding.GetEncoding("ISO-8859-1"));
+                _listFile = new StreamWriter(File.Create(GetListingFile(fileName)), Encoding.GetEncoding("ISO-8859-1"));
             }
 
             Sources.Push(new FileSource(fileName, new FileStream(fileName, FileMode.Open)));
@@ -1822,7 +1818,8 @@ public abstract class Assembler : Application, IAssembler
     /// actions to take place.
     /// </summary>
     protected virtual void EndPass()
-    { }
+    {
+    }
 
     /// <summary>
     /// Fetches the next source nextLine from the current source.
@@ -1914,7 +1911,7 @@ public abstract class Assembler : Application, IAssembler
             _listFile.WriteLine();
         }
 
-        if (!ThrowPage && (++_lineCount != (ERR_LINES_PER_PAGE - 3))) return;
+        if (!ThrowPage && (++_lineCount != (LinesPerPage - 3))) return;
         _listFile.Write('\f');
         _lineCount = 0;
         ThrowPage = false;
@@ -1937,7 +1934,7 @@ public abstract class Assembler : Application, IAssembler
     /// </summary>
     /// <param name="filename">The source file name</param>
     /// <returns>The name of the list file</returns>
-    public static string GetListingFile(string filename)
+    private static string GetListingFile(string filename)
     {
         return Path.ChangeExtension(filename, "lst");
     }
@@ -2152,7 +2149,7 @@ public abstract class Assembler : Application, IAssembler
     protected MemoryModel? Memory;
 
     // Tab expansion size.
-    private const int ERR_TAB_SIZE = 8;
+    private const int TabSize = 8;
 
     // Flag determining listing on/off state
     private bool _listing;
@@ -2161,7 +2158,7 @@ public abstract class Assembler : Application, IAssembler
     private int _lineCount;
 
     // The number of lines on a page (A4 = 60)
-    private const int ERR_LINES_PER_PAGE = 60;
+    private const int LinesPerPage = 60;
 
     // Writer assigned to listing file in final pass.
     private StreamWriter? _listFile;
@@ -2240,6 +2237,6 @@ public abstract class Assembler : Application, IAssembler
 
     public HashSet<string> NotLocal { get; } = new();
     public HashSet<string> Externals { get; } = new();
-    public Stack<Token> Tokens { get; } = new();
+    private Stack<Token> Tokens { get; } = new();
 
 }

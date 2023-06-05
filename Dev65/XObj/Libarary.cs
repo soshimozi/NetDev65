@@ -10,58 +10,58 @@ namespace Dev65.XObj;
  */
 public sealed class Library
 {
-    private List<Module> modules = new List<Module>();
+    private readonly List<Module?> _modules = new();
 
     public Library()
     { }
 
     public void Clear()
     {
-        modules.Clear();
+        _modules.Clear();
     }
 
-    public void AddModule(Module module)
+    public void AddModule(Module? module)
     {
-        modules.Add(module);
+        _modules.Add(module);
     }
 
     public bool UpdateModule(Module module)
     {
-        for (var index = 0; index < modules.Count; ++index)
+        for (var index = 0; index < _modules.Count; ++index)
         {
-            var target = modules[index];
+            var target = _modules[index];
 
-            if (target.Name == module.Name)
+            if (target?.Name == module.Name)
             {
-                modules[index] = module;
+                _modules[index] = module;
                 return true;
             }
         }
-        modules.Add(module);
+        _modules.Add(module);
         return false;
     }
 
     public bool RemoveModule(Module module)
     {
-        for (var index = 0; index < modules.Count; ++index)
+        for (var index = 0; index < _modules.Count; ++index)
         {
-            var target = modules[index];
+            var target = _modules[index];
 
-            if (target.Name == module.Name)
+            if (target?.Name == module.Name)
             {
-                modules.RemoveAt(index);
+                _modules.RemoveAt(index);
                 return true;
             }
         }
         return false;
     }
 
-    public Module[] GetModules()
+    public Module?[] GetModules()
     {
-        var result = new Module[modules.Count];
+        var result = new Module?[_modules.Count];
 
-        for (var index = 0; index < modules.Count; ++index)
-            result[index] = modules[index];
+        for (var index = 0; index < _modules.Count; ++index)
+            result[index] = _modules[index];
 
         return result;
     }
@@ -74,7 +74,7 @@ public sealed class Library
         var buffer = new StringBuilder();
 
         buffer.Append("<library>");
-        foreach (var module in modules)
+        foreach (var module in _modules)
             buffer.Append(module);
         buffer.Append("</library>");
 

@@ -5,7 +5,7 @@
 /// </summary>
 public sealed class SectionMap
 {
-    private readonly Dictionary<Section, long> map = new Dictionary<Section, long>();
+    private readonly Dictionary<Section, long> _map = new();
 
     /// <summary>
     /// Determines the base address of the given <see cref="Section"/>.
@@ -14,12 +14,12 @@ public sealed class SectionMap
     /// <returns>The base address of the section.</returns>
     public long BaseAddressOf(Section section)
     {
-        return map[section];
+        return _map[section];
     }
 
     public void SetBaseAddress(Section section, long addr)
     {
-        map[section] = addr;
+        _map[section] = addr;
     }
 
     /// <summary>
@@ -28,6 +28,6 @@ public sealed class SectionMap
     /// <returns>A list of all the code sections.</returns>
     public List<Section> GetSections()
     {
-        return map.Keys.ToList();
+        return _map.Keys.ToList();
     }
 }

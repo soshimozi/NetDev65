@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// </summary>
 public sealed class SymbolMap
 {
-    private Dictionary<string, long> map = new Dictionary<string, long>();
+    private readonly Dictionary<string, long> _map = new Dictionary<string, long>();
 
     /// <summary>
     /// Adds an entry to the lookup table for the given symbol and address.
@@ -15,7 +15,7 @@ public sealed class SymbolMap
     /// <param name="value">Its memory address.</param>
     public void AddAddress(string name, long value)
     {
-        map[name] = value;
+        _map[name] = value;
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public sealed class SymbolMap
     /// <returns>The associated memory address.</returns>
     public long AddressOf(string name)
     {
-        return map[name];
+        return _map[name];
     }
 
     /// <summary>
@@ -34,6 +34,6 @@ public sealed class SymbolMap
     /// <returns>A list of symbol names.</returns>
     public List<string> GetSymbols()
     {
-        return new List<string>(map.Keys);
+        return new List<string>(_map.Keys);
     }
 }
